@@ -7,7 +7,7 @@ constexpr char kPlayerSymbol = '@';
 
 int GetIndexFromCoordinates(int x, int y, int width);
 void DrawLevel(char level[], int width, int height, int playerX, int playerY);
-void UpdatePlayerPosition(int& playerX, int& playerY);
+bool UpdatePlayerPosition(char level[], int& playerX, int& playerY, int width, bool& playerHasKey);
 
 int main()
 {
@@ -32,14 +32,20 @@ int main()
 
 	int playerX = 1;
 	int playerY = 1;
+	bool playerHasKey = false;
+	bool gameOver = false;
 
-	while (true)
+
+	while (!gameOver)
 	{
 		system("cls");
 		DrawLevel(levelArray, kWidth, kHeight, playerX, playerY);
-		UpdatePlayerPosition(playerX, playerY);
+		gameOver = UpdatePlayerPosition(levelArray, playerX, playerY, kWidth, playerHasKey);
 	}
-	
+	system("cls");
+	DrawLevel(levelArray, kWidth, kHeight, playerX, playerY);
+	cout << "YOU WIN." << endl;
+
 }
 
 
@@ -69,37 +75,70 @@ void DrawLevel(char level[], int width, int height, int playerX, int playerY)
 	}
 }
 
-void UpdatePlayerPosition(int& playerX, int& playerY)
+bool UpdatePlayerPosition(char level[], int& playerX, int& playerY, int width, bool& playerHasKey)
 {
 	char input = _getch();
+
+	int newPlayerX = playerX;
+	int newPlayerY = playerY;
 
 	switch (input)
 	{
 		case 'w':
 		case 'W':
 		{
-			playerY--;
+			newPlayerY--;
 			break;
 		}
 		case 's':
 		case 'S':
 		{
-			playerY++;
+			newPlayerY++;
 			break;
 		}
 		case 'a':
 		case 'A':
 		{
-			playerX--;
+			newPlayerX--;
 			break;
 		}
 		case 'd':
 		case 'D':
 		{
-			playerX++;
+			newPlayerX++;
 			break;
 		}
 		default:
 			break;
 	}
+
+	int index = GetIndexFromCoordinates(newPlayerX, newPlayerY, width);
+	if (level[index] == ' ')
+	{
+		playerX = newPlayerX;
+		playerY = newPlayerY;
+	}
+	else if (level[index] == '*')
+	{
+		playerHasKey = true;
+		level[index] = ' ';
+		playerX = newPlayerX;
+		playerY = newPlayerY;
+	}
+	else if (level[index] == 'D' && playerHasKey)
+	{
+		level[index] = ' ';
+		playerHasKey = false;
+		playerX = newPlayerX;
+		playerY = newPlayerY;
+	}
+	else if (level[index] == 'X')
+	{
+		level[index] = ' ';
+		playerX = newPlayerX;
+		playerY = newPlayerY;
+		return true;
+	}
+	return false;
+
 }
