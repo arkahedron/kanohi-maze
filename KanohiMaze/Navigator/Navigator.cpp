@@ -113,21 +113,26 @@ bool ConvertLevel(char* level, int width, int height, int& playerX, int& playerY
 
 			switch (level[index])
 			{
-				case'+':
-				case'-':
-				case'|':
+				case '+':
+				case '-':
+				case '|':
+				case 'o':
 					level[index] = WAL;
 					break;
 				case '*':
+				case 'k':
 					level[index] = KEY;
 					break;
 				case 'D':
+				case 'd':
 					level[index] = DOR;
 					break;
 				case 'X':
+				case 'x':
 					level[index] = GOL;
 					break;
 				case '@':
+				case 'p':
 					level[index] = ' ';
 					playerX = x;
 					playerY = y;
