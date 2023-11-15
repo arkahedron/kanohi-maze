@@ -53,6 +53,8 @@ bool DoBinaryAction();
 void PrintMainText(string mainText);
 void PrintSubText(string subText);
 
+void OpenInventory();
+
 //Global variable initializers
 char mainInput = ' ';
 string mainText = " ";
@@ -98,12 +100,12 @@ int main()
 			{
 				system("cls");
 				DrawLevel(levelArray, width, height, playerX, playerY, playerHasKey);
+				cout << " > Inventory: TAB" << endl;
 				gameOver = UpdatePlayerPosition(levelArray, playerX, playerY, width, playerHasKey);
 			}
 			else if (isInventoryMode)
 			{
-				system("cls");
-
+				OpenInventory();
 			}
 			else {}
 		}
@@ -111,22 +113,23 @@ int main()
 		system("cls");
 		DrawLevel(levelArray, width, height, playerX, playerY, playerHasKey);
 
-		//End Game
+
+		//End game and prompt new level
 		PlayWinEffect();
 		PrintMainText("YOU WIN");
 		delete[] levelArray;
-
 		mainText = "PLAY AGAIN?";
 		continuePlaying = DoBinaryAction();
 		gameOver = false;
 	} while (continuePlaying);
+	cout << " exiting game..." << endl;
 }
 
 
 //Level initializers
 string SelectLevelFromList() 
 {
-	cout << "What level would you like to load?" << endl;
+	cout << " What level would you like to load?" << endl;
 
 	string selectedLevel;
 	int levelNum = 0;
@@ -153,7 +156,7 @@ string SelectLevelFromList()
 		return levelInput;
 	}
 	else {
-		cout << "No valid levels found!" << endl;
+		cout << " No valid levels found!" << endl;
 	}
 }
 char* LoadLevel(string levelName, int& width, int& height)
@@ -421,6 +424,27 @@ void PrintSubText(string subText)
 	DrawLevel(levelArray, width, height, playerX, playerY, playerHasKey);
 	cout << endl << "  [" << subText << "]" << endl;
 	system("pause");
+}
+
+void OpenInventory() 
+{
+	system("cls");
+	cout << "---{ INVENTORY }---" << endl;
+	if (playerHasKey) {
+		cout << endl << "- KEY" << endl;
+	}
+
+	cout << endl << " > Map: TAB" << endl;
+	char input = _getch();
+	switch (input)
+	{
+	case '\t':
+		isMapMode = true;
+		isInventoryMode = false;
+		break;
+	default:
+		break;
+	}
 }
 
 //Play state effects
