@@ -5,7 +5,7 @@
 
 using namespace std;
 
-constexpr char kCursor = '_';
+constexpr char kCursor = 197;
 
 //Border character definitions
 constexpr char kTopRightBorder = 187;
@@ -75,7 +75,7 @@ void SaveLevel(char* pLevel, int width, int height)
 	string levelName;
 	cin >> levelName;
 
-	levelName.insert(0, "../");
+	levelName.insert(0, "../Levels/");
 
 	ofstream levelFile;
 	levelFile.open(levelName);
@@ -128,8 +128,8 @@ bool EditLevel(char* pLevel, int& cursorX, int& cursorY, int width, int height)
 			newCursorX = width - 1;
 		if (newCursorY < 0)
 			newCursorY = 0;
-		else if (newCursorY == width)
-			newCursorY = width - 1;
+		else if (newCursorY == height)
+			newCursorY = height - 1;
 
 		cursorX = newCursorX;
 		cursorY = newCursorY;
