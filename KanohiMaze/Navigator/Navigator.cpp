@@ -4,8 +4,13 @@
 #include <windows.h>
 #include <fstream>
 #include <vector>
+#include <random>
 
 using namespace std;
+
+using u32 = uint_least32_t;
+using engine = std::mt19937;
+int RNGen(int min, int max);
 
 string defaultLevel = "Cavern.txt";
 bool manualLevelSelect;
@@ -16,7 +21,17 @@ constexpr char KEY = 126;
 constexpr char MAT = 127;
 constexpr char DOR = 177;
 constexpr char GOL = 234;
-constexpr int kBaseColor = 7;
+constexpr int colorBase = 7;
+constexpr int colorKey = 14;
+constexpr int colorMat = 3;
+//Border symbols
+constexpr char kHorizontalBorder = 205;
+constexpr char kTopLeftBorder = 201;
+constexpr char kTopRightBorder = 187;
+constexpr char kBottomLeftBorder = 200;
+constexpr char kBottomRightBorder = 188;
+constexpr char kVerticalBorder = 186;
+constexpr char kHole = 206;
 
 
 //Level construction
@@ -46,6 +61,7 @@ bool BinaryInput(string prompt, bool wipe);
 void PrintMainText(string mainText);
 void PrintSubText(string subText);
 void OpenMenu();
+int BuildDoorway();
 
 
 //Global variable initializers
@@ -78,7 +94,7 @@ int main()
 	cout << " ---{ WELCOME TO KANOHI MAZE }---" << endl;
 
 	do {
-		manualLevelSelect = BinaryInput(" Select Level Manually?", false);
+		manualLevelSelect = BinaryInput("Select Level Manually?", false);
 
 		//Select, import, and convert level, then check for errors
 		string levelName = SelectLevelFromList(manualLevelSelect);
@@ -129,6 +145,20 @@ int main()
 	cout << " exiting game..." << endl;
 }
 
+int RNGen(int min, int max)
+{
+	int randResult;
+	random_device os_seed;
+	const u32 seed = os_seed();
+	engine generator(seed);
+	uniform_int_distribution< u32 > distribute(min, max);
+	randResult = distribute(generator);
+
+	return randResult;
+}
+
+int holeX;
+int holeY;
 
 //Level initializers
 string SelectLevelFromList(bool manualSelect) 
@@ -227,6 +257,15 @@ bool ConvertLevel(char* level, int width, int height, int& playerX, int& playerY
 				case 'X':
 				case 'x':
 					level[index] = GOL;
+					holeY = y;
+					holeX = x;
+					/*
+					if (y == height) { holeY = y; holeX = x;}
+					else if (y == 0) { holeY = y; holeX = x;}
+					else if (x == width) { holeY = y; holeX = x; }
+					else if (x == 0) { holeY = y; holeX = x; }
+					*/
+
 					break;
 				case '@':
 				case 'p':
@@ -260,14 +299,17 @@ void DrawLevel(char level[], int width, int height, int playerX, int playerY, in
 
 	for (int y = 0; y < height; y++)
 	{
-		DisplayLeftBorder();
+		SetConsoleTextAttribute(console, colorBase);
+		cout << "  ";
+		if (holeX == 0 && holeY == y) { cout << kHole;}
+		else { DisplayLeftBorder(); }
 
 		for (int x = 0; x < width; x++)
 		{
 			if (playerX == x && playerY == y) {
 				SetConsoleTextAttribute(console, 11);
 				cout << kPlayerSymbol;
-				SetConsoleTextAttribute(console, kBaseColor);
+				SetConsoleTextAttribute(console, colorBase);
 			}
 			else
 			{
@@ -277,14 +319,17 @@ void DrawLevel(char level[], int width, int height, int playerX, int playerY, in
 					if (keyAmount>0) { SetConsoleTextAttribute(console, 2); }
 					else{ SetConsoleTextAttribute(console, 4); }
 				}
-				else if (level[indexToPrint] == MAT) { SetConsoleTextAttribute(console, 3); }
+				else if (level[indexToPrint] == MAT) { SetConsoleTextAttribute(console, colorMat); }
 				else if (level[indexToPrint] == GOL) { SetConsoleTextAttribute(console, 13); }
-				else if (level[indexToPrint] == KEY) { SetConsoleTextAttribute(console, 14); }
-				else { SetConsoleTextAttribute(console, kBaseColor); }
+				else if (level[indexToPrint] == KEY) { SetConsoleTextAttribute(console, colorKey); }
+				else { SetConsoleTextAttribute(console, colorBase); }
 				cout << level[indexToPrint];
+				SetConsoleTextAttribute(console, colorBase);
 			}
 		}
-		DisplayRightBorder();
+		if (holeX == width-1 && holeY == y) { cout << kHole << endl; }
+		else { DisplayRightBorder(); }
+		
 	}
 	DisplayBottomBorder(width);
 }
@@ -432,15 +477,15 @@ void OpenMenu()
 
 	if (keyAmount) {
 		cout << endl << " - x" << keyAmount;
-		SetConsoleTextAttribute(console, 14);
+		SetConsoleTextAttribute(console, colorKey);
 		cout << " KEY";
-		SetConsoleTextAttribute(console, kBaseColor);
+		SetConsoleTextAttribute(console, colorBase);
 	}
 	if (matAmount > 0) { 
 		cout << endl << " - x" << matAmount;
-		SetConsoleTextAttribute(console, 3);
+		SetConsoleTextAttribute(console, colorMat);
 		cout << " ORE";
-		SetConsoleTextAttribute(console, kBaseColor);
+		SetConsoleTextAttribute(console, colorBase);
 	}
 	cout << endl << " +-------------+" << endl;
 	cout << endl << " > Map: TAB";
@@ -476,11 +521,11 @@ bool BinaryInput(string prompt, bool wipe)
 	cout << endl << "> ";
 	SetConsoleTextAttribute(console, 2);
 	cout << "y";
-	SetConsoleTextAttribute(console, kBaseColor);
+	SetConsoleTextAttribute(console, colorBase);
 	cout << "es/";
 	SetConsoleTextAttribute(console, 4);
 	cout << "n";
-	SetConsoleTextAttribute(console, kBaseColor);
+	SetConsoleTextAttribute(console, colorBase);
 	cout << "o" << endl;
 
 	mainInput = _getch();
@@ -537,39 +582,47 @@ void PlayWinEffect()
 }
 
 //Define and print map borders
-constexpr char kHorizontalBorder = 205;
-constexpr char kTopLeftBorder = 201;
-constexpr char kTopRightBorder = 187;
-constexpr char kBottomLeftBorder = 200;
-constexpr char kBottomRightBorder = 188;
-constexpr char kVerticalBorder = 186;
+
 void DisplayTopBorder(int width)
 {
-	SetConsoleTextAttribute(console, kBaseColor);
+	
+	SetConsoleTextAttribute(console, colorBase);
 	cout << "  " << kTopLeftBorder;
 	for (int i = 0; i < width; i++)
 	{
-		cout << kHorizontalBorder;
+		if (holeY == 0 && holeX == i) { cout << kHole; }
+		else { cout << kHorizontalBorder; }
 	}
 	cout << kTopRightBorder << endl;
 }
 void DisplayBottomBorder(int width)
 {
-	SetConsoleTextAttribute(console, kBaseColor);
+	SetConsoleTextAttribute(console, colorBase);
 	cout << "  " << kBottomLeftBorder;
 	for (int i = 0; i < width; i++)
 	{
-		cout << kHorizontalBorder;
+		if (holeY == height-1 && holeX == i) { cout << kHole; }
+		else { cout << kHorizontalBorder; }
 	}
 	cout  << kBottomRightBorder << endl;
 }
 void DisplayLeftBorder()
 {
-	SetConsoleTextAttribute(console, kBaseColor);
-	cout << "  " << kVerticalBorder;
+	SetConsoleTextAttribute(console, colorBase);
+	cout << kVerticalBorder;
 }
 void DisplayRightBorder()
 {
-	SetConsoleTextAttribute(console, kBaseColor);
+	SetConsoleTextAttribute(console, colorBase);
 	cout << kVerticalBorder << endl;
+}
+
+int rSeed = -1;
+int BuildDoorway()
+{
+	if (rSeed == -1) 
+	{
+		rSeed = RNGen((width / 3), width - (width / 3));
+	}
+	return rSeed;
 }

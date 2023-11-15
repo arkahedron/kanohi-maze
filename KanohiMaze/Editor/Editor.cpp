@@ -156,7 +156,7 @@ string SelectLevelFromList(bool manualSelect)
 					{
 						levelStr.erase(levelStr.find_last_of("."), string::npos);
 						levelNum++;
-						cout << " > " << levelNum << ": " << levelStr << "\n";
+						cout << " > " << levelNum << ": " << levelStr << endl;
 					}
 				}
 			} while (FindNextFile(hFind, &FindFileData) != 0);
