@@ -37,6 +37,14 @@ void SaveLevel(char* pLevel, int width, int height);
 
 int main()
 {
+
+	cout << " Symbols Helper: " << endl;
+	for (int i = 1; i < 250; i++)
+	{
+		char symb = i;
+		cout << i << ": " << symb << endl;
+	}
+
 	int levelWidth;
 	int levelHeight;
 
