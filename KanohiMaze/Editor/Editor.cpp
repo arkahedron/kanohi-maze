@@ -20,8 +20,10 @@ constexpr int kLeftArrow = 75;
 constexpr int kRightArrow = 77;
 constexpr int kUpArrow = 72;
 constexpr int kDownArrow = 80;
-
 constexpr int kEscape = 27;
+char mainInput;
+int menuPick = 0;
+bool continueProgram = true;
 
 void GetLevelDimensions(int& width, int& height);
 void DisplayLevel(char* pLevel, int width, int height, int cursorX, int cursorY);
@@ -32,50 +34,170 @@ void DisplayBottomBorder(int width);
 void DisplayLeftBorder();
 void DisplayRightBorder();
 
+string SelectLevelFromList(bool manualSelect);
+char* LoadLevel(string levelName, int& width, int& height);
+
 bool EditLevel(char* pLevel, int& cursorX, int& cursorY, int width, int height);
 void SaveLevel(char* pLevel, int width, int height);
 
+bool BinaryInput(string prompt, bool wipe);
+
 int main()
 {
+	do {
+		cout << " [MENU] " << endl;
+		cout << " 1: symbols helper" << endl;
+		cout << " 2: create new map" << endl;
+		cout << " 3: edit existing map" << endl;
+		cout << " 4: exit program" << endl;
 
-	cout << " Symbols Helper: " << endl;
-	for (int i = 1; i < 250; i++)
-	{
-		char symb = i;
-		cout << i << ": " << symb << endl;
-	}
+		cin >> menuPick;
+		switch (menuPick)
+		{
+		case 1: {
+			cout << " Symbols Helper: " << endl;
+			for (int i = 1; i < 250; i++)
+			{
+				char symb = i;
+				cout << i << ": " << symb << endl;
+			}
+			break;
+		}
+		case 2: {
+			int levelWidth;
+			int levelHeight;
 
-	int levelWidth;
-	int levelHeight;
+			GetLevelDimensions(levelWidth, levelHeight);
 
-	GetLevelDimensions(levelWidth, levelHeight);
+			char* pLevel = new char[levelWidth * levelHeight];
 
-	char* pLevel = new char[levelWidth * levelHeight];
+			for (int i = 0; i < levelWidth * levelHeight; i++)
+			{
+				pLevel[i] = ' ';
+			}
 
-	for (int i = 0; i < levelWidth * levelHeight; i++)
-	{
-		pLevel[i] = ' ';
-	}
+			int cursorX = 0;
+			int cursorY = 0;
+			bool doneEditing = false;
+			while (!doneEditing)
+			{
+				system("cls");
+				DisplayLevel(pLevel, levelWidth, levelHeight, cursorX, cursorY);
+				doneEditing = EditLevel(pLevel, cursorX, cursorY, levelWidth, levelHeight);
+			}
 
-	int cursorX = 0;
-	int cursorY = 0;
-	bool doneEditing = false;
-	while (!doneEditing)
-	{
-		system("cls");
-		DisplayLevel(pLevel, levelWidth, levelHeight, cursorX, cursorY);
-		doneEditing = EditLevel(pLevel, cursorX, cursorY, levelWidth, levelHeight);
-	}
+			system("cls");
+			DisplayLevel(pLevel, levelWidth, levelHeight, -1, -1);
 
-	system("cls");
-	DisplayLevel(pLevel, levelWidth, levelHeight, -1, -1);
+			SaveLevel(pLevel, levelWidth, levelHeight);
 
-	SaveLevel(pLevel, levelWidth, levelHeight);
+			delete[] pLevel;
+			pLevel = nullptr;
+			break;
+		}
+		case 3: {
+			int width = 0;
+			int height = 0;
+			char* levelArray;
 
-	delete[] pLevel;
-	pLevel = nullptr;
+			string levelName = SelectLevelFromList(true);
+			levelArray = LoadLevel(levelName, width, height);
+
+			int cursorX = 0;
+			int cursorY = 0;
+			bool doneEditing = false;
+			while (!doneEditing)
+			{
+				system("cls");
+				DisplayLevel(levelArray, width, height, cursorX, cursorY);
+				doneEditing = EditLevel(levelArray, cursorX, cursorY, width, height);
+			}
+
+			system("cls");
+			DisplayLevel(levelArray, width, height, -1, -1);
+
+			SaveLevel(levelArray, width, height);
+
+			delete[] levelArray;
+			levelArray = nullptr;
+			break;
+		}
+		case 4:
+		{
+			continueProgram = false;
+			break;
+		}
+		default:
+			break;
+		}
+		if (!continueProgram) { cout << endl << " Exiting program..." << endl; break; }
+	} while (true);
 }
 
+
+string SelectLevelFromList(bool manualSelect)
+{
+	string selectedLevel;
+	int levelNum = 0;
+	if (manualSelect)
+	{
+		cout << " What level would you like to load?" << endl;
+
+		//Search for and print out potential valid text files as levels
+		WIN32_FIND_DATA FindFileData;
+		HANDLE hFind = FindFirstFile(L"../Levels/*", &FindFileData);
+		if (hFind != INVALID_HANDLE_VALUE) {
+			do {
+				if (!(FindFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+				{
+					wstring wsLevel(FindFileData.cFileName);
+					string levelStr(wsLevel.begin(), wsLevel.end());
+					if (bool isTextFile = (levelStr.substr(levelStr.find_last_of(".") + 1) == "txt"))
+					{
+						levelStr.erase(levelStr.find_last_of("."), string::npos);
+						levelNum++;
+						cout << " > " << levelNum << ": " << levelStr << "\n";
+					}
+				}
+			} while (FindNextFile(hFind, &FindFileData) != 0);
+			FindClose(hFind);
+
+			//Player input to select level, will be overhauled once map tethering is implemented
+			string levelInput;
+			cin >> levelInput;
+			levelInput.append(".txt");
+			return levelInput;
+		}
+		else { cout << " No valid levels found!" << endl; }
+	}
+	else { return "new"; }
+}
+char* LoadLevel(string levelName, int& width, int& height)
+{
+	//Get defined text file as level and try to open it
+	levelName.insert(0, "../Levels/");
+	ifstream levelFile;
+	levelFile.open(levelName);
+	if (levelFile)
+	{
+		constexpr int tempSize = 25;
+		char temp[tempSize];
+
+		levelFile.getline(temp, tempSize, '\n');
+		width = atoi(temp);
+
+		levelFile.getline(temp, tempSize, '\n');
+		height = atoi(temp);
+
+		char* levelData = new char[width * height];
+		levelFile.read(levelData, width * height);
+		return levelData;
+	}
+	else {
+		cout << " Invalid file, level failed to load!" << endl;
+		return LoadLevel(SelectLevelFromList(true), width, height);
+	}
+}
 
 void SaveLevel(char* pLevel, int width, int height)
 {
@@ -157,6 +279,31 @@ bool EditLevel(char* pLevel, int& cursorX, int& cursorY, int width, int height)
 	return false;
 }
 
+bool BinaryInput(string prompt, bool wipe)
+{
+	if (wipe) { system("cls"); }
+	cout << endl << "  [" << prompt << "]";
+	cout << endl << "> ";
+
+	cout << "y/n" << endl;
+
+	mainInput = _getch();
+
+	switch (mainInput)
+	{
+	case 'y':
+	case 'Y':
+		return true;
+		break;
+	case 'n':
+	case 'N':
+		return false;
+		break;
+	default:
+		return BinaryInput(prompt, wipe);
+		break;
+	}
+}
 
 void GetLevelDimensions(int& width, int& height)
 {

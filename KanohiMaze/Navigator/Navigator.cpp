@@ -7,12 +7,13 @@
 
 using namespace std;
 
-string defaultLevel = "Closet.txt";
+string defaultLevel = "Cavern.txt";
 bool manualLevelSelect;
 //Custom text flavoring
 char kPlayerSymbol = 4;
 constexpr char WAL = 219;
 constexpr char KEY = 126;
+constexpr char MAT = 127;
 constexpr char DOR = 177;
 constexpr char GOL = 234;
 constexpr int kBaseColor = 7;
@@ -25,13 +26,13 @@ bool ConvertLevel(char* level, int width, int height, int& playerX, int& playerY
 
 //Map gameplay managers
 int GetIndexFromCoordinates(int x, int y, int width);
-void DrawLevel(char level[], int width, int height, int playerX, int playerY, bool playerHasKey);
-bool UpdatePlayerPosition(char level[], int& playerX, int& playerY, int width, bool& playerHasKey);
+void DrawLevel(char level[], int width, int height, int playerX, int playerY, int keyAmount);
+bool UpdatePlayerPosition(char level[], int& playerX, int& playerY, int width, int& keyAmount);
 
 //State effect managers
 void PlayDoorClosedEffect();
 void PlayDoorOpenEffect();
-void PlayKeyPickupEffect();
+void PlayPickupEffect();
 void PlayWinEffect();
 
 //Border constructors
@@ -41,10 +42,9 @@ void DisplayLeftBorder();
 void DisplayRightBorder();
 
 //Action managers
-bool DoBinaryAction(string prompt, bool wipe);
+bool BinaryInput(string prompt, bool wipe);
 void PrintMainText(string mainText);
 void PrintSubText(string subText);
-
 void OpenMenu();
 
 
@@ -53,6 +53,7 @@ char mainInput = ' ';
 string mainText = " ";
 string subText = " ";
 bool inMapMode = false;
+HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
 
 //Size and assign level map
 int width = 0;
@@ -62,12 +63,14 @@ char* levelArray;
 //Initialize map variables
 int playerX = 1;
 int playerY = 1;
-bool playerHasKey = false;
 bool gameOver = false;
 bool isMapMode = true;
 bool isMenuMode = false;
 bool continuePlaying = true;
 int lookDirection = 0;
+int matAmount = 0;
+int keyAmount = 0;
+
 
 //Main code body
 int main()
@@ -75,7 +78,7 @@ int main()
 	cout << " ---{ WELCOME TO KANOHI MAZE }---" << endl;
 
 	do {
-		manualLevelSelect = DoBinaryAction(" Select Level Manually?", false);
+		manualLevelSelect = BinaryInput(" Select Level Manually?", false);
 
 		//Select, import, and convert level, then check for errors
 		string levelName = SelectLevelFromList(manualLevelSelect);
@@ -95,34 +98,32 @@ int main()
 			if (isMapMode)
 			{
 				system("cls");
-				DrawLevel(levelArray, width, height, playerX, playerY, playerHasKey);
-				cout << " > Move: WASD" << endl;
-				cout << " > Look: SHIFT+WASD" << endl;
-				cout << " > Act: E" << endl;
+				DrawLevel(levelArray, width, height, playerX, playerY, keyAmount);
+				cout << " > Move: WASD" << " |";
+				cout << " > Look: SHIFT+WASD " << endl;
+				cout << " > Act: E" << "     |";
 				//? cout << " > Attack: Q" << endl;
-				cout << " > Menu: TAB" << endl;
+				cout << " > Menu: TAB ";
 
-				gameOver = UpdatePlayerPosition(levelArray, playerX, playerY, width, playerHasKey);
+				gameOver = UpdatePlayerPosition(levelArray, playerX, playerY, width, keyAmount);
 			}
 			else if (isMenuMode)
 			{
 				OpenMenu();
 			}
 			else {}
-
 			if (!continuePlaying) { break; }
 		}
 		if (!continuePlaying) { break; }
 
 		system("cls");
-		DrawLevel(levelArray, width, height, playerX, playerY, playerHasKey);
-
+		DrawLevel(levelArray, width, height, playerX, playerY, keyAmount);
 
 		//End game and prompt new level
 		PlayWinEffect();
 		PrintMainText("GAME OVER");
 		delete[] levelArray;
-		continuePlaying = DoBinaryAction("PLAY AGAIN?",false);
+		continuePlaying = BinaryInput("PLAY AGAIN?",false);
 		gameOver = false;
 	} while (continuePlaying);
 	cout << " exiting game..." << endl;
@@ -134,7 +135,6 @@ string SelectLevelFromList(bool manualSelect)
 {
 	string selectedLevel;
 	int levelNum = 0;
-	
 	if (manualSelect)
 	{
 		cout << " What level would you like to load?" << endl;
@@ -150,6 +150,7 @@ string SelectLevelFromList(bool manualSelect)
 						string levelStr(wsLevel.begin(), wsLevel.end());
 						if (bool isTextFile = (levelStr.substr(levelStr.find_last_of(".") + 1) == "txt"))
 						{
+							levelStr.erase(levelStr.find_last_of("."), string::npos);
 							levelNum++;
 							cout << " > " << levelNum << ": " << levelStr << "\n";
 						}
@@ -160,15 +161,10 @@ string SelectLevelFromList(bool manualSelect)
 			//Player input to select level, will be overhauled once map tethering is implemented
 			string levelInput;
 			cin >> levelInput;
+			levelInput.append(".txt");
 			return levelInput;
-		}
-		else {
-			cout << " No valid levels found!" << endl;
-		}
-	}
-	else {
-		return defaultLevel;
-	}
+		} else { cout << " No valid levels found!" << endl; }
+	} else { return defaultLevel; }
 }
 char* LoadLevel(string levelName, int& width, int& height)
 {
@@ -191,9 +187,8 @@ char* LoadLevel(string levelName, int& width, int& height)
 		levelFile.read(levelData, width * height);
 		return levelData;
 	}
-	else
-	{
-		cout << "Opening file failed!" << endl;
+	else {
+		cout << " Invalid file, level failed to load!" << endl;
 		return LoadLevel(SelectLevelFromList(true),width, height);
 	}
 }
@@ -207,7 +202,7 @@ bool ConvertLevel(char* level, int width, int height, int& playerX, int& playerY
 		{
 			int index = GetIndexFromCoordinates(x, y, width);
 
-			//Conversion codes
+			//Level conversion key
 			switch (level[index]) {
 				case '+':
 				case '-':
@@ -224,6 +219,10 @@ bool ConvertLevel(char* level, int width, int height, int& playerX, int& playerY
 				case 'D':
 				case 'd':
 					level[index] = DOR;
+					break;
+				case 'M':
+				case 'm':
+					level[index] = MAT;
 					break;
 				case 'X':
 				case 'x':
@@ -253,10 +252,10 @@ int GetIndexFromCoordinates(int x, int y, int width)
 {
 	return x + y * width;
 }
-void DrawLevel(char level[], int width, int height, int playerX, int playerY, bool playerHasKey)
+void DrawLevel(char level[], int width, int height, int playerX, int playerY, int keyAmount)
 {
-	cout << "\n\n";
-	HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
+	cout << "\n";
+	
 	DisplayTopBorder(width);
 
 	for (int y = 0; y < height; y++)
@@ -273,25 +272,15 @@ void DrawLevel(char level[], int width, int height, int playerX, int playerY, bo
 			else
 			{
 				int indexToPrint = GetIndexFromCoordinates(x, y, width);
-		
-				if (level[indexToPrint] == DOR)
-				{
-					if (playerHasKey) { 
-						SetConsoleTextAttribute(console, 2); 
-					}
-					else{ 
-						SetConsoleTextAttribute(console, 4); 
-					}
+
+				if (level[indexToPrint] == DOR) {
+					if (keyAmount>0) { SetConsoleTextAttribute(console, 2); }
+					else{ SetConsoleTextAttribute(console, 4); }
 				}
-				else if (level[indexToPrint] == GOL) { 
-					SetConsoleTextAttribute(console, 13); 
-				}
-				else if (level[indexToPrint] == KEY) { 
-					SetConsoleTextAttribute(console, 14); 
-				}
-				else {
-					SetConsoleTextAttribute(console, kBaseColor);
-				}
+				else if (level[indexToPrint] == MAT) { SetConsoleTextAttribute(console, 3); }
+				else if (level[indexToPrint] == GOL) { SetConsoleTextAttribute(console, 13); }
+				else if (level[indexToPrint] == KEY) { SetConsoleTextAttribute(console, 14); }
+				else { SetConsoleTextAttribute(console, kBaseColor); }
 				cout << level[indexToPrint];
 			}
 		}
@@ -299,7 +288,7 @@ void DrawLevel(char level[], int width, int height, int playerX, int playerY, bo
 	}
 	DisplayBottomBorder(width);
 }
-bool UpdatePlayerPosition(char level[], int& playerX, int& playerY, int width, bool& playerHasKey)
+bool UpdatePlayerPosition(char level[], int& playerX, int& playerY, int width, int& keyAmount)
 {
 	char input = _getch();
 	int newPlayerX = playerX;
@@ -368,25 +357,35 @@ bool UpdatePlayerPosition(char level[], int& playerX, int& playerY, int width, b
 
 			if (level[actIndex] == KEY)
 			{
-				if (DoBinaryAction("COLLECT KEY?", true)) {
-					playerHasKey = true;
+				if (BinaryInput("COLLECT KEY?", true)) {
+					keyAmount++;
 					level[actIndex] = ' ';
-					PlayKeyPickupEffect();
+					PlayPickupEffect();
 					PrintSubText("KEY COLLECTED");
 				}
 				else {}
 			}
-			else if (level[actIndex] == DOR && playerHasKey)
+			else if (level[actIndex] == MAT)
 			{
-				if (DoBinaryAction("UNLOCK DOOR?", true)) {
+				if (BinaryInput("COLLECT ORE?", true)) {
+					matAmount++;
 					level[actIndex] = ' ';
-					playerHasKey = false;
+					PlayPickupEffect();
+					PrintSubText("ORE COLLECTED");
+				}
+				else {}
+			}
+			else if (level[actIndex] == DOR && keyAmount>0)
+			{
+				if (BinaryInput("UNLOCK DOOR?", true)) {
+					level[actIndex] = ' ';
+					keyAmount--;
 					PlayDoorOpenEffect();
 					PrintSubText("DOOR OPENED");
 				}
 				else {}
 			}
-			else if (level[actIndex] == DOR && !playerHasKey)
+			else if (level[actIndex] == DOR && keyAmount<1)
 			{
 				PlayDoorClosedEffect();
 				PrintSubText("DOOR LOCKED");
@@ -430,16 +429,28 @@ void OpenMenu()
 	system("cls");
 	cout << endl << " ----[MENU]----" << endl;
 	cout << endl << " +-{Inventory}-+";
-	if (playerHasKey) { cout << endl << " - KEY"; }
+
+	if (keyAmount) {
+		cout << endl << " - x" << keyAmount;
+		SetConsoleTextAttribute(console, 14);
+		cout << " KEY";
+		SetConsoleTextAttribute(console, kBaseColor);
+	}
+	if (matAmount > 0) { 
+		cout << endl << " - x" << matAmount;
+		SetConsoleTextAttribute(console, 3);
+		cout << " ORE";
+		SetConsoleTextAttribute(console, kBaseColor);
+	}
 	cout << endl << " +-------------+" << endl;
 	cout << endl << " > Map: TAB";
-	cout << endl <<" > Quit: ESCAPE" << endl;
+	cout << endl << " > Quit: ESCAPE" << endl;
 
 	char input = _getch();
 
 	//Exit game
 	if(input == 27) {
-		if (DoBinaryAction("Really Quit?", false)) {
+		if (BinaryInput("Really Quit?", false)) {
 			gameOver = true;
 			continuePlaying = false;
 		} else { OpenMenu(); }
@@ -458,9 +469,8 @@ void OpenMenu()
 		}
 	}
 }
-bool DoBinaryAction(string prompt, bool wipe)
+bool BinaryInput(string prompt, bool wipe)
 {
-	HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
 	if (wipe) { system("cls"); }
 	cout << endl << "  [" << prompt << "]"; 
 	cout << endl << "> ";
@@ -479,16 +489,14 @@ bool DoBinaryAction(string prompt, bool wipe)
 	{
 	case 'y':
 	case 'Y':
-		isMapMode = true;
 		return true;
 		break;
 	case 'n':
 	case 'N':
-		isMapMode = true;
 		return false;
 		break;
 	default:
-		return DoBinaryAction(prompt, wipe);
+		return BinaryInput(prompt, wipe);
 		break;
 	}
 }
@@ -500,35 +508,32 @@ void PrintMainText(string mainText) {
 void PrintSubText(string subText)
 {
 	system("cls");
-	DrawLevel(levelArray, width, height, playerX, playerY, playerHasKey);
-	cout << endl << "  [" << subText << "]" << endl;
+	DrawLevel(levelArray, width, height, playerX, playerY, keyAmount);
+	cout << "  [" << subText << "]" << endl;
 	system("pause");
 }
-
 
 //Play state effects
 void PlayDoorClosedEffect()
 {
-	
-
-	Beep(500, 75);
-	Beep(500, 75);
+	Beep(400, 75);
+	Beep(300, 75);
 }
 void PlayDoorOpenEffect()
 {
-	Beep(1397, 200);
+	Beep(900, 200);
 }
-void PlayKeyPickupEffect()
+void PlayPickupEffect()
 {	
 	
-	Beep(1568, 200);
+	Beep(600, 200);
 }
 void PlayWinEffect()
 {
-	Beep(1245, 150);
-	Beep(1397, 150);
-	Beep(1568, 200);
-	Beep(1868, 400);
+	Beep(900, 150);
+	Beep(1100, 150);
+	Beep(1300, 200);
+	Beep(1600, 400);
 }
 
 //Define and print map borders
@@ -540,6 +545,7 @@ constexpr char kBottomRightBorder = 188;
 constexpr char kVerticalBorder = 186;
 void DisplayTopBorder(int width)
 {
+	SetConsoleTextAttribute(console, kBaseColor);
 	cout << "  " << kTopLeftBorder;
 	for (int i = 0; i < width; i++)
 	{
@@ -549,6 +555,7 @@ void DisplayTopBorder(int width)
 }
 void DisplayBottomBorder(int width)
 {
+	SetConsoleTextAttribute(console, kBaseColor);
 	cout << "  " << kBottomLeftBorder;
 	for (int i = 0; i < width; i++)
 	{
@@ -558,9 +565,11 @@ void DisplayBottomBorder(int width)
 }
 void DisplayLeftBorder()
 {
+	SetConsoleTextAttribute(console, kBaseColor);
 	cout << "  " << kVerticalBorder;
 }
 void DisplayRightBorder()
 {
+	SetConsoleTextAttribute(console, kBaseColor);
 	cout << kVerticalBorder << endl;
 }
