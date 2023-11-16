@@ -3,17 +3,21 @@
 #include <conio.h>
 #include <windows.h>
 #include <fstream>
-#include <vector>
 #include <random>
 
 using namespace std;
 
+//Randomizer core
 using u32 = uint_least32_t;
 using engine = std::mt19937;
 int RNGen(int min, int max);
 
-string defaultLevel = "Cavern.txt";
+//Default map initialization
+string defaultLevel = "Closet.txt";
+string levelName = defaultLevel;
 bool manualLevelSelect;
+string tempLevelsList[] = { "Cavern.txt", "Closet.txt", "Corner.txt", "Hall.txt", "Shack.txt", "Tree.txt", "Vault.txt" };
+int rngLevelPick = 0;
 //Custom text flavoring
 char kPlayerSymbol = 4;
 constexpr char WAL = 219;
@@ -65,27 +69,34 @@ int BuildDoorway();
 
 
 //Global variable initializers
+HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
 char mainInput = ' ';
+bool inMapMode = false;
 string mainText = " ";
 string subText = " ";
-bool inMapMode = false;
-HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
 
 //Size and assign level map
+ifstream activeLevelFile;
 int width = 0;
 int height = 0;
 char* levelArray;
+int levelsCleared = 0;
+int thisLevelType;
+int nextLevelType;
+
 
 //Initialize map variables
 int playerX = 1;
 int playerY = 1;
-bool gameOver = false;
+bool levelComplete = false;
 bool isMapMode = true;
 bool isMenuMode = false;
 bool continuePlaying = true;
 int lookDirection = 0;
 int matAmount = 0;
 int keyAmount = 0;
+int holeX;
+int holeY;
 
 
 //Main code body
@@ -93,11 +104,24 @@ int main()
 {
 	cout << " ---{ WELCOME TO KANOHI MAZE }---" << endl;
 
+	manualLevelSelect = BinaryInput("Select Level Manually?", false);
+	levelName = SelectLevelFromList(manualLevelSelect);
+
 	do {
-		manualLevelSelect = BinaryInput("Select Level Manually?", false);
+		if (levelsCleared > 0) 
+		{
+			rngLevelPick = RNGen(0, size(tempLevelsList));
+			levelName = tempLevelsList[rngLevelPick];
+			PrintMainText("YOU ENTER A NEW ROOM");
+
+			/* "check rng list and post upcoming level" 
+			cout << endl << "RNG:" << size(tempLevelsList) << "::" << rngLevelPick << levelName << endl; 
+			system("pause"); */
+
+		} else { PrintMainText("YOU ENTER THE MAZE"); }
+
 
 		//Select, import, and convert level, then check for errors
-		string levelName = SelectLevelFromList(manualLevelSelect);
 		levelArray = LoadLevel(levelName, width, height);
 		bool anyWarnings = ConvertLevel(levelArray, width, height, playerX, playerY);
 		if (anyWarnings)
@@ -106,10 +130,8 @@ int main()
 			system("pause");
 		}
 
-		PrintMainText("YOU ENTER THE MAZE");
-
 		//Main game Loop
-		while (!gameOver)
+		while (!levelComplete)
 		{
 			if (isMapMode)
 			{
@@ -121,7 +143,7 @@ int main()
 				//? cout << " > Attack: Q" << endl;
 				cout << " > Menu: TAB ";
 
-				gameOver = UpdatePlayerPosition(levelArray, playerX, playerY, width, keyAmount);
+				levelComplete = UpdatePlayerPosition(levelArray, playerX, playerY, width, keyAmount);
 			}
 			else if (isMenuMode)
 			{
@@ -132,19 +154,26 @@ int main()
 		}
 		if (!continuePlaying) { break; }
 
-		system("cls");
-		DrawLevel(levelArray, width, height, playerX, playerY, keyAmount);
-
-		//End game and prompt new level
-		PlayWinEffect();
-		PrintMainText("GAME OVER");
 		delete[] levelArray;
-		continuePlaying = BinaryInput("PLAY AGAIN?",false);
-		gameOver = false;
+		activeLevelFile.close();
+		levelsCleared++;
+		levelComplete = false;
+
 	} while (continuePlaying);
-	cout << " exiting game..." << endl;
+	cout << " Exiting maze..." << endl;
+
+	//Post-game results?
+	if (matAmount > 0) {
+		cout << endl << " [Materials Collected]" << endl;
+		cout << endl << " - x" << matAmount;
+		SetConsoleTextAttribute(console, colorMat);
+		cout << " ORE" << endl;
+		SetConsoleTextAttribute(console, colorBase);
+	}
+	system("pause");
 }
 
+//RNG core
 int RNGen(int min, int max)
 {
 	int randResult;
@@ -156,9 +185,6 @@ int RNGen(int min, int max)
 
 	return randResult;
 }
-
-int holeX;
-int holeY;
 
 //Level initializers
 string SelectLevelFromList(bool manualSelect) 
@@ -200,21 +226,21 @@ char* LoadLevel(string levelName, int& width, int& height)
 {
 	//Get defined text file as level and try to open it
 	levelName.insert(0, "../Levels/");
-	ifstream levelFile;
-	levelFile.open(levelName);
-	if(levelFile)
+
+	activeLevelFile.open(levelName);
+	if(activeLevelFile)
 	{
 		constexpr int tempSize = 25;
 		char temp[tempSize];
 
-		levelFile.getline(temp, tempSize, '\n');
+		activeLevelFile.getline(temp, tempSize, '\n');
 		width = atoi(temp);
 
-		levelFile.getline(temp, tempSize, '\n');
+		activeLevelFile.getline(temp, tempSize, '\n');
 		height = atoi(temp);
 
 		char* levelData = new char[width * height];
-		levelFile.read(levelData, width * height);
+		activeLevelFile.read(levelData, width * height);
 		return levelData;
 	}
 	else {
@@ -259,13 +285,6 @@ bool ConvertLevel(char* level, int width, int height, int& playerX, int& playerY
 					level[index] = GOL;
 					holeY = y;
 					holeX = x;
-					/*
-					if (y == height) { holeY = y; holeX = x;}
-					else if (y == 0) { holeY = y; holeX = x;}
-					else if (x == width) { holeY = y; holeX = x; }
-					else if (x == 0) { holeY = y; holeX = x; }
-					*/
-
 					break;
 				case '@':
 				case 'p':
@@ -291,22 +310,27 @@ int GetIndexFromCoordinates(int x, int y, int width)
 {
 	return x + y * width;
 }
+//Draw map body
 void DrawLevel(char level[], int width, int height, int playerX, int playerY, int keyAmount)
 {
+	//Push print body down one and print top border
 	cout << "\n";
-	
 	DisplayTopBorder(width);
 
 	for (int y = 0; y < height; y++)
 	{
+		//Reset coloration and push print body to right by a space
 		SetConsoleTextAttribute(console, colorBase);
 		cout << "  ";
+
+		//Print LEFT border and check for goal on its edge to place hole
 		if (holeX == 0 && holeY == y) { cout << kHole;}
 		else { DisplayLeftBorder(); }
 
 		for (int x = 0; x < width; x++)
 		{
 			if (playerX == x && playerY == y) {
+				//Colorize and print player symbol
 				SetConsoleTextAttribute(console, 11);
 				cout << kPlayerSymbol;
 				SetConsoleTextAttribute(console, colorBase);
@@ -314,7 +338,7 @@ void DrawLevel(char level[], int width, int height, int playerX, int playerY, in
 			else
 			{
 				int indexToPrint = GetIndexFromCoordinates(x, y, width);
-
+				//Colorize other unique symbols
 				if (level[indexToPrint] == DOR) {
 					if (keyAmount>0) { SetConsoleTextAttribute(console, 2); }
 					else{ SetConsoleTextAttribute(console, 4); }
@@ -323,16 +347,20 @@ void DrawLevel(char level[], int width, int height, int playerX, int playerY, in
 				else if (level[indexToPrint] == GOL) { SetConsoleTextAttribute(console, 13); }
 				else if (level[indexToPrint] == KEY) { SetConsoleTextAttribute(console, colorKey); }
 				else { SetConsoleTextAttribute(console, colorBase); }
+				//Print relevant symbol and reset color to base
 				cout << level[indexToPrint];
 				SetConsoleTextAttribute(console, colorBase);
 			}
 		}
+		//Print RIGHT border and check for goal on its edge to place hole
 		if (holeX == width-1 && holeY == y) { cout << kHole << endl; }
 		else { DisplayRightBorder(); }
 		
 	}
+	//Print BOTTOM border
 	DisplayBottomBorder(width);
 }
+//Map movement and action check
 bool UpdatePlayerPosition(char level[], int& playerX, int& playerY, int width, int& keyAmount)
 {
 	char input = _getch();
@@ -496,7 +524,7 @@ void OpenMenu()
 	//Exit game
 	if(input == 27) {
 		if (BinaryInput("Really Quit?", false)) {
-			gameOver = true;
+			levelComplete = true;
 			continuePlaying = false;
 		} else { OpenMenu(); }
 	}
@@ -546,12 +574,14 @@ bool BinaryInput(string prompt, bool wipe)
 	}
 }
 void PrintMainText(string mainText) {
+	cout << " " << endl;
 	system("cls");
 	cout << endl << "  [" << mainText << "]" << endl;
 	system("pause");
 }
 void PrintSubText(string subText)
 {
+	cout << " " << endl;
 	system("cls");
 	DrawLevel(levelArray, width, height, playerX, playerY, keyAmount);
 	cout << "  [" << subText << "]" << endl;
@@ -561,35 +591,41 @@ void PrintSubText(string subText)
 //Play state effects
 void PlayDoorClosedEffect()
 {
+	/*
 	Beep(400, 75);
 	Beep(300, 75);
+	*/
 }
 void PlayDoorOpenEffect()
 {
+	/*
 	Beep(900, 200);
+	*/
 }
 void PlayPickupEffect()
 {	
-	
+	/*
 	Beep(600, 200);
+	*/
 }
 void PlayWinEffect()
 {
+	/*
 	Beep(900, 150);
 	Beep(1100, 150);
 	Beep(1300, 200);
 	Beep(1600, 400);
+	*/
 }
 
-//Define and print map borders
-
+//Print map borders
 void DisplayTopBorder(int width)
 {
-	
 	SetConsoleTextAttribute(console, colorBase);
 	cout << "  " << kTopLeftBorder;
 	for (int i = 0; i < width; i++)
 	{
+		//Goal on TOP edge hole check and place
 		if (holeY == 0 && holeX == i) { cout << kHole; }
 		else { cout << kHorizontalBorder; }
 	}
@@ -601,6 +637,7 @@ void DisplayBottomBorder(int width)
 	cout << "  " << kBottomLeftBorder;
 	for (int i = 0; i < width; i++)
 	{
+		//Goal on BOTTOM edge hole check and place
 		if (holeY == height-1 && holeX == i) { cout << kHole; }
 		else { cout << kHorizontalBorder; }
 	}

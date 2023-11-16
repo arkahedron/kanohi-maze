@@ -36,6 +36,7 @@ void DisplayRightBorder();
 
 string SelectLevelFromList(bool manualSelect);
 char* LoadLevel(string levelName, int& width, int& height);
+string importedLevel = "templevelname";
 
 bool EditLevel(char* pLevel, int& cursorX, int& cursorY, int width, int height);
 void SaveLevel(char* pLevel, int width, int height);
@@ -100,8 +101,8 @@ int main()
 			int height = 0;
 			char* levelArray;
 
-			string levelName = SelectLevelFromList(true);
-			levelArray = LoadLevel(levelName, width, height);
+			importedLevel = SelectLevelFromList(true);
+			levelArray = LoadLevel(importedLevel, width, height);
 
 			int cursorX = 0;
 			int cursorY = 0;
@@ -201,9 +202,34 @@ char* LoadLevel(string levelName, int& width, int& height)
 
 void SaveLevel(char* pLevel, int width, int height)
 {
-	cout << "Pick a name for your level file (eg: Level1.txt): ";
 	string levelName;
-	cin >> levelName;
+	if (menuPick == 3) {
+		if (BinaryInput("Save as a new level?", false))
+		{
+			cout << "Name the level (eg: Level1): ";
+			cin >> levelName;
+			levelName.append(".txt");
+		}
+		else {
+			if (BinaryInput("Really overwrite existing file?", false))
+			{
+				cout << "Name the level (eg: Level1): ";
+				levelName = importedLevel;
+				
+			}
+			else {
+				cout << "Name the level (eg: Level1): ";
+				cin >> levelName;
+				levelName.append(".txt");
+			}
+		}
+	}
+	else {
+		cout << "Name the level (eg: Level1): ";
+		cin >> levelName;
+		levelName.append(".txt");
+	}
+
 
 	levelName.insert(0, "../Levels/");
 
