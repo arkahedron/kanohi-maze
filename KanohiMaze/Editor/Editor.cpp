@@ -343,6 +343,9 @@ void GetLevelDimensions(int& width, int& height)
 
 void DisplayLevel(char* pLevel, int width, int height, int cursorX, int cursorY)
 {
+	cout << "[SYMBOL LEGEND]: " << "O,o = WALL | " << "D,d = DOOR | " << "K,k = KEY " << endl;
+	cout << "@,P,p = PLAYER | " << "X,x = GOAL | " << "M,m = ITEM | " << "C,c = CHEST " << endl;
+
 	DisplayTopBorder(width);
 
 	for (int y = 0; y < height; y++)

@@ -5,8 +5,23 @@
 #include <fstream>
 #include <vector>
 #include <random>
+#include "resource.h"
+
+//Get resource handle
+HMODULE GCM() 
+{
+	HMODULE hModule = NULL;
+	GetModuleHandleEx(
+		GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS,
+		(LPCTSTR)GCM,
+		&hModule);
+	return hModule;
+}
 
 using namespace std;
+
+//For single exe file distribution, embed and load level txt files as resources
+bool wrapLevelsInEXE = true;
 
 //Randomizer core
 using u32 = uint_least32_t;
@@ -101,11 +116,105 @@ int keyAmount = 0;
 int holeX;
 int holeY;
 
+/*
+
+char* LoadResLevel(string levelName, int& width, int& height)
+{
+
+	string result;
+	HRSRC hRes = FindResource(GCM(), MAKEINTRESOURCE(ENTRY_TEXT), MAKEINTRESOURCE(TEXTFILE));
+	HGLOBAL hData = LoadResource(GCM(), hRes);
+	DWORD hSize = SizeofResource(GCM(), hRes);
+	char* hFinal = (char*)LockResource(hData);
+	result.assign(hFinal, hSize);
+
+	constexpr int tempSize = 25;
+	char temp[tempSize];
+
+
+
+	activeLevelFile.getline(temp, tempSize, '\n');
+	width = atoi(temp);
+	cout << result;
+	system("pause");
+	return hFinal;
+
+	/*
+	ofstream levelFile;
+	levelFile.open(levelName);
+	levelFile.write(hFinal, width * height);
+	if (activeLevelFile)
+	{
+		constexpr int tempSize = 25;
+		char temp[tempSize];
+
+		activeLevelFile.getline(temp, tempSize, '\n');
+		width = atoi(temp);
+
+		activeLevelFile.getline(temp, tempSize, '\n');
+		height = atoi(temp);
+
+		char* levelData = new char[width * height];
+		activeLevelFile.read(levelData, width * height);
+		return levelData;
+	}
+	else {
+		cout << " Invalid file, level failed to load!" << endl;
+		system("pause");
+		//return LoadLevel(SelectLevelFromList(true), width, height);
+	}
+
+	
+	char* levelData = new char[width * height];
+
+	//istream lvlDat;
+	//lvlDat << result;
+	
+	//std::strstream lvlDat = result;
+	char* levelData = new char[width * height];
+	activeLevelFile.read(levelData, width * height);
+
+	return hFinal;
+	
+	/* Access bytes in data - here's a simple example involving text output
+	// The text stored in the resource might not be NULL terminated.
+	char* buffer = new char[hSize + 1];
+	::memcpy(buffer, hData, hSize);
+	buffer[hSize] = 0; // NULL terminator
+	::printf("Contents of text file: %s\n", buffer); // Print as ASCII text
+
+	constexpr int tempSize = 25;
+	char temp[tempSize];
+
+	ifstream lvlData(result);
+
+	//activeLevelFile.open(lvlData);
+
+	lvlData.getline(temp, tempSize, '\n');
+	width = atoi(temp);
+	cout << width;
+
+	lvlData.getline(temp, tempSize, '\n');
+	height = atoi(temp);
+	cout << height;
+
+	char* levelData = new char[width * height];
+	activeLevelFile.read(levelData, width* height);
+	return levelData;
+
+
+	delete[] buffer;
+	
+}
+*/
 
 //Main code body
 int main()
 {
 	cout << " ---{ WELCOME TO KANOHI MAZE }---" << endl;
+
+	
+
 
 	//manualLevelSelect = BinaryInput("Select Level Manually?", false);
 	levelName = defaultLevel;
@@ -119,6 +228,8 @@ int main()
 
 		//Select, import, and convert level, then check for errors
 		levelArray = LoadLevel(levelName, width, height);
+
+		//levelArray = LoadLevel(levelName, width, height);
 		bool anyWarnings = ConvertLevel(levelArray, width, height, playerX, playerY);
 		if (anyWarnings)
 		{
@@ -191,7 +302,7 @@ int RNGen(int min, int max)
 string SelectLevelFromList(bool manualSelect) 
 {
 	LPCWSTR lpath = L"../Levels/*.txt";
-	vector<wstring> fileArray;
+	vector<wstring> fileListArray;
 	wstring lvlSelect;
 	int lvlIndex = -1;
 
@@ -203,12 +314,12 @@ string SelectLevelFromList(bool manualSelect)
 			if ((ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0)
 			{
 				lvlIndex++;
-				fileArray.push_back(ffd.cFileName);
+				fileListArray.push_back(ffd.cFileName);
 			}
 		} while (FindNextFileW(hFind, &ffd));
 		FindClose(hFind);
 	}
-	lvlSelect = fileArray[RNGen(0, lvlIndex)];
+	lvlSelect = fileListArray[RNGen(0, lvlIndex)];
 	string selectedLevel(lvlSelect.begin(), lvlSelect.end());
 	cout << endl << selectedLevel << endl;
 	
@@ -265,14 +376,14 @@ bool ConvertLevel(char* level, int width, int height, int& playerX, int& playerY
 				case 'o':
 					level[index] = WAL;
 					break;
+				case 'D':
+				case 'd':
+					level[index] = DOR;
+					break;
 				case '*':
 				case 'K':
 				case 'k':
 					level[index] = KEY;
-					break;
-				case 'D':
-				case 'd':
-					level[index] = DOR;
 					break;
 				case 'M':
 				case 'm':
