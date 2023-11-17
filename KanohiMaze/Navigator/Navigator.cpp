@@ -3,6 +3,7 @@
 #include <conio.h>
 #include <windows.h>
 #include <fstream>
+#include <vector>
 #include <random>
 
 using namespace std;
@@ -13,21 +14,22 @@ using engine = std::mt19937;
 int RNGen(int min, int max);
 
 //Default map initialization
-string defaultLevel = "Closet.txt";
+string defaultLevel = "Entry.txt";
 string levelName = defaultLevel;
 bool manualLevelSelect;
-string tempLevelsList[] = { "Cavern.txt", "Closet.txt", "Corner.txt", "Hall.txt", "Shack.txt", "Tree.txt", "Vault.txt" };
 int rngLevelPick = 0;
 //Custom text flavoring
 char kPlayerSymbol = 4;
 constexpr char WAL = 219;
 constexpr char KEY = 126;
-constexpr char MAT = 127;
+constexpr char MAT = 15;
 constexpr char DOR = 177;
 constexpr char GOL = 234;
+constexpr char BOX = 127;
 constexpr int colorBase = 7;
 constexpr int colorKey = 14;
-constexpr int colorMat = 3;
+constexpr int colorMat = 8;
+constexpr int colorBox = 6;
 //Border symbols
 constexpr char kHorizontalBorder = 205;
 constexpr char kTopLeftBorder = 201;
@@ -46,7 +48,7 @@ bool ConvertLevel(char* level, int width, int height, int& playerX, int& playerY
 //Map gameplay managers
 int GetIndexFromCoordinates(int x, int y, int width);
 void DrawLevel(char level[], int width, int height, int playerX, int playerY, int keyAmount);
-bool UpdatePlayerPosition(char level[], int& playerX, int& playerY, int width, int& keyAmount);
+bool ManagePlayerInput(char level[], int& playerX, int& playerY, int width, int& keyAmount);
 
 //State effect managers
 void PlayDoorClosedEffect();
@@ -65,13 +67,14 @@ bool BinaryInput(string prompt, bool wipe);
 void PrintMainText(string mainText);
 void PrintSubText(string subText);
 void OpenMenu();
-int BuildDoorway();
+void MakeChestLoot();
+//int BuildDoorway();
 
+void InteractFacingSpace(char level[], int pX, int pY);
 
 //Global variable initializers
 HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
 char mainInput = ' ';
-bool inMapMode = false;
 string mainText = " ";
 string subText = " ";
 
@@ -89,7 +92,7 @@ int nextLevelType;
 int playerX = 1;
 int playerY = 1;
 bool levelComplete = false;
-bool isMapMode = true;
+bool isMapMode = false;
 bool isMenuMode = false;
 bool continuePlaying = true;
 int lookDirection = 0;
@@ -104,22 +107,15 @@ int main()
 {
 	cout << " ---{ WELCOME TO KANOHI MAZE }---" << endl;
 
-	manualLevelSelect = BinaryInput("Select Level Manually?", false);
-	levelName = SelectLevelFromList(manualLevelSelect);
+	//manualLevelSelect = BinaryInput("Select Level Manually?", false);
+	levelName = defaultLevel;
 
 	do {
 		if (levelsCleared > 0) 
 		{
-			rngLevelPick = RNGen(0, size(tempLevelsList));
-			levelName = tempLevelsList[rngLevelPick];
+			levelName = SelectLevelFromList(true);
 			PrintMainText("YOU ENTER A NEW ROOM");
-
-			/* "check rng list and post upcoming level" 
-			cout << endl << "RNG:" << size(tempLevelsList) << "::" << rngLevelPick << levelName << endl; 
-			system("pause"); */
-
 		} else { PrintMainText("YOU ENTER THE MAZE"); }
-
 
 		//Select, import, and convert level, then check for errors
 		levelArray = LoadLevel(levelName, width, height);
@@ -130,20 +126,23 @@ int main()
 			system("pause");
 		}
 
+		isMapMode = true;
+
 		//Main game Loop
 		while (!levelComplete)
 		{
+			
 			if (isMapMode)
 			{
 				system("cls");
 				DrawLevel(levelArray, width, height, playerX, playerY, keyAmount);
-				cout << " > Move: WASD" << " |";
-				cout << " > Look: SHIFT+WASD " << endl;
-				cout << " > Act: E" << "     |";
-				//? cout << " > Attack: Q" << endl;
-				cout << " > Menu: TAB ";
+				//Input prompts
+				cout << " >Move: WASD" << " |";
+				cout << " >Look: SHFT+WASD " << endl;
+				cout << " >Act: E" << "     |";
+				cout << " >Menu: TAB ";
 
-				levelComplete = UpdatePlayerPosition(levelArray, playerX, playerY, width, keyAmount);
+				levelComplete = ManagePlayerInput(levelArray, playerX, playerY, width, keyAmount);
 			}
 			else if (isMenuMode)
 			{
@@ -153,14 +152,15 @@ int main()
 			if (!continuePlaying) { break; }
 		}
 		if (!continuePlaying) { break; }
-
+		isMapMode = false;
 		delete[] levelArray;
 		activeLevelFile.close();
 		levelsCleared++;
 		levelComplete = false;
 
 	} while (continuePlaying);
-	cout << " Exiting maze..." << endl;
+	system("cls");
+	cout << endl << " Exiting maze..." << endl;
 
 	//Post-game results?
 	if (matAmount > 0) {
@@ -186,41 +186,39 @@ int RNGen(int min, int max)
 	return randResult;
 }
 
+
 //Level initializers
 string SelectLevelFromList(bool manualSelect) 
 {
-	string selectedLevel;
-	int levelNum = 0;
-	if (manualSelect)
+	LPCWSTR lpath = L"../Levels/*.txt";
+	vector<wstring> fileArray;
+	wstring lvlSelect;
+	int lvlIndex = -1;
+
+	WIN32_FIND_DATAW ffd;
+	HANDLE hFind = FindFirstFileW(lpath, &ffd);
+	if (hFind != INVALID_HANDLE_VALUE)
 	{
-		cout << " What level would you like to load?" << endl;
+		do {
+			if ((ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0)
+			{
+				lvlIndex++;
+				fileArray.push_back(ffd.cFileName);
+			}
+		} while (FindNextFileW(hFind, &ffd));
+		FindClose(hFind);
+	}
+	lvlSelect = fileArray[RNGen(0, lvlIndex)];
+	string selectedLevel(lvlSelect.begin(), lvlSelect.end());
+	cout << endl << selectedLevel << endl;
+	
+	if (selectedLevel == levelName || selectedLevel == defaultLevel) {
+		return SelectLevelFromList(true);
+	}
+	else {
+		return selectedLevel;
+	}
 
-		//Search for and print out potential valid text files as levels
-		WIN32_FIND_DATA FindFileData;
-		HANDLE hFind = FindFirstFile(L"../Levels/*", &FindFileData);
-		if (hFind != INVALID_HANDLE_VALUE) {
-				do {
-					if (!(FindFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
-					{
-						wstring wsLevel(FindFileData.cFileName);
-						string levelStr(wsLevel.begin(), wsLevel.end());
-						if (bool isTextFile = (levelStr.substr(levelStr.find_last_of(".") + 1) == "txt"))
-						{
-							levelStr.erase(levelStr.find_last_of("."), string::npos);
-							levelNum++;
-							cout << " > " << levelNum << ": " << levelStr << "\n";
-						}
-					}
-				} while (FindNextFile(hFind, &FindFileData) != 0);
-			FindClose(hFind);
-
-			//Player input to select level, will be overhauled once map tethering is implemented
-			string levelInput;
-			cin >> levelInput;
-			levelInput.append(".txt");
-			return levelInput;
-		} else { cout << " No valid levels found!" << endl; }
-	} else { return defaultLevel; }
 }
 char* LoadLevel(string levelName, int& width, int& height)
 {
@@ -263,13 +261,13 @@ bool ConvertLevel(char* level, int width, int height, int& playerX, int& playerY
 				case '+':
 				case '-':
 				case '|':
-				case 'o':
 				case 'O':
+				case 'o':
 					level[index] = WAL;
 					break;
 				case '*':
-				case 'k':
 				case 'K':
+				case 'k':
 					level[index] = KEY;
 					break;
 				case 'D':
@@ -280,6 +278,10 @@ bool ConvertLevel(char* level, int width, int height, int& playerX, int& playerY
 				case 'm':
 					level[index] = MAT;
 					break;
+				case 'C':
+				case 'c':
+					level[index] = BOX;
+					break;
 				case 'X':
 				case 'x':
 					level[index] = GOL;
@@ -287,8 +289,8 @@ bool ConvertLevel(char* level, int width, int height, int& playerX, int& playerY
 					holeX = x;
 					break;
 				case '@':
-				case 'p':
 				case 'P':
+				case 'p':
 					level[index] = ' ';
 					playerX = x;
 					playerY = y;
@@ -304,6 +306,7 @@ bool ConvertLevel(char* level, int width, int height, int& playerX, int& playerY
 	}
 	return anyWarnings;
 }
+
 
 //Map gameplay managers
 int GetIndexFromCoordinates(int x, int y, int width)
@@ -343,9 +346,10 @@ void DrawLevel(char level[], int width, int height, int playerX, int playerY, in
 					if (keyAmount>0) { SetConsoleTextAttribute(console, 2); }
 					else{ SetConsoleTextAttribute(console, 4); }
 				}
-				else if (level[indexToPrint] == MAT) { SetConsoleTextAttribute(console, colorMat); }
-				else if (level[indexToPrint] == GOL) { SetConsoleTextAttribute(console, 13); }
 				else if (level[indexToPrint] == KEY) { SetConsoleTextAttribute(console, colorKey); }
+				else if (level[indexToPrint] == MAT) { SetConsoleTextAttribute(console, colorMat); }
+				else if (level[indexToPrint] == BOX) { SetConsoleTextAttribute(console, colorBox); }
+				else if (level[indexToPrint] == GOL) { SetConsoleTextAttribute(console, 15); }
 				else { SetConsoleTextAttribute(console, colorBase); }
 				//Print relevant symbol and reset color to base
 				cout << level[indexToPrint];
@@ -361,7 +365,7 @@ void DrawLevel(char level[], int width, int height, int playerX, int playerY, in
 	DisplayBottomBorder(width);
 }
 //Map movement and action check
-bool UpdatePlayerPosition(char level[], int& playerX, int& playerY, int width, int& keyAmount)
+bool ManagePlayerInput(char level[], int& playerX, int& playerY, int width, int& keyAmount)
 {
 	char input = _getch();
 	int newPlayerX = playerX;
@@ -410,59 +414,7 @@ bool UpdatePlayerPosition(char level[], int& playerX, int& playerY, int width, i
 		case 'e':
 		case 'E':
 		{
-			int actX = playerX;
-			int actY = playerY;			
-			switch (lookDirection) 
-			{
-			case 1: /*facing up*/
-			{ actY--; break; }
-			case 2: /*facing left*/
-			{ actX--; break; }
-			case 3: /*facing down*/
-			{ actY++; break; }
-			case 4: /*facing right*/
-			{ actX++; break; }
-			default: break; 
-			}
-			//Interact with space player is facing
-			int actIndex = GetIndexFromCoordinates(actX, actY, width);
-			char interactedWith = level[actIndex];
-
-			if (level[actIndex] == KEY)
-			{
-				if (BinaryInput("COLLECT KEY?", true)) {
-					keyAmount++;
-					level[actIndex] = ' ';
-					PlayPickupEffect();
-					PrintSubText("KEY COLLECTED");
-				}
-				else {}
-			}
-			else if (level[actIndex] == MAT)
-			{
-				if (BinaryInput("COLLECT ORE?", true)) {
-					matAmount++;
-					level[actIndex] = ' ';
-					PlayPickupEffect();
-					PrintSubText("ORE COLLECTED");
-				}
-				else {}
-			}
-			else if (level[actIndex] == DOR && keyAmount>0)
-			{
-				if (BinaryInput("UNLOCK DOOR?", true)) {
-					level[actIndex] = ' ';
-					keyAmount--;
-					PlayDoorOpenEffect();
-					PrintSubText("DOOR OPENED");
-				}
-				else {}
-			}
-			else if (level[actIndex] == DOR && keyAmount<1)
-			{
-				PlayDoorClosedEffect();
-				PrintSubText("DOOR LOCKED");
-			}
+			InteractFacingSpace(level ,playerX, playerY);
 			break;
 		}
 		default:
@@ -495,6 +447,74 @@ bool UpdatePlayerPosition(char level[], int& playerX, int& playerY, int width, i
 	else {}
 	return false;
 }
+//Act on object the player is facing
+void InteractFacingSpace(char level[], int pX, int pY)
+{
+	int actX = playerX;
+	int actY = playerY;
+	switch (lookDirection)
+	{
+	case 1: /*facing up*/
+	{ actY--; break; }
+	case 2: /*facing left*/
+	{ actX--; break; }
+	case 3: /*facing down*/
+	{ actY++; break; }
+	case 4: /*facing right*/
+	{ actX++; break; }
+	default: break;
+	}
+	//Interact with space player is facing
+	int actIndex = GetIndexFromCoordinates(actX, actY, width);
+	char interactedWith = level[actIndex];
+
+	if (level[actIndex] == KEY)
+	{
+		if (BinaryInput("COLLECT KEY?", true)) {
+			keyAmount++;
+			level[actIndex] = ' ';
+			PlayPickupEffect();
+			//PrintSubText("KEY COLLECTED");
+		}
+		else {}
+	}
+	else if (level[actIndex] == MAT)
+	{
+		if (BinaryInput("COLLECT ORE?", true)) {
+			matAmount++;
+			level[actIndex] = ' ';
+			PlayPickupEffect();
+			//PrintSubText("ORE COLLECTED");
+		}
+		else {}
+	}
+	else if (level[actIndex] == BOX)
+	{
+		if (BinaryInput("LOOT CRATE?", true)) {
+			//random items?
+			level[actIndex] = ' ';
+			PlayPickupEffect();
+
+			MakeChestLoot();
+		}
+		else {}
+	}
+	else if (level[actIndex] == DOR && keyAmount > 0)
+	{
+		if (BinaryInput("USE KEY ON DOOR?", true)) {
+			level[actIndex] = ' ';
+			keyAmount--;
+			PlayDoorOpenEffect();
+			PrintSubText("DOOR OPENED");
+		}
+		else {}
+	}
+	else if (level[actIndex] == DOR && keyAmount < 1)
+	{
+		PlayDoorClosedEffect();
+		PrintSubText("DOOR LOCKED");
+	}
+}
 
 //Action managers
 void OpenMenu() 
@@ -516,14 +536,14 @@ void OpenMenu()
 		SetConsoleTextAttribute(console, colorBase);
 	}
 	cout << endl << " +-------------+" << endl;
-	cout << endl << " > Map: TAB";
-	cout << endl << " > Quit: ESCAPE" << endl;
+	cout << endl << " >Map: TAB";
+	cout << endl << " >Quit: ESCAPE ";
 
 	char input = _getch();
 
 	//Exit game
 	if(input == 27) {
-		if (BinaryInput("Really Quit?", false)) {
+		if (BinaryInput("REALLY QUIT?", false)) {
 			levelComplete = true;
 			continuePlaying = false;
 		} else { OpenMenu(); }
@@ -545,8 +565,10 @@ void OpenMenu()
 bool BinaryInput(string prompt, bool wipe)
 {
 	if (wipe) { system("cls"); }
-	cout << endl << "  [" << prompt << "]"; 
-	cout << endl << "> ";
+	if (isMapMode) { DrawLevel(levelArray, width, height, playerX, playerY, keyAmount); }
+	else { cout << endl; }
+	cout << " [" << prompt << "]"; 
+	cout << endl << " > ";
 	SetConsoleTextAttribute(console, 2);
 	cout << "y";
 	SetConsoleTextAttribute(console, colorBase);
@@ -554,7 +576,7 @@ bool BinaryInput(string prompt, bool wipe)
 	SetConsoleTextAttribute(console, 4);
 	cout << "n";
 	SetConsoleTextAttribute(console, colorBase);
-	cout << "o" << endl;
+	cout << "o ";
 
 	mainInput = _getch();
 
@@ -562,10 +584,12 @@ bool BinaryInput(string prompt, bool wipe)
 	{
 	case 'y':
 	case 'Y':
+	case 'E':
 		return true;
 		break;
 	case 'n':
 	case 'N':
+	case 'Q':
 		return false;
 		break;
 	default:
@@ -576,7 +600,7 @@ bool BinaryInput(string prompt, bool wipe)
 void PrintMainText(string mainText) {
 	cout << " " << endl;
 	system("cls");
-	cout << endl << "  [" << mainText << "]" << endl;
+	cout << endl << " [" << mainText << "]" << endl;
 	system("pause");
 }
 void PrintSubText(string subText)
@@ -584,7 +608,48 @@ void PrintSubText(string subText)
 	cout << " " << endl;
 	system("cls");
 	DrawLevel(levelArray, width, height, playerX, playerY, keyAmount);
-	cout << "  [" << subText << "]" << endl;
+	cout << " [" << subText << "]" << endl;
+	system("pause");
+}
+void MakeChestLoot() {
+	//loot table: 1 key, 1 ore, 2 ore
+	system("cls");
+	DrawLevel(levelArray, width, height, playerX, playerY, keyAmount);
+	cout << " [FOUND x";
+	switch (int chestRoll = RNGen(1, 3))
+	{
+	case 1:
+	{
+		cout << "1";
+		SetConsoleTextAttribute(console, colorKey);
+		cout << " KEY";
+		SetConsoleTextAttribute(console, colorBase);
+		keyAmount++;
+		break;
+	}
+	case 2:
+	{
+		cout << "1";
+		SetConsoleTextAttribute(console, colorMat);
+		cout << " ORE";
+		SetConsoleTextAttribute(console, colorBase);
+		matAmount++;
+		break;
+	}
+	case 3:
+	{
+		cout << "2";
+		SetConsoleTextAttribute(console, colorMat);
+		cout << " ORE";
+		SetConsoleTextAttribute(console, colorBase);
+		matAmount++;
+		matAmount++;
+		break;
+	}
+	default:
+		break;
+	}
+	cout << "]" << endl;
 	system("pause");
 }
 
@@ -654,6 +719,9 @@ void DisplayRightBorder()
 	cout << kVerticalBorder << endl;
 }
 
+
+/*
+//for placing symbol randomly along a line
 int rSeed = -1;
 int BuildDoorway()
 {
@@ -663,3 +731,4 @@ int BuildDoorway()
 	}
 	return rSeed;
 }
+*/
