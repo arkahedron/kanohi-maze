@@ -34,13 +34,13 @@ string levelName = defaultLevel;
 bool manualLevelSelect;
 int rngLevelPick = 0;
 //Custom text flavoring
-char kPlayerSymbol = 4;
+char kPlayerSymbol = 48; //4
 constexpr char WAL = 219;
 constexpr char KEY = 126;
-constexpr char MAT = 15;
-constexpr char DOR = 177;
+constexpr char MAT = 232; //15
+constexpr char DOR = 35;
 constexpr char GOL = 234;
-constexpr char BOX = 127;
+constexpr char BOX = 239; //127
 constexpr int colorBase = 7;
 constexpr int colorKey = 14;
 constexpr int colorMat = 8;
@@ -488,7 +488,7 @@ bool ManagePlayerInput(char level[], int& playerX, int& playerY, int width, int&
 			newPlayerY--;
 		case 'W':
 		{
-			kPlayerSymbol = 30;
+			kPlayerSymbol = 65;//30
 			lookDirection = 1;
 			break;
 		}
@@ -496,7 +496,7 @@ bool ManagePlayerInput(char level[], int& playerX, int& playerY, int width, int&
 			newPlayerY++;
 		case 'S':
 		{
-			kPlayerSymbol = 31;
+			kPlayerSymbol = 86; //31
 			lookDirection = 3;
 			break;
 		}
@@ -504,7 +504,7 @@ bool ManagePlayerInput(char level[], int& playerX, int& playerY, int width, int&
 			newPlayerX--;
 		case 'A':
 		{
-			kPlayerSymbol = 17;
+			kPlayerSymbol = 60; //17
 			lookDirection = 2;
 			break;
 		}
@@ -512,7 +512,7 @@ bool ManagePlayerInput(char level[], int& playerX, int& playerY, int width, int&
 			newPlayerX++;
 		case 'D':
 		{
-			kPlayerSymbol = 16;
+			kPlayerSymbol = 62; //16
 			lookDirection = 4;
 			break;
 		}
