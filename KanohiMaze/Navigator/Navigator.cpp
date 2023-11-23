@@ -5,23 +5,10 @@
 #include <fstream>
 #include <vector>
 #include <random>
-#include "resource.h"
 
-//Get resource handle
-HMODULE GCM() 
-{
-	HMODULE hModule = NULL;
-	GetModuleHandleEx(
-		GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS,
-		(LPCTSTR)GCM,
-		&hModule);
-	return hModule;
-}
 
 using namespace std;
 
-//For single exe file distribution, embed and load level txt files as resources
-bool wrapLevelsInEXE = true;
 
 //Randomizer core
 using u32 = uint_least32_t;
