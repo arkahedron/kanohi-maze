@@ -1,4 +1,5 @@
 #include "Visuals.h"
+#include "Level.h"
 #include <string>
 #include <windows.h>
 #include <iostream>
@@ -19,9 +20,8 @@ constexpr char kBottomRightBorder = 188;
 constexpr char kVerticalBorder = 186;
 constexpr char kHole = 206;
 
-
-
 Visuals::Visuals()
+	:levelRef(nullptr)
 {
 
 }
@@ -51,30 +51,26 @@ void Visuals::DrawControls()
 }
 
 //Print map borders
-void Visuals::DrawTop(int width)
+void Visuals::DrawTop()
 {
 	cout << "\n";
 	SetConsoleTextAttribute(console, colorBase);
 	cout << "  " << kTopLeftBorder;
-	for (int i = 0; i < width; i++)
+	for (int i = 0; i < levelRef->m_width; i++)
 	{
-		////Goal on TOP edge hole check and place
-		//if (levelRef.m_holeX == 0 && levelRef.m_holeX == i) { cout << kHole; }
-		//else { cout << kHorizontalBorder; }
-		cout << kHorizontalBorder;
+		if (levelRef->m_holeY == 0 && levelRef->m_holeX == i) { cout << kHole; }
+		else { cout << kHorizontalBorder; }
 	}
 	cout << kTopRightBorder << endl;
 }
-void Visuals::DrawBottom(int width)
+void Visuals::DrawBottom()
 {
 	SetConsoleTextAttribute(console, colorBase);
 	cout << "  " << kBottomLeftBorder;
-	for (int i = 0; i < width; i++)
+	for (int i = 0; i < levelRef->m_width; i++)
 	{
-		////Goal on BOTTOM edge hole check and place
-		//if (levelRef.m_holeY == width - 1 && levelRef.m_holeX == i) { cout << kHole; }
-		//else { cout << kHorizontalBorder; }
-		cout << kHorizontalBorder;
+		if (levelRef->m_holeY == levelRef->m_height - 1 && levelRef->m_holeX == i) { cout << kHole; }
+		else { cout << kHorizontalBorder; }
 	}
 	cout << kBottomRightBorder << endl;
 }
@@ -82,16 +78,14 @@ void Visuals::DrawLeft(int y)
 {
 	SetConsoleTextAttribute(console, colorBase);
 	cout << "  ";
-	//if (levelRef.m_holeX == 0 && levelRef.m_holeY == y) { cout << kHole; }
-	//else { cout << kVerticalBorder; }
-	cout << kVerticalBorder;
+	if (levelRef->m_holeX == 0 && levelRef->m_holeY == y) { cout << kHole; }
+	else { cout << kVerticalBorder; }
 	
 }
-void Visuals::DrawRight(int y, int width)
+void Visuals::DrawRight(int y)
 {
 	SetConsoleTextAttribute(console, colorBase);
-	//if (levelRef.m_holeX == width - 1 && levelRef.m_holeY == y) { cout << kHole << endl; }
-	//else { cout << kVerticalBorder << endl; }
-	cout << kVerticalBorder << endl;
+	if (levelRef->m_holeX == levelRef->m_width - 1 && levelRef->m_holeY == y) { cout << kHole << endl; }
+	else { cout << kVerticalBorder << endl; }
 	
 }

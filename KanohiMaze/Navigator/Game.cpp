@@ -16,8 +16,9 @@ Game::Game()
 	: levelEnd(false)
 	, exitedGame(false)
 	, m_levelName("Entry.txt")
+	, m_visuals()
 {
-
+	m_visuals.SetLevelRef(&m_level);
 }
 Game::~Game()
 {
@@ -121,8 +122,8 @@ bool Game::Update()
 void Game::Draw()
 {
 	system("cls");
-	//m_visuals.SetLevelRef(m_level);
-	m_visuals.DrawTop(m_level.GetWidth());
+
+	m_visuals.DrawTop();
 
 	for (int y = 0; y < m_level.GetHeight(); y++)
 	{
@@ -150,10 +151,10 @@ void Game::Draw()
 				m_visuals.ColorText(colorBase);
 			}
 		}
-		m_visuals.DrawRight(y, m_level.GetWidth());
+		m_visuals.DrawRight(y);
 
 	}
-	m_visuals.DrawBottom(m_level.GetWidth());
+	m_visuals.DrawBottom();
 }
 
 void Game::Interact(int x, int y)

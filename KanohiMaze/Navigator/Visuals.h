@@ -1,14 +1,16 @@
 #pragma once
-//#include "Level.h"
 #include <string>
+
+class Level;
 
 class Visuals
 {
+
 public:
 	Visuals();
 	~Visuals();
 
-	//void SetLevelRef(Level lvlRef) { Level levelRef = lvlRef; };
+	void SetLevelRef(Level* lvlRef) { levelRef = lvlRef; };
 
 	void ColorText(int color);
 
@@ -16,8 +18,10 @@ public:
 
 	void DrawControls();
 
-	void DrawTop(int width);
-	void DrawBottom(int width);
+	void DrawTop();
+	void DrawBottom();
 	void DrawLeft(int y);
-	void DrawRight(int y, int width);
+	void DrawRight(int y);
+private:
+	Level* levelRef;
 };
