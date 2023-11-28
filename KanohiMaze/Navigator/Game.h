@@ -23,6 +23,7 @@ public:
 	Level GetLevelRef() { return m_level; };
 	Player GetPlayerRef() { return m_player; };
 
+	bool lvlDrawn;
 	bool levelEnd;
 	bool exitedGame;
 

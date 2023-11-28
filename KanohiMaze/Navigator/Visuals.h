@@ -10,6 +10,9 @@ public:
 	Visuals();
 	~Visuals();
 
+	void ResetCursor();
+	void DrawAtSpace(int x, int y, char thing);
+
 	void SetLevelRef(Level* lvlRef) { levelRef = lvlRef; };
 
 	void ColorText(int color);

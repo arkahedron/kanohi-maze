@@ -62,6 +62,7 @@ bool Menu::Open(Inventory inv)
 		{
 		case '\t':
 			m_isOpen = false;
+			system("cls");
 			break;
 		default:
 			break;

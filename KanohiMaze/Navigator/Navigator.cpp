@@ -214,7 +214,7 @@ int main()
 			{
 				//if (isMapMode)
 				//{
-				system("cls");
+				//system("cls");
 				myGame.Run();
 				levelComplete = myGame.levelEnd;
 				exitedMaze = myGame.exitedGame;

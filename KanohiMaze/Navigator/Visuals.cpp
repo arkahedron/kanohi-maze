@@ -6,7 +6,7 @@
 
 using namespace std;
 
-HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
+static const HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
 constexpr int colorBase = 7;
 constexpr int colorKey = 14;
 constexpr int colorMat = 8;
@@ -21,13 +21,34 @@ constexpr char kVerticalBorder = 186;
 constexpr char kHole = 206;
 
 Visuals::Visuals()
-	:levelRef(nullptr)
+	: levelRef(nullptr)
 {
 
 }
 Visuals::~Visuals()
 {
 
+}
+
+void Visuals::ResetCursor()
+{
+	std::cout.flush();
+	SetConsoleCursorPosition(console, {0,0});
+	cout.flush();
+}
+
+void Visuals::DrawAtSpace(int x, int y, char thing)
+{
+	std::cout.flush();
+	COORD coord = { (SHORT)x, (SHORT)y };
+	coord.X += 3;
+	coord.Y += 2;
+	SetConsoleCursorPosition(console, coord);
+	cout << thing;
+	cout.flush();
+	COORD idle = { 0,0 };
+	idle.Y += (levelRef->m_height+5);
+	SetConsoleCursorPosition(console, idle);
 }
 
 void Visuals::ColorText(int color)
@@ -47,7 +68,7 @@ void Visuals::DrawControls()
 	cout << " >Move: WASD" << " |";
 	cout << " >Look: SHFT+WASD " << endl;
 	cout << " >Act: E" << "     |";
-	cout << " >Menu: TAB ";
+	cout << " >Menu: TAB " << endl;
 }
 
 //Print map borders

@@ -63,9 +63,9 @@ void Player::PickupMat(int amt)
 	m_inventory.mats += amt;
 }
 
-void Player::Draw()
+char Player::Draw()
 {
 	m_visuals.ColorText(11);
-	cout << kPlayerSymbol;
-	m_visuals.ColorText(colorBase);
+	return kPlayerSymbol;
+	//m_visuals.ColorText(colorBase);
 }

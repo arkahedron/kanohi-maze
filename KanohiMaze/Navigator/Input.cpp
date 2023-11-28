@@ -40,15 +40,18 @@ bool Input::BinaryChoice(string prompt)
 	case 'y':
 	case 'Y':
 	case 'E':
+		
 		return true;
 		break;
 	case 'n':
 	case 'N':
 	case 'Q':
+		
 		return false;
 		break;
 	default:
 		cout << endl;
+		
 		return BinaryChoice(prompt);
 		break;
 	}

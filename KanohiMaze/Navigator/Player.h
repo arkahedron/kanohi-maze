@@ -39,5 +39,5 @@ public:
 	void UseKey();
 	void PickupMat(int amt);
 
-	void Draw();
+	char Draw();
 };

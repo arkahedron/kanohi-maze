@@ -43,6 +43,30 @@ void SaveLevel(char* pLevel, int width, int height);
 
 bool BinaryInput(string prompt, bool wipe);
 
+int bufferX, bufferY;
+static const HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+void DrawAtSpace(int x, int y, char thing) 
+{	
+	std::cout.flush();
+	COORD coord = { (SHORT)x, (SHORT)y };
+	coord.X += bufferX;
+	coord.Y += bufferY;
+	SetConsoleCursorPosition(hOut, coord);
+	cout << thing;
+	cout.flush();
+	//coord.X--;
+	SetConsoleCursorPosition(hOut, coord);
+}
+void PushToStart()
+{
+	COORD Start = {0,0};
+	//Start.X = 0;
+	//Start.Y = 0;
+	SetConsoleCursorPosition(hOut, Start);
+}
+
+
+
 int main()
 {
 	do {
@@ -70,6 +94,7 @@ int main()
 
 			GetLevelDimensions(levelWidth, levelHeight);
 
+			system("cls");
 			char* pLevel = new char[levelWidth * levelHeight];
 
 			for (int i = 0; i < levelWidth * levelHeight; i++)
@@ -82,7 +107,7 @@ int main()
 			bool doneEditing = false;
 			while (!doneEditing)
 			{
-				system("cls");
+				//system("cls");
 				DisplayLevel(pLevel, levelWidth, levelHeight, cursorX, cursorY);
 				doneEditing = EditLevel(pLevel, cursorX, cursorY, levelWidth, levelHeight);
 			}
@@ -251,11 +276,12 @@ void SaveLevel(char* pLevel, int width, int height)
 		levelFile.close();
 	}
 }
-
+int newCursorX;
+int newCursorY;
 bool EditLevel(char* pLevel, int& cursorX, int& cursorY, int width, int height)
 {
-	int newCursorX = cursorX;
-	int newCursorY = cursorY;
+	newCursorX = cursorX;
+	newCursorY = cursorY;
 
 	int intInput = _getch();
 
@@ -287,8 +313,13 @@ bool EditLevel(char* pLevel, int& cursorX, int& cursorY, int width, int height)
 		else if (newCursorY == height)
 			newCursorY = height - 1;
 
+		int index = GetIndexFromXY(cursorX, cursorY, width);
+
+		DrawAtSpace(cursorX, cursorY, pLevel[index]);
 		cursorX = newCursorX;
 		cursorY = newCursorY;
+		index = GetIndexFromXY(newCursorX, newCursorY, width);
+		DrawAtSpace(newCursorX, newCursorY, kCursor);
 	}
 	else
 	{
@@ -299,9 +330,11 @@ bool EditLevel(char* pLevel, int& cursorX, int& cursorY, int width, int height)
 		else
 		{
 			int index = GetIndexFromXY(newCursorX, newCursorY, width);
-			pLevel[index] = (char)intInput;
+			pLevel[index] = (char)intInput; 
+			DrawAtSpace(cursorX, cursorY, pLevel[index]);
 		}
 	}
+	PushToStart();
 	return false;
 }
 
@@ -341,11 +374,18 @@ void GetLevelDimensions(int& width, int& height)
 
 }
 
+
+bool lvlDrawn(false);
+
 void DisplayLevel(char* pLevel, int width, int height, int cursorX, int cursorY)
 {
-	cout << "[SYMBOL LEGEND]: " << "O,o = WALL | " << "D,d = DOOR | " << "K,k = KEY " << endl;
-	cout << "@,P,p = PLAYER | " << "X,x = GOAL | " << "M,m = ITEM | " << "C,c = CHEST " << endl;
-
+	if (lvlDrawn == false)
+	{
+		cout << " [SYMBOL LEGEND]: " << "O,o = WALL | " << "D,d = DOOR | " << "K,k = KEY " << endl;
+		cout << " @,P,p = PLAYER | " << "X,x = GOAL | " << "M,m = ITEM | " << "C,c = CHEST " << endl;
+		bufferY += 3;
+		bufferX += 1;
+	}
 	DisplayTopBorder(width);
 
 	for (int y = 0; y < height; y++)
@@ -355,46 +395,67 @@ void DisplayLevel(char* pLevel, int width, int height, int cursorX, int cursorY)
 		{
 			if (cursorX == x && cursorY == y)
 			{
-				cout << kCursor;
+				//int index = GetIndexFromXY(x, y, width);
+				
+				//DrawAtSpace(cursorX, cursorY, pLevel[index]);
+				//DrawAtSpace(newCursorX, newCursorY, kCursor);
+				//PushToStart();
 			}
 			else
 			{
-				int index = GetIndexFromXY(x, y, width);
-				cout << pLevel[index];
+				if (lvlDrawn == false)
+				{
+					int index = GetIndexFromXY(x, y, width);
+					DrawAtSpace(x, y, pLevel[index]);
+					//SetCursorPosition(x, y);
+					//cout << pLevel[index];
+				}
 			}
 		}
 		DisplayRightBorder();
 	}
-
 	DisplayBottomBorder(width);
+	lvlDrawn = true;
 }
 
 void DisplayTopBorder(int width)
 {
-	cout << kTopLeftBorder;
-	for (int i = 0; i < width; i++)
+	if (lvlDrawn == false)
 	{
-		cout << kHorizontalBorder;
+		cout << kTopLeftBorder;
+		for (int i = 0; i < width; i++)
+		{
+			cout << kHorizontalBorder;
+		}
+		cout << kTopRightBorder << endl;
 	}
-	cout << kTopRightBorder << endl;
-}
+	}
 void DisplayBottomBorder(int width) 
 {
-	cout << kBottomLeftBorder;
-	for (int i = 0; i < width; i++)
+	if (lvlDrawn == false)
 	{
-		cout << kHorizontalBorder;
+		cout << kBottomLeftBorder;
+		for (int i = 0; i < width; i++)
+		{
+			cout << kHorizontalBorder;
+		}
+		cout << kBottomRightBorder << endl;
 	}
-	cout << kBottomRightBorder << endl;
-}
+	}
 void DisplayLeftBorder()
 {
-	cout << kVerticalBorder;
-}
+	if (lvlDrawn == false)
+	{
+		cout << kVerticalBorder;
+	}
+	}
 void DisplayRightBorder()
 {
-	cout << kVerticalBorder << endl;
-}
+	if (lvlDrawn == false)
+	{
+		cout << " " << kVerticalBorder << endl;
+	}
+	}
 
 int GetIndexFromXY(int x, int y, int width)
 {
