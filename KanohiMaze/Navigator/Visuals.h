@@ -1,5 +1,7 @@
 #pragma once
 #include <string>
+#include <Windows.h>
+#include <iostream>
 
 class Level;
 
@@ -10,14 +12,15 @@ public:
 	Visuals();
 	~Visuals();
 
-	void ResetCursor();
-	void DrawAtSpace(int x, int y, char thing);
-
 	void SetLevelRef(Level* lvlRef) { levelRef = lvlRef; };
 
-	void ColorText(int color);
+	COORD FindCursorPos();
+	void ResetCursor(COORD cPos = {0,0});
+	void WipeLastLines(int x);
 
-	void SubText(std::string txt);
+	void DrawAtSpace(int x, int y, char thing);
+
+	void ColorText(int color);
 
 	void DrawControls();
 

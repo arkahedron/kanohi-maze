@@ -37,12 +37,6 @@ public:
 
 	char GetSpaceAtPosition(int x, int y);
 
-	int GetHeight() { return m_height; }
-	int GetWidth() { return m_width; }
-	int GetHoleX() { return m_holeX; }
-	int GetHoleY() { return m_holeY; }
-
-
 private:
 	int GetIndexFromCoordinates(int x, int y);
 	bool Convert(int* playerX, int* playerY);

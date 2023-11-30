@@ -1,15 +1,18 @@
 #include "Player.h"
 #include <iostream>
 #include <Windows.h>
+#include <conio.h>
 
 using namespace std;
 
 char kPlayerSymbol = 48; //4
-constexpr int colorBase = 7;
 
 Player::Player()
-	: m_lookDirection(0)
+	: lookDirection(0)
 	, exited(false)
+	, menuIsOpen(false)
+	, keys(0)
+	, mats(0)
 {
 
 }
@@ -26,46 +29,91 @@ void Player::SetPosition(int x, int y)
 }
 void Player::SetLookDirection(int z)
 {
-	m_lookDirection = z;
-
+	lookDirection = z;
 	switch (z) 
 	{
-	case 1:
+	case 1: /*facing up*/
 	{ kPlayerSymbol = 65; /*30*/ break; }
-	case 2:
+	case 2: /*facing down*/
 	{ kPlayerSymbol = 86; /*31*/ break; }
-	case 3:
+	case 3: /*facing left*/
 	{ kPlayerSymbol = 60; /*17*/ break; }
-	case 4:
+	case 4: /*facing right*/
 	{ kPlayerSymbol = 62; /*16*/ break; }
 	}
 }
 
-void Player::OpenMenu()
-{
-	exited = m_menu.Open(m_inventory);
-}
-
 bool Player::HasKey()
 {
-	return ((m_inventory.keys > 0) ? true : false);
+	return ((keys > 0) ? true : false);
 }
 void Player::PickupKey(int amt)
 {
-	m_inventory.keys += amt;
+	keys += amt;
 }
 void Player::UseKey()
 {
-	m_inventory.keys--;
+	keys--;
 }
 void Player::PickupMat(int amt)
 {
-	m_inventory.mats += amt;
+	mats += amt;
 }
 
 char Player::Draw()
 {
 	m_visuals.ColorText(11);
 	return kPlayerSymbol;
-	//m_visuals.ColorText(colorBase);
+}
+
+void Player::OpenMenu()
+{
+	menuIsOpen = true;
+	do {
+		system("cls");
+		cout << endl << " ----[MENU]----" << endl;
+		cout << endl << " +-{Inventory}-+";
+
+		if (keys > 0) {
+			cout << endl << " - x" << keys;
+			m_visuals.ColorText(14);
+			cout << " KEY";
+			m_visuals.ColorText(7);
+		}
+		if (mats > 0) {
+			cout << endl << " - x" << mats;
+			m_visuals.ColorText(8);
+			cout << " ORE";
+			m_visuals.ColorText(7);
+		}
+		cout << endl << " +-------------+" << endl;
+		cout << endl << " >Map: TAB";
+		cout << endl << " >Quit: ESCAPE ";
+
+		char input = _getch();
+
+		//Exit game
+		if (input == 27) {
+			cout << endl;
+			if (m_input.BinaryChoice("REALLY QUIT?"))
+			{
+				exited = true;
+				menuIsOpen = false;
+			}
+			else {}
+		}
+
+		//Menu inputs, will be expanded upon
+		else {
+			switch (input)
+			{
+			case '\t':
+				menuIsOpen = false;
+				system("cls");
+				break;
+			default:
+				break;
+			}
+		}
+	} while (menuIsOpen);
 }

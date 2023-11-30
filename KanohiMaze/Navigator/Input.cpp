@@ -23,7 +23,6 @@ Input::~Input()
 
 bool Input::BinaryChoice(string prompt)
 {
-
 	cout  << " [" << prompt << "]";
 	cout << endl << " > ";
 	m_visuals.ColorText(2);
@@ -40,18 +39,16 @@ bool Input::BinaryChoice(string prompt)
 	case 'y':
 	case 'Y':
 	case 'E':
-		
 		return true;
 		break;
 	case 'n':
 	case 'N':
 	case 'Q':
-		
 		return false;
 		break;
 	default:
 		cout << endl;
-		
+		m_visuals.WipeLastLines(2);
 		return BinaryChoice(prompt);
 		break;
 	}

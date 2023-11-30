@@ -1,36 +1,31 @@
 #pragma once
 #include "Point.h"
 #include "Visuals.h"
-#include "Inventory.h"
-#include "Menu.h"
+#include "Input.h"
 
 class Player
 {
+	Input m_input;
 	Point m_position;
-	Inventory m_inventory;
 	Visuals m_visuals;
-	Menu m_menu;
-	int m_lookDirection;
 
 public:
 	Player();
 	~Player();
 
+	int lookDirection;
+	bool menuIsOpen;
+	int keys;
+	int mats;
 	bool exited;
 
 	int GetXPosition() { return m_position.x; };
 	int GetYPosition() { return m_position.y; };
-
 	int* GetXPositionPointer() { return &(m_position.x); }
 	int* GetYPositionPointer() { return &(m_position.y); }
-
-	int GetLookDirection() { return m_lookDirection; };
-	int* GetLookDirectionPointer() { return &(m_lookDirection); }
-
 	void SetPosition(int x, int y);
-	void SetLookDirection(int z);
 
-	Inventory GetInvRef(){ return m_inventory; }
+	void SetLookDirection(int z);
 
 	void OpenMenu();
 

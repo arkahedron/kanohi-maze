@@ -130,9 +130,7 @@
   <ItemGroup>
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Input.cpp" />
-    <ClCompile Include="Inventory.cpp" />
     <ClCompile Include="Level.cpp" />
-    <ClCompile Include="Menu.cpp" />
     <ClCompile Include="Navigator.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Randomizer.cpp" />
@@ -141,9 +139,9 @@
   <ItemGroup>
     <ClInclude Include="Game.h" />
     <ClInclude Include="Input.h" />
-    <ClInclude Include="Inventory.h" />
+    <ClInclude Include="Item.h" />
     <ClInclude Include="Level.h" />
-    <ClInclude Include="Menu.h" />
+    <ClInclude Include="PlacableActor.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Point.h" />
     <ClInclude Include="Randomizer.h" />

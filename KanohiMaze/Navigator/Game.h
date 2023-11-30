@@ -14,6 +14,7 @@ class Game
 	Input m_input;
 	Visuals m_visuals;
 	Randomizer m_randomizer;
+
 	std::string m_levelName;
 
 public:
@@ -23,6 +24,7 @@ public:
 	Level GetLevelRef() { return m_level; };
 	Player GetPlayerRef() { return m_player; };
 
+	int roomsCleared;
 	bool lvlDrawn;
 	bool levelEnd;
 	bool exitedGame;

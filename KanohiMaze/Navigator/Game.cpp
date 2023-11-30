@@ -12,14 +12,13 @@ constexpr int colorMat = 8;
 constexpr int colorBox = 6;
 
 
-
-
 Game::Game()
 	: levelEnd(false)
 	, exitedGame(false)
 	, m_levelName("Entry.txt")
 	, m_visuals()
 	, lvlDrawn(false)
+	, roomsCleared(0)
 {
 	m_visuals.SetLevelRef(&m_level);
 }
@@ -62,66 +61,47 @@ bool Game::Update()
 	m_visuals.DrawAtSpace(m_player.GetXPosition(), m_player.GetYPosition(), m_level.GetSpaceAtPosition(m_player.GetXPosition(), m_player.GetYPosition()));
 
 	//Movement inputs
-	switch (input) {
+	switch (input) 
+	{
 	case '\t':
 		m_player.OpenMenu();
 		lvlDrawn = false;
 		break;
-	case 'w':
-		newPlayerY--;
+	case 'w': newPlayerY--;
 	case 'W':
-	{
-		m_player.SetLookDirection(1);
-		break;
-	}
-	case 's':
-		newPlayerY++;
+	{ m_player.SetLookDirection(1); break; }
+	case 's': newPlayerY++;
 	case 'S':
-	{
-		m_player.SetLookDirection(2);
-		break;
-	}
-	case 'a':
-		newPlayerX--;
+	{ m_player.SetLookDirection(2); break; }
+	case 'a': newPlayerX--;
 	case 'A':
-	{
-		m_player.SetLookDirection(3);
-		break;
-	}
-	case 'd':
-		newPlayerX++;
+	{ m_player.SetLookDirection(3); break; }
+	case 'd': newPlayerX++;
 	case 'D':
-	{
-		m_player.SetLookDirection(4);
-		break;
+	{ m_player.SetLookDirection(4); break; }
+	default: break;
 	}
-	default:
-		break;
-	}
-
 
 	//Move player and check for unique space
-	////int index = GetIndexFromCoordinates(newPlayerX, newPlayerY, width);
 	if (m_level.IsSpace(newPlayerX, newPlayerY))
 	{
 		//Confine player to level edges
 		if (newPlayerX < 0)
 			newPlayerX = 0;
-		else if (newPlayerX == m_level.GetWidth())
-			newPlayerX = m_level.GetWidth() - 1;
+		else if (newPlayerX == m_level.m_width)
+			newPlayerX = m_level.m_width - 1;
 		if (newPlayerY < 0)
 			newPlayerY = 0;
-		else if (newPlayerY == m_level.GetHeight())
-			newPlayerY = m_level.GetHeight() - 1;
+		else if (newPlayerY == m_level.m_height)
+			newPlayerY = m_level.m_height - 1;
 		m_player.SetPosition(newPlayerX, newPlayerY);
-		//m_visuals.DrawAtSpace(newPlayerX, newPlayerY, m_player.Draw());
-		
 	}
 	else if (m_level.IsGoal(newPlayerX, newPlayerY))
 	{
 		m_level.ClearSpace(newPlayerX, newPlayerY);
 		m_player.SetPosition(newPlayerX, newPlayerY);
 		m_level.ClearLevel();
+		roomsCleared++;
 		lvlDrawn = false;
 		return true;
 	}
@@ -130,57 +110,52 @@ bool Game::Update()
 	m_visuals.ColorText(colorBase);
 	return false;
 }
+
 void Game::Draw()
 {
 	if (!lvlDrawn)
 	{
-		m_visuals.ResetCursor();
-	//system("cls");
-
-	m_visuals.DrawTop();
-
-	for (int y = 0; y < m_level.GetHeight(); y++)
-	{
-		m_visuals.DrawLeft(y);
-
-		for (int x = 0; x < m_level.GetWidth(); x++)
+		m_visuals.ResetCursor(); /*required for correct map placement*/
+		m_visuals.DrawTop();
+		for (int y = 0; y < m_level.m_height; y++)
 		{
-			if (m_player.GetXPosition() == x && m_player.GetYPosition() == y) {
-				cout << m_player.Draw();
-			}
-			else
+			m_visuals.DrawLeft(y);
+			for (int x = 0; x < m_level.m_width; x++)
 			{
-				//Colorize other unique symbols
-				if (m_level.IsDoor(x, y)) {
-					if (m_player.HasKey()) { m_visuals.ColorText(2); }
-					else { m_visuals.ColorText(4); }
+				//Actual Per-Space print
+				if (m_player.GetXPosition() == x && m_player.GetYPosition() == y) {
+					cout << m_player.Draw();
 				}
-				else if (m_level.IsKey(x, y)) { m_visuals.ColorText(colorKey); }
-				else if (m_level.IsMat(x, y)) { m_visuals.ColorText(colorMat); }
-				else if (m_level.IsBox(x, y)) { m_visuals.ColorText(colorBox); }
-				else if (m_level.IsGoal(x, y)) { m_visuals.ColorText(15); }
-				else { m_visuals.ColorText(colorBase); }
-				//Print relevant symbol and reset color to base
-				m_level.Draw(x, y);
-				m_visuals.ColorText(colorBase);
+				else
+				{
+					//Colorize other unique symbols
+					if (m_level.IsDoor(x, y)) {
+						if (m_player.HasKey()) { m_visuals.ColorText(2); }
+						else { m_visuals.ColorText(4); }
+					}
+					else if (m_level.IsKey(x, y)) { m_visuals.ColorText(colorKey); }
+					else if (m_level.IsMat(x, y)) { m_visuals.ColorText(colorMat); }
+					else if (m_level.IsBox(x, y)) { m_visuals.ColorText(colorBox); }
+					else if (m_level.IsGoal(x, y)) { m_visuals.ColorText(15); }
+					else { m_visuals.ColorText(colorBase); }
+					//Print relevant symbol and reset color to base
+					m_level.Draw(x, y);
+					m_visuals.ColorText(colorBase);
+				}
 			}
+			m_visuals.DrawRight(y);
 		}
-		m_visuals.DrawRight(y);
-
-	}
-	m_visuals.DrawBottom();
-	m_visuals.DrawControls();
+		m_visuals.DrawBottom();
+		m_visuals.DrawControls();
 	}
 	lvlDrawn = true;
 }
 
 void Game::Interact(int x, int y)
 {
-	//system("cls");
-	//Draw();
 	int actX = x;
 	int actY = y;
-	switch (m_player.GetLookDirection())
+	switch (m_player.lookDirection)
 	{
 	case 1: /*facing up*/
 	{ actY--; break; }
@@ -239,13 +214,15 @@ void Game::Interact(int x, int y)
 				m_level.ClearSpace(actX, actY);
 				m_player.UseKey();
 				///PlayDoorOpenEffect();
-				m_visuals.SubText("DOOR OPENED");
+				cout << '\r' << " [DOOR OPENED]" << endl;
+				system("pause");
 			}
 		}
 		else
 		{
 			///PlayDoorClosedEffect();
-			m_visuals.SubText("DOOR LOCKED");
+			cout << '\r' << " [DOOR LOCKED]" << endl;
+			system("pause");
 		}
 		system("cls");
 		lvlDrawn = false;

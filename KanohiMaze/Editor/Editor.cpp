@@ -21,6 +21,8 @@ constexpr int kRightArrow = 77;
 constexpr int kUpArrow = 72;
 constexpr int kDownArrow = 80;
 constexpr int kEscape = 27;
+constexpr int kBackspace = 8;
+
 char mainInput;
 int menuPick = 0;
 bool continueProgram = true;
@@ -326,6 +328,10 @@ bool EditLevel(char* pLevel, int& cursorX, int& cursorY, int width, int height)
 		if (intInput == kEscape)
 		{
 			return true;
+		}
+		else if (intInput == kBackspace)
+		{
+			//ignore
 		}
 		else
 		{

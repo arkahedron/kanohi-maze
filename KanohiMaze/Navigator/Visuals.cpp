@@ -30,18 +30,36 @@ Visuals::~Visuals()
 
 }
 
-void Visuals::ResetCursor()
+COORD Visuals::FindCursorPos()
 {
-	std::cout.flush();
-	SetConsoleCursorPosition(console, {0,0});
+	CONSOLE_SCREEN_BUFFER_INFO cbsi;
+	if (GetConsoleScreenBufferInfo(console, &cbsi))
+	{
+		return cbsi.dwCursorPosition;
+	}
+	else{ COORD invalid = {0,0}; return invalid;}
+
+}
+void Visuals::ResetCursor(COORD cPos)
+{
+	COORD cursorPos = cPos;
 	cout.flush();
+	SetConsoleCursorPosition(console, cursorPos);
+	cout.flush();
+}
+void Visuals::WipeLastLines(int x)
+{
+	COORD replace = FindCursorPos();
+	replace.Y -= x;
+	ResetCursor(replace);
 }
 
 void Visuals::DrawAtSpace(int x, int y, char thing)
 {
 	std::cout.flush();
 	COORD coord = { (SHORT)x, (SHORT)y };
-	coord.X += 3;
+	/*Temp harsh-defined buffer for edges and border to align map draw*/
+	coord.X += 3; 
 	coord.Y += 2;
 	SetConsoleCursorPosition(console, coord);
 	cout << thing;
@@ -54,13 +72,6 @@ void Visuals::DrawAtSpace(int x, int y, char thing)
 void Visuals::ColorText(int color)
 {
 	SetConsoleTextAttribute(console, color);
-}
-
-void Visuals::SubText(string txt)
-{
-
-	cout << '\r' << " [" << txt << "]" << endl;
-	system("pause");
 }
 
 void Visuals::DrawControls()
@@ -79,7 +90,8 @@ void Visuals::DrawTop()
 	cout << "  " << kTopLeftBorder;
 	for (int i = 0; i < levelRef->m_width; i++)
 	{
-		if (levelRef->m_holeY == 0 && levelRef->m_holeX == i) { cout << kHole; }
+		if (levelRef->m_holeY == 0 && levelRef->m_holeX == i) 
+		{ cout << kHole; }
 		else { cout << kHorizontalBorder; }
 	}
 	cout << kTopRightBorder << endl;
@@ -90,7 +102,8 @@ void Visuals::DrawBottom()
 	cout << "  " << kBottomLeftBorder;
 	for (int i = 0; i < levelRef->m_width; i++)
 	{
-		if (levelRef->m_holeY == levelRef->m_height - 1 && levelRef->m_holeX == i) { cout << kHole; }
+		if (levelRef->m_holeY == levelRef->m_height - 1 && levelRef->m_holeX == i) 
+		{ cout << kHole; }
 		else { cout << kHorizontalBorder; }
 	}
 	cout << kBottomRightBorder << endl;
@@ -99,14 +112,16 @@ void Visuals::DrawLeft(int y)
 {
 	SetConsoleTextAttribute(console, colorBase);
 	cout << "  ";
-	if (levelRef->m_holeX == 0 && levelRef->m_holeY == y) { cout << kHole; }
+	if (levelRef->m_holeX == 0 && levelRef->m_holeY == y) 
+	{ cout << kHole; }
 	else { cout << kVerticalBorder; }
 	
 }
 void Visuals::DrawRight(int y)
 {
 	SetConsoleTextAttribute(console, colorBase);
-	if (levelRef->m_holeX == levelRef->m_width - 1 && levelRef->m_holeY == y) { cout << kHole << endl; }
+	if (levelRef->m_holeX == levelRef->m_width - 1 && levelRef->m_holeY == y) 
+	{ cout << kHole << endl; }
 	else { cout << kVerticalBorder << endl; }
 	
 }
