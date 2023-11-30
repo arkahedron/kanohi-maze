@@ -9,6 +9,8 @@
 #include "Player.h"
 #include "Input.h"
 
+#include "Item.h"
+
 using namespace std;
 
 bool exitedMaze = true;
@@ -32,11 +34,29 @@ void PrintScores() {
 	cout << s_Rooms << "]" << endl << endl;
 }
 
+void TestMode()
+{
+	cout << " [t] - test mode" << endl;
+	//Test Mode
+	char input = (char)_getch();
+	if (input == 't')
+	{ do{
+		char input = (char)_getch();
+		cout << " [ENTERED TEST MODE]" << endl;
+		Item* randomDisc = new Item("Kanoka Disc", ItemType::RESOURCE, Rarity::GREAT);
+		(*randomDisc).RollElement();
+		(*randomDisc).RollRarity(3);
+		(*randomDisc).Print();
+		cout << endl;
+		} while (input != (char)27); }
+}
 
 int main()
 {
+	if (true) { TestMode(); }
+
 	Game myGame;
-	std::cout << " ---{ WELCOME TO KANOHI MAZE }---" << endl;
+	cout << " ---{ WELCOME TO KANOHI MAZE }---" << endl;
 	system("pause");
 	do {
 

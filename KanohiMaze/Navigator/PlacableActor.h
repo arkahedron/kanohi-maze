@@ -1,18 +1,22 @@
 #pragma once
 #include "Point.h"
+#include "Visuals.h"
 
-constexpr int colorGreen = 10;
-constexpr int colorRed = 12;
-constexpr int colorBlue = 9;
-constexpr int colorRegular = 7;
+enum class ActorType
+{
+	Door,
+	Enemy,
+	Goal,
+	Key,
+	Chest,
+	Player,
+};
 
 class PlacableActor
 {
 public:
-	PlacableActor(int x, int y, int color = colorRegular);
+	PlacableActor(int x, int y, AColor color = AColor::Regular);
 	virtual ~PlacableActor();
-
-	bool exited;
 
 	int GetXPosition();
 	int GetYPosition();
@@ -20,12 +24,13 @@ public:
 	int* GetYPositionPointer();
 	void SetPosition(int x, int y);
 
-	int GetColor() { return m_color; }
+	AColor GetColor() { return m_color; }
 
 	void Remove() { m_IsActive = false; }
 	bool IsActive() { return m_IsActive; }
 	void Place(int x, int y);
 
+	virtual ActorType GetType() = 0;
 	virtual void Draw() = 0;
 	virtual void Update()
 	{
@@ -36,6 +41,6 @@ protected:
 	Point* m_pPosition;
 	
 	bool m_IsActive;
-	int m_color;
+	AColor m_color;
 };
 

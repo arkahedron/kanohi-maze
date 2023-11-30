@@ -74,6 +74,13 @@ void Visuals::ColorText(int color)
 	SetConsoleTextAttribute(console, color);
 }
 
+void Visuals::PrintOutActor(char actor, AColor color)
+{
+	SetConsoleTextAttribute(console, (int)color);
+	cout << actor;
+	SetConsoleTextAttribute(console, (int)AColor::Regular);
+}
+
 void Visuals::DrawControls()
 {
 	cout << " >Move: WASD" << " |";

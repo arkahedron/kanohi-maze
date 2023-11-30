@@ -29,3 +29,16 @@ int Randomizer::Generate(int min, int max)
 
 	return randResult;
 }
+
+int Randomizer::Modulate()
+{
+	int randResult;
+	random_device os_seed;
+	const u32 seed = os_seed();
+	engine generator(seed);
+	uniform_int_distribution< u32 > distribute(0,2);
+	randResult = distribute(generator);
+	randResult -= 1;
+
+	return randResult;
+}

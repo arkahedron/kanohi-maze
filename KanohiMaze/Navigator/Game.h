@@ -35,8 +35,12 @@ public:
 
 	void ChestLoot();
 
+	int GetPlayerLives() { return m_player.lives; }
+
 private:
 	bool Update();
 	void Draw();
 	void Interact(int x, int y);
+
+	//bool HandleCollision(int newPlayerX, int newPlayerY);
 };

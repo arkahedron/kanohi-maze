@@ -1,9 +1,12 @@
 #pragma once
+#include "PlacableActor.h"
 #include "Point.h"
 #include "Visuals.h"
 #include "Input.h"
 
-class Player
+class Key;
+
+class Player : public PlacableActor
 {
 	Input m_input;
 	Point m_position;
@@ -15,15 +18,10 @@ public:
 
 	int lookDirection;
 	bool menuIsOpen;
+	bool exited;
 	int keys;
 	int mats;
-	bool exited;
-
-	int GetXPosition() { return m_position.x; };
-	int GetYPosition() { return m_position.y; };
-	int* GetXPositionPointer() { return &(m_position.x); }
-	int* GetYPositionPointer() { return &(m_position.y); }
-	void SetPosition(int x, int y);
+	int lives;
 
 	void SetLookDirection(int z);
 
@@ -32,7 +30,14 @@ public:
 	bool HasKey();
 	void PickupKey(int amt);
 	void UseKey();
+
 	void PickupMat(int amt);
 
-	char Draw();
+	int GetLives() { return lives; }
+	void DecrementLives() { lives--; }
+
+	char GoodDraw();
+
+	virtual ActorType GetType() override { return ActorType::Player; }
+	virtual void  Draw() override;
 };

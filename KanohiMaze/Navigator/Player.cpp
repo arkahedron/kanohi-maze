@@ -6,13 +6,16 @@
 using namespace std;
 
 char kPlayerSymbol = 48; //4
+constexpr int kStartingLives = 3;
 
 Player::Player()
-	: lookDirection(0)
+	: PlacableActor(0,0, AColor::Teal)
+	, lookDirection(0)
 	, exited(false)
 	, menuIsOpen(false)
 	, keys(0)
 	, mats(0)
+	, lives(kStartingLives)
 {
 
 }
@@ -21,12 +24,6 @@ Player::~Player()
 
 }
 
-
-void Player::SetPosition(int x, int y)
-{
-	m_position.x = x;
-	m_position.y = y;
-}
 void Player::SetLookDirection(int z)
 {
 	lookDirection = z;
@@ -60,7 +57,14 @@ void Player::PickupMat(int amt)
 	mats += amt;
 }
 
-char Player::Draw()
+void Player::Draw()
+{
+	m_visuals.ColorText(11);
+	cout << kPlayerSymbol;
+	m_visuals.ColorText(7);
+}
+
+char Player::GoodDraw()
 {
 	m_visuals.ColorText(11);
 	return kPlayerSymbol;

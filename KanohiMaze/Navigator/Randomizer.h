@@ -12,6 +12,7 @@ public:
 	~Randomizer();
 
 	int Generate(int min, int max);
+	int Modulate();
 
 	//void ChestLoot(Player pRef);
 };

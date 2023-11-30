@@ -3,6 +3,14 @@
 #include <conio.h>
 #include <windows.h>
 
+#include "Enemy.h"
+#include "Key.h"
+#include "Door.h"
+#include "Goal.h"
+#include "Chest.h"
+
+#include <assert.h>
+
 using namespace std;
 
 
@@ -106,10 +114,82 @@ bool Game::Update()
 		return true;
 	}
 	else {}
-	m_visuals.DrawAtSpace(m_player.GetXPosition(), m_player.GetYPosition(), m_player.Draw());
+	m_visuals.DrawAtSpace(m_player.GetXPosition(), m_player.GetYPosition(), m_player.GoodDraw());
 	m_visuals.ColorText(colorBase);
+
+	if (newPlayerX == m_player.GetXPosition() && newPlayerY == m_player.GetYPosition())
+	{
+		return false;
+	}
+	//else
+	//{
+	//	return HandleCollision(newPlayerX, newPlayerY);
+	//}
+
 	return false;
 }
+
+/*POLYMORPHIC*/
+//bool Game::HandleCollision(int newPlayerX, int newPlayerY)
+//{
+//	PlacableActor* collidedActor = m_level.UpdateActors(newPlayerX, newPlayerY);
+//	if (collidedActor != nullptr && collidedActor->IsActive())
+//	{
+//		switch (collidedActor->GetType())
+//		{
+//		case ActorType::Enemy:
+//		{
+//			Enemy* collidedEnemy = dynamic_cast<Enemy*>(collidedActor);
+//			assert(collidedEnemy);
+//			collidedEnemy->Remove();
+//			m_player.SetPosition(newPlayerX, newPlayerY);
+//			m_player.DecrementLives();
+//			if(m_player.GetLives() < 0) { return true;}
+//			break;
+//		}
+//		case ActorType::Goal:
+//		{
+//			Goal* collidedGoal = dynamic_cast<Goal*>(collidedActor);
+//			assert(collidedGoal);
+//			m_level.ClearLevel();
+//			roomsCleared++;
+//			lvlDrawn = false;
+//			return true;
+//		}
+//		default:
+//			break;
+//		}
+//	}
+//	else if (m_level.IsSpace(newPlayerX, newPlayerY))
+//	{
+//		m_player.SetPosition(newPlayerX, newPlayerY);
+//	}
+//	else if (m_level.IsWall(newPlayerX, newPlayerY))
+//	{ /*hit wall, do nothing*/ }
+//	return false;
+//}
+
+//
+//void Game::Draw()
+//{
+//	HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
+//	system("cls");
+//
+//	m_level.Draw();
+//
+//	lvlDrawn = true;
+//	COORD actorCursorPosition;
+//	actorCursorPosition.X = m_player.GetXPosition();
+//	actorCursorPosition.Y = m_player.GetYPosition();
+//	SetConsoleCursorPosition(console, actorCursorPosition);
+//	m_player.Draw();
+//	
+//	COORD currentCursorPosition;
+//	currentCursorPosition.X = 0;
+//	currentCursorPosition.Y = m_level.m_height;
+//	SetConsoleCursorPosition(console, currentCursorPosition);
+//}
+
 
 void Game::Draw()
 {
@@ -123,8 +203,9 @@ void Game::Draw()
 			for (int x = 0; x < m_level.m_width; x++)
 			{
 				//Actual Per-Space print
-				if (m_player.GetXPosition() == x && m_player.GetYPosition() == y) {
-					cout << m_player.Draw();
+				if (m_player.GetXPosition() == x && m_player.GetYPosition() == y) 
+				{
+					cout << m_player.GoodDraw();/*old player draw*/
 				}
 				else
 				{
