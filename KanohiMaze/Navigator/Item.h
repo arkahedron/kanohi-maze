@@ -2,22 +2,28 @@
 #include <string>
 #include <iostream>
 #include "Randomizer.h"
+#include "Visuals.h"
 
 enum class ItemType { CONSUMABLE, RESOURCE, EQUIPMENT };
-enum class Element { NONE = 0, ICE, WATER, AIR, FIRE, STONE, EARTH  };
-enum class Rarity { SCRAP, USEFUL, GREAT, EPIC, ANCIENT };
+enum class Element { NONE = -1, ICE, WATER, AIR, FIRE, STONE, EARTH  };
+enum class Rarity { NONE = -1, SCRAP, USEFUL, GREAT, EPIC, ANCIENT };
 
 class Item
 {
 
 public:
+	Visuals m_visuals;
 
 	Item(std::string name, ItemType type, Rarity rarity = Rarity::SCRAP, Element element = Element::NONE);
 	~Item();
+
 	void RollElement();
-	void RollRarity(int range = 2);
+	void RollRarity(int range = 2); /*Rarity ranges are 1-3*/
+
 	void Draw();
 	void Print();
+
+	void ListLootData();
 
 	std::string m_name;
 	Rarity GetRarity() { return m_rarity; };

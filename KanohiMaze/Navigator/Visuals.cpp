@@ -7,10 +7,6 @@
 using namespace std;
 
 static const HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
-constexpr int colorBase = 7;
-constexpr int colorKey = 14;
-constexpr int colorMat = 8;
-constexpr int colorBox = 6;
 
 constexpr char kHorizontalBorder = 205;
 constexpr char kTopLeftBorder = 201;
@@ -38,7 +34,6 @@ COORD Visuals::FindCursorPos()
 		return cbsi.dwCursorPosition;
 	}
 	else{ COORD invalid = {0,0}; return invalid;}
-
 }
 void Visuals::ResetCursor(COORD cPos)
 {
@@ -54,6 +49,12 @@ void Visuals::WipeLastLines(int x)
 	ResetCursor(replace);
 }
 
+void Visuals::PrintOutActor(char actor, AColor color)
+{ 
+	ColorText(color);
+	cout << actor;
+	ResetTextColor(); 
+}
 void Visuals::DrawAtSpace(int x, int y, char thing)
 {
 	std::cout.flush();
@@ -69,32 +70,31 @@ void Visuals::DrawAtSpace(int x, int y, char thing)
 	SetConsoleCursorPosition(console, idle);
 }
 
-void Visuals::ColorText(int color)
-{
-	SetConsoleTextAttribute(console, color);
-}
+void Visuals::ColorText(AColor color)
+{ SetConsoleTextAttribute(console, (int)color); }
+void Visuals::ResetTextColor() 
+{ SetConsoleTextAttribute(console, (int)AColor::Regular); }
 
-void Visuals::PrintOutActor(char actor, AColor color)
+void Visuals::DrawMazeControls()
 {
-	SetConsoleTextAttribute(console, (int)color);
-	cout << actor;
-	SetConsoleTextAttribute(console, (int)AColor::Regular);
-}
-
-void Visuals::DrawControls()
-{
+	cout << "  ";
+	ColorText(AColor::Inverted);
 	cout << " >Move: WASD" << " |";
 	cout << " >Look: SHFT+WASD " << endl;
+	ResetTextColor();
+	cout << "  ";
+	ColorText(AColor::Inverted);
 	cout << " >Act: E" << "     |";
-	cout << " >Menu: TAB " << endl;
+	cout << " >Menu: TAB       " << endl;
+	ResetTextColor();
 }
 
-//Print map borders
+
 void Visuals::DrawTop()
 {
-	cout << "\n";
-	SetConsoleTextAttribute(console, colorBase);
-	cout << "  " << kTopLeftBorder;
+	ResetTextColor();
+	cout << "\n" << "  " ; /* 1 down 1 right buffer*/
+	cout << kTopLeftBorder;
 	for (int i = 0; i < levelRef->m_width; i++)
 	{
 		if (levelRef->m_holeY == 0 && levelRef->m_holeX == i) 
@@ -105,20 +105,22 @@ void Visuals::DrawTop()
 }
 void Visuals::DrawBottom()
 {
-	SetConsoleTextAttribute(console, colorBase);
-	cout << "  " << kBottomLeftBorder;
+	ResetTextColor();
+	cout << "  "; /* 1 right buffer*/
+	cout << kBottomLeftBorder;
 	for (int i = 0; i < levelRef->m_width; i++)
 	{
 		if (levelRef->m_holeY == levelRef->m_height - 1 && levelRef->m_holeX == i) 
 		{ cout << kHole; }
 		else { cout << kHorizontalBorder; }
-	}
-	cout << kBottomRightBorder << endl;
+	} 
+	cout << kBottomRightBorder;
+	cout << endl;
 }
 void Visuals::DrawLeft(int y)
 {
-	SetConsoleTextAttribute(console, colorBase);
-	cout << "  ";
+	ResetTextColor();
+	cout << "  "; /* 1 right buffer*/
 	if (levelRef->m_holeX == 0 && levelRef->m_holeY == y) 
 	{ cout << kHole; }
 	else { cout << kVerticalBorder; }
@@ -126,9 +128,10 @@ void Visuals::DrawLeft(int y)
 }
 void Visuals::DrawRight(int y)
 {
-	SetConsoleTextAttribute(console, colorBase);
+	ResetTextColor();
 	if (levelRef->m_holeX == levelRef->m_width - 1 && levelRef->m_holeY == y) 
-	{ cout << kHole << endl; }
-	else { cout << kVerticalBorder << endl; }
+	{ cout << kHole; }
+	else { cout << kVerticalBorder; }
+	cout << endl;
 	
 }

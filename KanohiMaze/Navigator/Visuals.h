@@ -5,23 +5,25 @@
 
 enum class AColor
 {
-	DarkGreen = 2,
-	DarkTeal = 3,
-	DarkRed = 4,
-	Purple = 5,
-	Orange = 6,
-	Regular = 7,
-	Grey = 8,
-	Blue = 9,
-	Green = 10,
-	Teal = 11,
-	Red = 12,
-	Pink = 13,
-	Yellow = 14,
-	White = 15,
-	SolidGreen = 34,
-	SolidRed = 68,
-	SolidBlue = 153,
+	DarkBlue = 1, /**/
+	DarkGreen = 2, /**/
+	DarkTeal = 3, /**/
+	DarkRed = 4, /**/
+	Purple = 5,/*Epic, */
+	Orange = 6, /*Stone, chest, container*/
+	Regular = 7, /*base*/
+	Grey = 8, /*Earth, ores, items*/
+	Blue = 9, /*Water, */
+	Green = 10, /*Air, */
+	Teal = 11, /*Ice, player*/
+	Red = 12, /*Fire, */
+	Pink = 13, /*Ancient, */
+	Yellow = 14, /*Great, keys*/
+	White = 15, /*Useful, exit, pathways*/
+	SolidGreen = 34, /**/
+	SolidRed = 68, /**/
+	SolidBlue = 153, /**/
+	Inverted = 240, /* inverts text, controls*/
 };
 
 class Level;
@@ -41,11 +43,12 @@ public:
 
 	void DrawAtSpace(int x, int y, char thing);
 
-	void ColorText(int color);
+	void ColorText(AColor color = AColor::Regular);
+	void ResetTextColor();
 
 	void PrintOutActor(char actor, AColor color = AColor::Regular);
 
-	void DrawControls();
+	void DrawMazeControls();
 
 	void DrawTop();
 	void DrawBottom();

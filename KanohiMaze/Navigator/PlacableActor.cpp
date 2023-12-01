@@ -10,8 +10,8 @@ PlacableActor::PlacableActor(int x, int y, AColor color)
 }
 PlacableActor::~PlacableActor()
 {
-//	delete m_pPosition;
-//	m_pPosition = nullptr;
+	//delete m_pPosition;
+	//m_pPosition = nullptr;
 }
 
 int PlacableActor::GetXPosition()

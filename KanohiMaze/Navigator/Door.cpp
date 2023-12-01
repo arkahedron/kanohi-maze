@@ -12,15 +12,10 @@ Door::Door(int x, int y, AColor color, AColor closedColor)
 
 void Door::Draw()
 {
-	HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
 	if (m_isOpen)
-	{
-		SetConsoleTextAttribute(console, (int)m_color);
-	}
+	{ m_visuals.ColorText(m_color); }
 	else
-	{
-		SetConsoleTextAttribute(console, (int)m_closedColor);
-	}
+	{ m_visuals.ColorText(m_closedColor); }
 	std::cout << "#";
-	SetConsoleTextAttribute(console, (int)AColor::Regular);
+	m_visuals.ResetTextColor();
 }

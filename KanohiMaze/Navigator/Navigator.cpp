@@ -39,16 +39,20 @@ void TestMode()
 	cout << " [t] - test mode" << endl;
 	//Test Mode
 	char input = (char)_getch();
-	if (input == 't')
-	{ do{
-		char input = (char)_getch();
+	if (input == 't') {
 		cout << " [ENTERED TEST MODE]" << endl;
+		do{
+		input = (char)_getch();
 		Item* randomDisc = new Item("Kanoka Disc", ItemType::RESOURCE, Rarity::GREAT);
 		(*randomDisc).RollElement();
 		(*randomDisc).RollRarity(3);
 		(*randomDisc).Print();
 		cout << endl;
-		} while (input != (char)27); }
+		} while (input != (char)27); 
+		Item pLoot = Item("Kanoka Disc", ItemType::RESOURCE);
+		pLoot.ListLootData();
+	}
+	system("pause");
 }
 
 int main()

@@ -5,12 +5,12 @@
 
 using namespace std;
 
-char kPlayerSymbol = 48; //4
+char kPlayerSymbol = 48;
 constexpr int kStartingLives = 3;
 
 Player::Player()
 	: PlacableActor(0,0, AColor::Teal)
-	, lookDirection(0)
+	, playerFacing(Direction::none)
 	, exited(false)
 	, menuIsOpen(false)
 	, keys(0)
@@ -24,49 +24,32 @@ Player::~Player()
 
 }
 
-void Player::SetLookDirection(int z)
+void Player::SetFacingDirection(Direction pFacing)
 {
-	lookDirection = z;
-	switch (z) 
-	{
-	case 1: /*facing up*/
-	{ kPlayerSymbol = 65; /*30*/ break; }
-	case 2: /*facing down*/
-	{ kPlayerSymbol = 86; /*31*/ break; }
-	case 3: /*facing left*/
-	{ kPlayerSymbol = 60; /*17*/ break; }
-	case 4: /*facing right*/
-	{ kPlayerSymbol = 62; /*16*/ break; }
-	}
+	playerFacing = pFacing;
+	kPlayerSymbol = (int)playerFacing;
 }
 
+
 bool Player::HasKey()
-{
-	return ((keys > 0) ? true : false);
-}
+{ return ((keys > 0) ? true : false); }
 void Player::PickupKey(int amt)
-{
-	keys += amt;
-}
+{ keys += amt; }
 void Player::UseKey()
-{
-	keys--;
-}
+{ keys--; }
 void Player::PickupMat(int amt)
-{
-	mats += amt;
-}
+{ mats += amt; }
 
 void Player::Draw()
 {
-	m_visuals.ColorText(11);
+	m_visuals.ColorText(AColor::Teal);
 	cout << kPlayerSymbol;
-	m_visuals.ColorText(7);
+	m_visuals.ResetTextColor();
 }
 
 char Player::GoodDraw()
 {
-	m_visuals.ColorText(11);
+	m_visuals.ColorText(AColor::Teal);
 	return kPlayerSymbol;
 }
 
@@ -76,35 +59,41 @@ void Player::OpenMenu()
 	do {
 		system("cls");
 		cout << endl << " ----[MENU]----" << endl;
+
 		cout << endl << " +-{Inventory}-+";
 
 		if (keys > 0) {
 			cout << endl << " - x" << keys;
-			m_visuals.ColorText(14);
+			m_visuals.ColorText(AColor::Yellow);
 			cout << " KEY";
-			m_visuals.ColorText(7);
+			m_visuals.ResetTextColor();
 		}
 		if (mats > 0) {
 			cout << endl << " - x" << mats;
-			m_visuals.ColorText(8);
+			m_visuals.ColorText(AColor::Grey);
 			cout << " ORE";
-			m_visuals.ColorText(7);
+			m_visuals.ResetTextColor();
 		}
 		cout << endl << " +-------------+" << endl;
-		cout << endl << " >Map: TAB";
-		cout << endl << " >Quit: ESCAPE ";
+
+		//Menu control prints
+		cout << endl << "  ";
+		m_visuals.ColorText(AColor::Inverted);
+		cout << " >Map: TAB     ";
+		m_visuals.ResetTextColor();
+		cout << endl << "  ";
+		m_visuals.ColorText(AColor::Inverted);
+		cout << " >Quit: ESCAPE ";
+		m_visuals.ResetTextColor();
+		cout << endl;
 
 		char input = _getch();
 
-		//Exit game
-		if (input == 27) {
-			cout << endl;
+		//Exit game selection
+		if (input == 27) 
+		{
 			if (m_input.BinaryChoice("REALLY QUIT?"))
-			{
-				exited = true;
-				menuIsOpen = false;
-			}
-			else {}
+			{ exited = true; menuIsOpen = false; }
 		}
 
 		//Menu inputs, will be expanded upon

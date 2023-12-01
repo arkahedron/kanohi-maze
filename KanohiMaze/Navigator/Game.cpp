@@ -13,13 +13,6 @@
 
 using namespace std;
 
-
-constexpr int colorBase = 7;
-constexpr int colorKey = 14;
-constexpr int colorMat = 8;
-constexpr int colorBox = 6;
-
-
 Game::Game()
 	: levelEnd(false)
 	, exitedGame(false)
@@ -77,16 +70,16 @@ bool Game::Update()
 		break;
 	case 'w': newPlayerY--;
 	case 'W':
-	{ m_player.SetLookDirection(1); break; }
+	{ m_player.SetFacingDirection(Direction::up); break; }
 	case 's': newPlayerY++;
 	case 'S':
-	{ m_player.SetLookDirection(2); break; }
+	{ m_player.SetFacingDirection(Direction::down); break; }
 	case 'a': newPlayerX--;
 	case 'A':
-	{ m_player.SetLookDirection(3); break; }
+	{ m_player.SetFacingDirection(Direction::left); break; }
 	case 'd': newPlayerX++;
 	case 'D':
-	{ m_player.SetLookDirection(4); break; }
+	{ m_player.SetFacingDirection(Direction::right); break; }
 	default: break;
 	}
 
@@ -115,7 +108,7 @@ bool Game::Update()
 	}
 	else {}
 	m_visuals.DrawAtSpace(m_player.GetXPosition(), m_player.GetYPosition(), m_player.GoodDraw());
-	m_visuals.ColorText(colorBase);
+	m_visuals.ResetTextColor();
 
 	if (newPlayerX == m_player.GetXPosition() && newPlayerY == m_player.GetYPosition())
 	{
@@ -211,23 +204,23 @@ void Game::Draw()
 				{
 					//Colorize other unique symbols
 					if (m_level.IsDoor(x, y)) {
-						if (m_player.HasKey()) { m_visuals.ColorText(2); }
-						else { m_visuals.ColorText(4); }
+						if (m_player.HasKey()) { m_visuals.ColorText(AColor::DarkGreen); }
+						else { m_visuals.ColorText(AColor::DarkRed); }
 					}
-					else if (m_level.IsKey(x, y)) { m_visuals.ColorText(colorKey); }
-					else if (m_level.IsMat(x, y)) { m_visuals.ColorText(colorMat); }
-					else if (m_level.IsBox(x, y)) { m_visuals.ColorText(colorBox); }
-					else if (m_level.IsGoal(x, y)) { m_visuals.ColorText(15); }
-					else { m_visuals.ColorText(colorBase); }
+					else if (m_level.IsKey(x, y)) { m_visuals.ColorText(AColor::Yellow); }
+					else if (m_level.IsMat(x, y)) { m_visuals.ColorText(AColor::Grey); }
+					else if (m_level.IsBox(x, y)) { m_visuals.ColorText(AColor::Orange); }
+					else if (m_level.IsGoal(x, y)) { m_visuals.ColorText(AColor::White); }
+					else { m_visuals.ResetTextColor(); }
 					//Print relevant symbol and reset color to base
 					m_level.Draw(x, y);
-					m_visuals.ColorText(colorBase);
+					m_visuals.ResetTextColor();
 				}
 			}
 			m_visuals.DrawRight(y);
 		}
 		m_visuals.DrawBottom();
-		m_visuals.DrawControls();
+		m_visuals.DrawMazeControls();
 	}
 	lvlDrawn = true;
 }
@@ -236,18 +229,19 @@ void Game::Interact(int x, int y)
 {
 	int actX = x;
 	int actY = y;
-	switch (m_player.lookDirection)
+	switch (m_player.playerFacing)
 	{
-	case 1: /*facing up*/
+	case Direction::up:
 	{ actY--; break; }
-	case 2: /*facing down*/
+	case Direction::down:
 	{ actY++; break; }
-	case 3: /*facing left*/
+	case Direction::left:
 	{ actX--; break; }
-	case 4: /*facing right*/
+	case Direction::right:
 	{ actX++; break; }
 	default: break;
 	}
+
 	//Interact with space player is facing
 	char interactedWith = m_level.GetSpaceAtPosition(actX, actY);
 
@@ -321,27 +315,27 @@ void Game::ChestLoot() {
 	case 1:
 	{
 		cout << "1";
-		m_visuals.ColorText(14);
+		m_visuals.ColorText(AColor::Yellow);
 		cout << " KEY";
-		m_visuals.ColorText(7);
+		m_visuals.ResetTextColor();
 		m_player.PickupKey(1);
 		break;
 	}
 	case 2:
 	{
 		cout << "1";
-		m_visuals.ColorText(8);
+		m_visuals.ColorText(AColor::Grey);
 		cout << " ORE";
-		m_visuals.ColorText(7);
+		m_visuals.ResetTextColor();
 		m_player.PickupMat(1);
 		break;
 	}
 	case 3:
 	{
 		cout << "2";
-		m_visuals.ColorText(8);
+		m_visuals.ColorText(AColor::Grey);
 		cout << " ORE";
-		m_visuals.ColorText(7);
+		m_visuals.ResetTextColor();
 		m_player.PickupMat(2);
 		break;
 	}

@@ -19,8 +19,8 @@ constexpr char WAL = (char)219;
 constexpr char KEY = (char)126;
 constexpr char DOR = (char)35;
 constexpr char GOL = (char)234;
-constexpr char MAT = (char)232; //15
-constexpr char BOX = (char)239; //127
+constexpr char MAT = (char)232;
+constexpr char BOX = (char)239; 
 
 Level::Level()
 	: m_pLevelData(nullptr)
@@ -137,7 +137,7 @@ bool Level::Load(string levelName, int* playerX, int* playerY)
 //void Level::Draw()
 //{
 //	HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
-//	SetConsoleTextAttribute(console, colorRegular);
+//	m_visuals.ResetTextColor();
 //
 //	m_visuals.ResetCursor(); /*required for correct map placement*/
 //	m_visuals.DrawTop();

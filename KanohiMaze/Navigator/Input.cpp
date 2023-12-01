@@ -6,11 +6,6 @@
 
 using namespace std;
 
-constexpr int colorBase = 7;
-constexpr int colorKey = 14;
-constexpr int colorMat = 8;
-constexpr int colorBox = 6;
-
 Input::Input()
 	: m_mainInput(' ')
 {
@@ -25,13 +20,13 @@ bool Input::BinaryChoice(string prompt)
 {
 	cout  << " [" << prompt << "]";
 	cout << endl << " > ";
-	m_visuals.ColorText(2);
+	m_visuals.ColorText(AColor::DarkGreen);
 	cout << "y";
-	m_visuals.ColorText(colorBase);
+	m_visuals.ResetTextColor();
 	cout << "es/";
-	m_visuals.ColorText(4);
+	m_visuals.ColorText(AColor::DarkRed);
 	cout << "n";
-	m_visuals.ColorText(colorBase);
+	m_visuals.ResetTextColor();
 	cout << "o ";
 	m_mainInput = _getch();
 	switch (m_mainInput)

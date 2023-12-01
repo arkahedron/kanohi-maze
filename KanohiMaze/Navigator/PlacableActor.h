@@ -38,6 +38,7 @@ public:
 	}
 
 protected:
+	Visuals m_visuals;
 	Point* m_pPosition;
 	
 	bool m_IsActive;
