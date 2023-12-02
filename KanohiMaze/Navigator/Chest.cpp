@@ -1,9 +1,8 @@
 #include "Chest.h"
 #include <iostream>
 
-Chest::Chest(int x, int y, int value)
+Chest::Chest(int x, int y)
 	: PlacableActor(x, y)
-	, m_value(value)
 {
 
 }

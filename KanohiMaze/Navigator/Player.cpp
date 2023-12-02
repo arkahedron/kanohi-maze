@@ -3,6 +3,9 @@
 #include <Windows.h>
 #include <conio.h>
 
+#include "Key.h"
+#include "Ore.h"
+
 using namespace std;
 
 char kPlayerSymbol = 48;
@@ -21,7 +24,11 @@ Player::Player()
 }
 Player::~Player()
 {
-
+	/*while (!m_pItems.empty())
+	{
+		delete m_pItems.back();
+		m_pItems.pop_back();
+	}*/
 }
 
 void Player::SetFacingDirection(Direction pFacing)
@@ -32,13 +39,45 @@ void Player::SetFacingDirection(Direction pFacing)
 
 
 bool Player::HasKey()
-{ return ((keys > 0) ? true : false); }
+{
+	for (auto item = m_pItems.begin(); item != m_pItems.end(); ++item)
+	{
+		if ((*item)->GetName() == "Key")
+		{
+			return true;
+		}
+	}
+	return false;
+	//return ((keys > 0) ? true : false); 
+}
 void Player::PickupKey(int amt)
-{ keys += amt; }
+{
+	m_pItems.push_back(new Key());
+	keys += amt; 
+}
 void Player::UseKey()
-{ keys--; }
+{ 
+	for ( auto item = m_pItems.begin(); item != m_pItems.end(); ++item)
+	{
+		if ((*item)->GetName() == "Key")
+		{
+			m_pItems.erase(item);
+			break;
+		}
+	}
+	keys--; 
+}
 void Player::PickupMat(int amt)
-{ mats += amt; }
+{
+	for (int i = 0; i < amt; i++)
+	{	
+		Ore* newOre = new Ore();
+		newOre->RollRarity(1);
+		m_pItems.push_back(newOre);
+	}
+	
+	mats += amt; 
+}
 
 void Player::Draw()
 {
@@ -58,23 +97,43 @@ void Player::OpenMenu()
 	menuIsOpen = true;
 	do {
 		system("cls");
-		cout << endl << " ----[MENU]----" << endl;
+		cout << endl << "  ----[MENU]----" << endl;
 
-		cout << endl << " +-{Inventory}-+";
+		cout << endl << "  +-{Inventory}-+";
 
-		if (keys > 0) {
-			cout << endl << " - x" << keys;
-			m_visuals.ColorText(AColor::Yellow);
-			cout << " KEY";
-			m_visuals.ResetTextColor();
+		for (auto item = m_pItems.begin(); item != m_pItems.end(); ++item)
+		{
+			if((*item)->GetName() == "Key")
+			{
+				cout << endl << "   - ";
+				m_visuals.ColorText(AColor::Yellow);
+				(*item)->Print();
+				m_visuals.ResetTextColor();
+			}
+			if ((*item)->GetName() == "Ore")
+			{
+				cout << endl << "   - ";
+				m_visuals.ColorText(AColor::Yellow);
+				(*item)->Print();
+				m_visuals.ResetTextColor();
+			}
 		}
-		if (mats > 0) {
-			cout << endl << " - x" << mats;
-			m_visuals.ColorText(AColor::Grey);
-			cout << " ORE";
-			m_visuals.ResetTextColor();
-		}
-		cout << endl << " +-------------+" << endl;
+
+		//if (keys > 0) {
+		//	cout << endl << " - x" << keys;
+		//	m_visuals.ColorText(AColor::Yellow);
+		//	cout << " KEY";
+		//	m_visuals.ResetTextColor();
+		//}
+		//if (mats > 0) {
+		//	cout << endl << " - x" << mats;
+		//	m_visuals.ColorText(AColor::Grey);
+		//	cout << " ORE";
+		//	m_visuals.ResetTextColor();
+		//}
+
+
+		cout << endl << "  +-------------+" << endl;
 
 		//Menu control prints
 		cout << endl << "  ";

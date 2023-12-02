@@ -1,13 +1,11 @@
 #pragma once
 #include "PlacableActor.h"
-class Key : public PlacableActor
+#include "Item.h"
+
+class Key : public PlacableActor, public Item
 {
 public:
-	Key(int x, int y, AColor color)
-		:PlacableActor(x, y, color)
-	{
-
-	}
+	Key(int x = 0, int y = 0);
 
 	virtual ActorType GetType() override { return ActorType::Key; }
 	virtual void Draw() override;

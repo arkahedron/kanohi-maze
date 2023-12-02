@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 #include "PlacableActor.h"
 #include "Point.h"
 #include "Visuals.h"
@@ -13,6 +14,7 @@ enum class Direction
 	right = 62, 
 };
 
+class Item;
 class Key;
 
 class Player : public PlacableActor
@@ -25,12 +27,14 @@ public:
 	Player();
 	~Player();
 
-	Direction playerFacing;
+	std::vector<Item*> m_pItems;
+
 	bool menuIsOpen;
 	bool exited;
 	int keys;
 	int mats;
 	int lives;
+	Direction playerFacing;
 
 	void SetFacingDirection(Direction pFacing);
 

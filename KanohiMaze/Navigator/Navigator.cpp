@@ -43,21 +43,20 @@ void TestMode()
 		cout << " [ENTERED TEST MODE]" << endl;
 		do{
 		input = (char)_getch();
-		Item* randomDisc = new Item("Kanoka Disc", ItemType::RESOURCE, Rarity::GREAT);
+		Item* randomDisc = new Item("Kanoki", ItemType::RESOURCE, Rarity::GREAT);
 		(*randomDisc).RollElement();
 		(*randomDisc).RollRarity(3);
 		(*randomDisc).Print();
 		cout << endl;
 		} while (input != (char)27); 
-		Item pLoot = Item("Kanoka Disc", ItemType::RESOURCE);
+		Item pLoot = Item("TempItem", ItemType::RESOURCE, Rarity::NONE);
 		pLoot.ListLootData();
 	}
-	system("pause");
 }
 
 int main()
 {
-	if (true) { TestMode(); }
+	if (false) { TestMode(); }
 
 	Game myGame;
 	cout << " ---{ WELCOME TO KANOHI MAZE }---" << endl;

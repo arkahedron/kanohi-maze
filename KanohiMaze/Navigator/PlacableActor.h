@@ -9,6 +9,7 @@ enum class ActorType
 	Goal,
 	Key,
 	Chest,
+	Ore,
 	Player,
 };
 
@@ -43,5 +44,6 @@ protected:
 	
 	bool m_IsActive;
 	AColor m_color;
+	ASymbol m_symbol;
 };
 

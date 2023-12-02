@@ -2,9 +2,15 @@
 #include <iostream>
 #include <Windows.h>
 
+Key::Key(int x, int y)
+	: PlacableActor(x, y, AColor::Yellow)
+	, Item("Key", ItemType::CONSUMABLE, Rarity::NONE)
+
+{
+
+}
+
 void Key::Draw()
 {
-	m_visuals.ColorText(AColor::Yellow);
 	std::cout << "~";
-	m_visuals.ResetTextColor();
 }

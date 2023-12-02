@@ -6,7 +6,7 @@
 
 enum class ItemType { CONSUMABLE, RESOURCE, EQUIPMENT };
 enum class Element { NONE = -1, ICE, WATER, AIR, FIRE, STONE, EARTH  };
-enum class Rarity { NONE = -1, SCRAP, USEFUL, GREAT, EPIC, ANCIENT };
+enum class Rarity { NONE = -1, SCRAP, DECENT, GREAT, EPIC, ANCIENT };
 
 class Item
 {
@@ -25,11 +25,12 @@ public:
 
 	void ListLootData();
 
-	std::string m_name;
 	Rarity GetRarity() { return m_rarity; };
 	Element GetElement() { return m_element; };
+	std::string GetName() { return m_name; };
 
 protected:
+	std::string m_name;
 	ItemType m_type;
 	Rarity m_rarity;
 	Element m_element;

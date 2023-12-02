@@ -19,13 +19,24 @@ enum class AColor
 	Red = 12, /*Fire, */
 	Pink = 13, /*Ancient, */
 	Yellow = 14, /*Great, keys*/
-	White = 15, /*Useful, exit, pathways*/
+	White = 15, /*Decent, exit, pathways*/
 	SolidGreen = 34, /**/
 	SolidRed = 68, /**/
 	SolidBlue = 153, /**/
 	Inverted = 240, /* inverts text, controls*/
 };
 
+enum class ASymbol
+{
+	Space = 0,
+	Door = 35,
+	Enemy = 153,
+	Key = 162,
+	Wall = 219,
+	Ore = 232,
+	Goal = 234,
+	Chest = 239,
+};
 class Level;
 
 class Visuals

@@ -29,7 +29,7 @@ void Item::RollRarity(int range)
 	switch (range)
 	{
 	case 1:
-		maxPick = (int)Rarity::USEFUL;
+		maxPick = (int)Rarity::DECENT;
 		break;
 	case 2:
 		maxPick = (int)Rarity::GREAT;
@@ -59,24 +59,26 @@ void Item::Print()
 	m_visuals.ResetTextColor();
 	switch (m_rarity)
 	{
+	case Rarity::NONE:
+		break;
 	case Rarity::SCRAP:
 		a_scraps++;
-		cout << " Scrap ";
+		cout << "Scrap ";
 		break;
-	case Rarity::USEFUL:
+	case Rarity::DECENT:
 		m_visuals.ColorText(AColor::White);
 		a_usefuls++;
-		cout << " Useful ";
+		cout << "Decent ";
 		break;
 	case Rarity::GREAT:
 		m_visuals.ColorText(AColor::Yellow);
 		a_greats++;
-		cout << " Great ";
+		cout << "Great ";
 		break;
 	case Rarity::EPIC:
 		m_visuals.ColorText(AColor::Purple);
 		a_epics++;
-		cout << " Epic ";
+		cout << "Epic ";
 		break;
 	case Rarity::ANCIENT:
 		m_visuals.ColorText(AColor::Pink);
@@ -88,38 +90,41 @@ void Item::Print()
 	}
 	m_visuals.ResetTextColor();
 	cout << m_name;
-	cout << " of ";
-	switch (m_element)
+	if(m_element != Element::NONE)
 	{
-	case Element::NONE:
-		break;
-	case Element::ICE:
-		m_visuals.ColorText(AColor::Teal);
-		cout << "Ice";
-		break;
-	case Element::WATER:
-		m_visuals.ColorText(AColor::Blue);
-		cout << "Water";
-		break;
-	case Element::AIR:
-		m_visuals.ColorText(AColor::Green);
-		::cout << "Air";
-		break;
-	case Element::FIRE:
-		m_visuals.ColorText(AColor::Red);
-		cout << "Fire";
-		break;
-	case Element::STONE:
-		m_visuals.ColorText(AColor::Orange);
-		cout << "Stone";
-		break;
-	case Element::EARTH:
-		m_visuals.ColorText(AColor::Grey);
-		cout << "Earth";
-		break;
-	default:
-		m_visuals.ResetTextColor();
-		break;
+		cout << " of ";
+		switch (m_element)
+		{
+		case Element::NONE:
+			break;
+		case Element::ICE:
+			m_visuals.ColorText(AColor::Teal);
+			cout << "Ice";
+			break;
+		case Element::WATER:
+			m_visuals.ColorText(AColor::Blue);
+			cout << "Water";
+			break;
+		case Element::AIR:
+			m_visuals.ColorText(AColor::Green);
+			::cout << "Air";
+			break;
+		case Element::FIRE:
+			m_visuals.ColorText(AColor::Red);
+			cout << "Fire";
+			break;
+		case Element::STONE:
+			m_visuals.ColorText(AColor::Orange);
+			cout << "Stone";
+			break;
+		case Element::EARTH:
+			m_visuals.ColorText(AColor::Grey);
+			cout << "Earth";
+			break;
+		default:
+			m_visuals.ResetTextColor();
+			break;
+		}
 	}
 	m_visuals.ResetTextColor();
 	//cout << m_type;

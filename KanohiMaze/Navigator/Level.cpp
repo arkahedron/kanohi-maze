@@ -10,6 +10,7 @@
 #include "Door.h"
 #include "Goal.h"
 #include "Chest.h"
+#include "Ore.h"
 
 #include <assert.h>
 
@@ -289,7 +290,7 @@ char Level::GetSpaceAtPosition(int x, int y)
 //	}
 //	return anyWarnings;
 //}
-//
+
 //PlacableActor* Level::UpdateActors(int x, int y)
 //{
 //	PlacableActor* collidedActor = nullptr;

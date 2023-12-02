@@ -5,6 +5,7 @@ PlacableActor::PlacableActor(int x, int y, AColor color)
 	: m_pPosition( new Point(x,y))
 	, m_IsActive(true)
 	, m_color(color)
+	, m_symbol(ASymbol::Space)
 {
 
 }

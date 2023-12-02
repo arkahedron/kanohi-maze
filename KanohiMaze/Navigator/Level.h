@@ -32,7 +32,7 @@ public:
 	//void Draw(int x, int y);
 	void Draw(int x, int y);
 
-	PlacableActor* UpdateActors(int x, int y);
+	//PlacableActor* UpdateActors(int x, int y);
 
 	bool IsSpace(int x, int y);
 	bool IsWall(int x, int y);
@@ -48,7 +48,8 @@ public:
 	char GetSpaceAtPosition(int x, int y);
 
 private:
-	int GetIndexFromCoordinates(int x, int y);
 	bool Convert(int* playerX, int* playerY);
+	int GetIndexFromCoordinates(int x, int y);
 
 };
+
