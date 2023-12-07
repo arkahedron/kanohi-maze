@@ -130,13 +130,13 @@ int main()
 
 			importedLevel = SelectLevelFromList(true);
 			levelArray = LoadLevel(importedLevel, width, height);
-
+			system("cls");
 			int cursorX = 0;
 			int cursorY = 0;
 			bool doneEditing = false;
 			while (!doneEditing)
 			{
-				system("cls");
+				
 				DisplayLevel(levelArray, width, height, cursorX, cursorY);
 				doneEditing = EditLevel(levelArray, cursorX, cursorY, width, height);
 			}

@@ -1,21 +1,34 @@
 #include "Door.h"
-#include <iostream>
-#include <Windows.h>
+#include "Player.h"
 
-Door::Door(int x, int y, AColor color, AColor closedColor)
-	: PlacableActor(x, y, color)
+Door::Door(int x, int y)
+	: PlacableActor(x, y, AColor::White, ASymbol::Door)
 	, m_isOpen(false)
-	, m_closedColor(closedColor)
+	, m_openColor(AColor::Green)
 {
-
+	m_IsSolid = true;
 }
 
-void Door::Draw()
+
+//void Door::Update()
+//{
+//	bool playerHasKey = m_pPlayerRef->HasKey();
+//	if (m_pPlayerRef)
+//	{
+//		if (playerHasKey)
+//		{
+//			m_color = m_openColor;
+//		}
+//		else { m_color = m_color; }
+//	}
+//	Draw();
+//}
+
+
+void Door::Unlock()
 {
-	if (m_isOpen)
-	{ m_visuals.ColorText(m_color); }
-	else
-	{ m_visuals.ColorText(m_closedColor); }
-	std::cout << "#";
-	m_visuals.ResetTextColor();
+	m_IsSolid = false;
+	
+	Update();
+
 }

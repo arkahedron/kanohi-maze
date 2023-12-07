@@ -29,17 +29,19 @@ public:
 	std::string SelectNewLevel();
 
 	bool Load(std::string levelName, int* playerX, int* playerY);
+	void Draw(bool drawn = false);
 	//void Draw(int x, int y);
-	void Draw(int x, int y);
 
-	//PlacableActor* UpdateActors(int x, int y);
+	PlacableActor* UpdateActors(int x, int y);
+	PlacableActor* GetActorAtPos(int x, int y);
 
 	bool IsSpace(int x, int y);
-	bool IsWall(int x, int y);
+	/*bool IsWall(int x, int y);
+
 	bool IsDoor(int x, int y);
 	bool IsKey(int x, int y);
 	bool IsMat(int x, int y);
-	bool IsBox(int x, int y);
+	bool IsBox(int x, int y);*/
 	bool IsGoal(int x, int y);
 
 	void ClearSpace(int x, int y);

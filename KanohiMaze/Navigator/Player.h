@@ -8,10 +8,10 @@
 enum class Direction 
 { 
 	none = 0,
-	up = 65, 
-	down = 86, 
-	left = 60, 
-	right = 62, 
+	Up = 65, 
+	Down = 86, 
+	Left = 60, 
+	Right = 62, 
 };
 
 class Item;
@@ -52,5 +52,4 @@ public:
 	void DecrementLives() { lives--; }
 
 	virtual ActorType GetType() override { return ActorType::Player; }
-	virtual void  Draw() override;
 };

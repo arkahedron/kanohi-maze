@@ -8,6 +8,5 @@ public:
 	Ore(int x = 0, int y = 0);
 
 	virtual ActorType GetType() override { return ActorType::Ore; }
-	virtual void Draw() override;
 
 };

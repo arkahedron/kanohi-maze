@@ -12,8 +12,8 @@ char kPlayerSymbol = 48;
 constexpr int kStartingLives = 3;
 
 Player::Player()
-	: PlacableActor(0,0, AColor::Teal)
-	, playerFacing(Direction::none)
+	: PlacableActor(0,0, AColor::Teal, ASymbol::pDown)
+	, playerFacing(Direction::Down)
 	, exited(false)
 	, menuIsOpen(false)
 	, keys(0)
@@ -24,17 +24,18 @@ Player::Player()
 }
 Player::~Player()
 {
-	/*while (!m_pItems.empty())
-	{
-		delete m_pItems.back();
-		m_pItems.pop_back();
-	}*/
+//	while (!m_pItems.empty())
+//	{
+//		delete m_pItems.back();
+//		m_pItems.pop_back();
+//	}
 }
 
 void Player::SetFacingDirection(Direction pFacing)
 {
 	playerFacing = pFacing;
 	kPlayerSymbol = (int)playerFacing;
+	m_symbol = static_cast<ASymbol>(kPlayerSymbol);
 }
 
 
@@ -79,12 +80,6 @@ void Player::PickupMat(int amt)
 	mats += amt; 
 }
 
-void Player::Draw()
-{
-	m_visuals.ColorText(AColor::Teal);
-	cout << kPlayerSymbol;
-	m_visuals.ResetTextColor();
-}
 
 char Player::GoodDraw()
 {

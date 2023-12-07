@@ -66,7 +66,7 @@ void Visuals::DrawAtSpace(int x, int y, char thing)
 	cout << thing;
 	cout.flush();
 	COORD idle = { 0,0 };
-	idle.Y += (levelRef->m_height+5);
+	if (levelRef) { idle.Y += (levelRef->m_height + 5); }
 	SetConsoleCursorPosition(console, idle);
 }
 

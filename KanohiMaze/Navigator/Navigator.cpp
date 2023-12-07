@@ -76,8 +76,9 @@ int main()
 				s_Keys = myGame.GetPlayerRef().keys;
 				s_Rooms = myGame.roomsCleared;
 
-				if (exitedMaze) { break; }
+				if (exitedMaze) { break;  }
 			}
+			myGame.Unload();
 			levelComplete = false;
 		}
 	} while (!exitedMaze);

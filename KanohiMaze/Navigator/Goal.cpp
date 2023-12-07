@@ -1,13 +1,7 @@
 #include "Goal.h"
-#include <iostream>
 
 Goal::Goal(int x, int y)
-	: PlacableActor(x, y)
+	: PlacableActor(x, y, AColor::White, ASymbol::Goal)
 {
 
-}
-
-void Goal::Draw()
-{
-	std::cout << (char)234;
 }

@@ -31,11 +31,16 @@ enum class ASymbol
 	Space = 0,
 	Door = 35,
 	Enemy = 153,
-	Key = 162,
+	Key = 126,
 	Wall = 219,
 	Ore = 232,
 	Goal = 234,
 	Chest = 239,
+
+	pUp = 65,
+	pDown = 86,
+	pLeft = 60,
+	pRight = 62,
 };
 class Level;
 

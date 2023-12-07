@@ -22,6 +22,7 @@ Game::Game()
 	, roomsCleared(0)
 {
 	m_visuals.SetLevelRef(&m_level);
+	//m_player.SetPlayerRef(&m_player);
 }
 Game::~Game()
 {
@@ -56,10 +57,22 @@ bool Game::Update()
 	int newPlayerX = m_player.GetXPosition();
 	int newPlayerY = m_player.GetYPosition();
 
+	//Actor the player might be overlapping, validate it when using it
+	PlacableActor* ingressActor;
 	
-	if(input == 'e' || input == 'E')
-	{ Interact(newPlayerX, newPlayerY);}
-	m_visuals.DrawAtSpace(m_player.GetXPosition(), m_player.GetYPosition(), m_level.GetSpaceAtPosition(m_player.GetXPosition(), m_player.GetYPosition()));
+	if (input == 'e' || input == 'E')
+	{
+		Interact(newPlayerX, newPlayerY);
+	}
+
+	//Restoring correct symbol on space after player moves from it
+	ingressActor = m_level.GetActorAtPos(newPlayerX, newPlayerY);
+	if (ingressActor != nullptr) 
+	{ ingressActor->Draw(); }
+	else 
+	{ m_visuals.DrawAtSpace(newPlayerX, newPlayerY, ' '); }
+	
+
 
 	//Movement inputs
 	switch (input) 
@@ -70,21 +83,36 @@ bool Game::Update()
 		break;
 	case 'w': newPlayerY--;
 	case 'W':
-	{ m_player.SetFacingDirection(Direction::up); break; }
+	{ m_player.SetFacingDirection(Direction::Up); break; }
 	case 's': newPlayerY++;
 	case 'S':
-	{ m_player.SetFacingDirection(Direction::down); break; }
+	{ m_player.SetFacingDirection(Direction::Down); break; }
 	case 'a': newPlayerX--;
 	case 'A':
-	{ m_player.SetFacingDirection(Direction::left); break; }
+	{ m_player.SetFacingDirection(Direction::Left); break; }
 	case 'd': newPlayerX++;
 	case 'D':
-	{ m_player.SetFacingDirection(Direction::right); break; }
+	{ m_player.SetFacingDirection(Direction::Right); break; }
 	default: break;
 	}
 
 	//Move player and check for unique space
+	bool pathableSpace = false;
+	
+	ingressActor = m_level.GetActorAtPos(newPlayerX, newPlayerY);
+
 	if (m_level.IsSpace(newPlayerX, newPlayerY))
+	{
+		if (ingressActor != nullptr) {
+			bool isImpassable = ingressActor->GetSolidity();
+				if(!isImpassable)
+				{
+					pathableSpace = true;
+				} 
+			} else { pathableSpace = true; }
+	}else { pathableSpace = false; }
+
+	if (pathableSpace)
 	{
 		//Confine player to level edges
 		if (newPlayerX < 0)
@@ -107,7 +135,8 @@ bool Game::Update()
 		return true;
 	}
 	else {}
-	m_visuals.DrawAtSpace(m_player.GetXPosition(), m_player.GetYPosition(), m_player.GoodDraw());
+	//m_player.Draw();
+	//m_visuals.DrawAtSpace(m_player.GetXPosition(), m_player.GetYPosition(), m_player.GoodDraw());
 	m_visuals.ResetTextColor();
 
 	if (newPlayerX == m_player.GetXPosition() && newPlayerY == m_player.GetYPosition())
@@ -162,68 +191,68 @@ bool Game::Update()
 //	return false;
 //}
 
-//
-//void Game::Draw()
-//{
-//	HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
-//	system("cls");
-//
-//	m_level.Draw();
-//
-//	lvlDrawn = true;
-//	COORD actorCursorPosition;
-//	actorCursorPosition.X = m_player.GetXPosition();
-//	actorCursorPosition.Y = m_player.GetYPosition();
-//	SetConsoleCursorPosition(console, actorCursorPosition);
-//	m_player.Draw();
-//	
-//	COORD currentCursorPosition;
-//	currentCursorPosition.X = 0;
-//	currentCursorPosition.Y = m_level.m_height;
-//	SetConsoleCursorPosition(console, currentCursorPosition);
-//}
-
 
 void Game::Draw()
 {
-	if (!lvlDrawn)
-	{
-		m_visuals.ResetCursor(); /*required for correct map placement*/
-		m_visuals.DrawTop();
-		for (int y = 0; y < m_level.m_height; y++)
-		{
-			m_visuals.DrawLeft(y);
-			for (int x = 0; x < m_level.m_width; x++)
-			{
-				//Actual Per-Space print
-				if (m_player.GetXPosition() == x && m_player.GetYPosition() == y) 
-				{
-					cout << m_player.GoodDraw();/*old player draw*/
-				}
-				else
-				{
-					//Colorize other unique symbols
-					if (m_level.IsDoor(x, y)) {
-						if (m_player.HasKey()) { m_visuals.ColorText(AColor::DarkGreen); }
-						else { m_visuals.ColorText(AColor::DarkRed); }
-					}
-					else if (m_level.IsKey(x, y)) { m_visuals.ColorText(AColor::Yellow); }
-					else if (m_level.IsMat(x, y)) { m_visuals.ColorText(AColor::Grey); }
-					else if (m_level.IsBox(x, y)) { m_visuals.ColorText(AColor::Orange); }
-					else if (m_level.IsGoal(x, y)) { m_visuals.ColorText(AColor::White); }
-					else { m_visuals.ResetTextColor(); }
-					//Print relevant symbol and reset color to base
-					m_level.Draw(x, y);
-					m_visuals.ResetTextColor();
-				}
-			}
-			m_visuals.DrawRight(y);
-		}
-		m_visuals.DrawBottom();
-		m_visuals.DrawMazeControls();
-	}
+	HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
+	//system("cls");
+
+	m_level.Draw(lvlDrawn);
+
 	lvlDrawn = true;
+	COORD actorCursorPosition;
+	actorCursorPosition.X = m_player.GetXPosition();
+	actorCursorPosition.Y = m_player.GetYPosition();
+	SetConsoleCursorPosition(console, actorCursorPosition);
+	m_player.Draw();
+	
+	COORD currentCursorPosition;
+	currentCursorPosition.X = 0;
+	currentCursorPosition.Y = m_level.m_height + 5;
+	SetConsoleCursorPosition(console, currentCursorPosition);
 }
+
+//
+//void Game::Draw()
+//{
+//	if (!lvlDrawn)
+//	{
+//		m_visuals.ResetCursor(); /*required for correct map placement*/
+//		m_visuals.DrawTop();
+//		for (int y = 0; y < m_level.m_height; y++)
+//		{
+//			m_visuals.DrawLeft(y);
+//			for (int x = 0; x < m_level.m_width; x++)
+//			{
+//				//Actual Per-Space print
+//				if (m_player.GetXPosition() == x && m_player.GetYPosition() == y) 
+//				{
+//					cout << m_player.GoodDraw();/*old player draw*/
+//				}
+//				else
+//				{
+//					//Colorize other unique symbols
+//					if (m_level.IsDoor(x, y)) {
+//						if (m_player.HasKey()) { m_visuals.ColorText(AColor::DarkGreen); }
+//						else { m_visuals.ColorText(AColor::DarkRed); }
+//					}
+//					else if (m_level.IsKey(x, y)) { m_visuals.ColorText(AColor::Yellow); }
+//					else if (m_level.IsMat(x, y)) { m_visuals.ColorText(AColor::Grey); }
+//					else if (m_level.IsBox(x, y)) { m_visuals.ColorText(AColor::Orange); }
+//					else if (m_level.IsGoal(x, y)) { m_visuals.ColorText(AColor::White); }
+//					else { m_visuals.ResetTextColor(); }
+//					//Print relevant symbol and reset color to base
+//					m_level.Draw(x, y);
+//					m_visuals.ResetTextColor();
+//				}
+//			}
+//			m_visuals.DrawRight(y);
+//		}
+//		m_visuals.DrawBottom();
+//		m_visuals.DrawMazeControls();
+//	}
+//	lvlDrawn = true;
+//}
 
 void Game::Interact(int x, int y)
 {
@@ -231,13 +260,13 @@ void Game::Interact(int x, int y)
 	int actY = y;
 	switch (m_player.playerFacing)
 	{
-	case Direction::up:
+	case Direction::Up:
 	{ actY--; break; }
-	case Direction::down:
+	case Direction::Down:
 	{ actY++; break; }
-	case Direction::left:
+	case Direction::Left:
 	{ actX--; break; }
-	case Direction::right:
+	case Direction::Right:
 	{ actX++; break; }
 	default: break;
 	}
@@ -245,63 +274,139 @@ void Game::Interact(int x, int y)
 	//Interact with space player is facing
 	char interactedWith = m_level.GetSpaceAtPosition(actX, actY);
 
-	if (m_level.IsKey(actX, actY))
-	{
-		if (m_input.BinaryChoice("COLLECT KEY?")) {
-			m_player.PickupKey(1);
-			m_level.ClearSpace(actX, actY);
-			///PlayPickupEffect();
-			//m_visuals.SubText("KEY COLLECTED");
-		}
-		else {}
-		system("cls");
-		lvlDrawn = false;
-	}
-	else if (m_level.IsMat(actX, actY))
-	{
-		if (m_input.BinaryChoice("COLLECT ORE?")) {
-			m_player.PickupMat(1);
-			m_level.ClearSpace(actX, actY);
-			///PlayPickupEffect();
-			//m_visuals.SubText("ORE COLLECTED");
-		}
-		else {}
-		system("cls");
-		lvlDrawn = false;
-	}
-	else if (m_level.IsBox(actX, actY))
-	{
-		if (m_input.BinaryChoice("SEARCH CHEST?")) {
-			//random items?
-			ChestLoot();
-			///PlayPickupEffect();
-			m_level.ClearSpace(actX, actY);
-		}
-		else {}
-		system("cls");
-		lvlDrawn = false;
-	}
-	else if (m_level.IsDoor(actX, actY))
-	{
-		if(m_player.HasKey())
+	PlacableActor* actRef =  m_level.GetActorAtPos(actX, actY);
+	if (actRef != nullptr) {
+		ActorType actTypeRef = actRef->GetType();
+	
+		switch (actTypeRef)
 		{
-			if (m_input.BinaryChoice("USE KEY ON DOOR?")) {
-				m_level.ClearSpace(actX, actY);
-				m_player.UseKey();
-				///PlayDoorOpenEffect();
-				cout << '\r' << " [DOOR OPENED]" << endl;
+		case ActorType::Door:
+			if (m_player.HasKey())
+			{
+				if (m_input.BinaryChoice("USE KEY ON DOOR?")) {
+					actRef->Remove();
+					m_level.ClearSpace(actX, actY);
+					m_player.UseKey();
+					///PlayDoorOpenEffect();
+					cout << '\r' << " [DOOR OPENED]" << endl;
+					system("pause");
+				}
+			}
+			else
+			{
+				///PlayDoorClosedEffect();
+				cout << '\r' << " [DOOR LOCKED]" << endl;
 				system("pause");
 			}
+			system("cls");
+			lvlDrawn = false;
+			break;
+		case ActorType::Enemy:
+			break;
+		case ActorType::Goal:
+			break;
+		case ActorType::Key:
+			if (m_input.BinaryChoice("COLLECT KEY?")) {
+				m_player.PickupKey(1);
+				actRef->Remove();
+				m_level.ClearSpace(actX, actY);
+				///PlayPickupEffect();
+				//m_visuals.SubText("KEY COLLECTED");
+			}
+			else {}
+			system("cls");
+			lvlDrawn = false;
+			break;
+		case ActorType::Chest:
+			if (m_input.BinaryChoice("SEARCH CHEST?")) {
+				//random items?
+				ChestLoot();
+				///PlayPickupEffect();
+				actRef->Remove();
+				m_level.ClearSpace(actX, actY);
+			}
+			else {}
+			system("cls");
+			lvlDrawn = false;
+			break;
+		case ActorType::Ore:
+			if (m_input.BinaryChoice("COLLECT ORE?")) {
+				m_player.PickupMat(1);
+				actRef->Remove();
+				m_level.ClearSpace(actX, actY);
+				///PlayPickupEffect();
+				//m_visuals.SubText("ORE COLLECTED");
+			}
+			else {}
+			system("cls");
+			lvlDrawn = false;
+			break;
+		case ActorType::Player:
+			break;
+		default:
+			break;
 		}
-		else
-		{
-			///PlayDoorClosedEffect();
-			cout << '\r' << " [DOOR LOCKED]" << endl;
-			system("pause");
-		}
-		system("cls");
-		lvlDrawn = false;
 	}
+
+
+
+	//if (m_level.IsKey(actX, actY))
+	//{
+	//	if (m_input.BinaryChoice("COLLECT KEY?")) {
+	//		m_player.PickupKey(1);
+	//		m_level.ClearSpace(actX, actY);
+	//		///PlayPickupEffect();
+	//		//m_visuals.SubText("KEY COLLECTED");
+	//	}
+	//	else {}
+	//	system("cls");
+	//	lvlDrawn = false;
+	//}
+	//else if (m_level.IsMat(actX, actY))
+	//{
+	//	if (m_input.BinaryChoice("COLLECT ORE?")) {
+	//		m_player.PickupMat(1);
+	//		m_level.ClearSpace(actX, actY);
+	//		///PlayPickupEffect();
+	//		//m_visuals.SubText("ORE COLLECTED");
+	//	}
+	//	else {}
+	//	system("cls");
+	//	lvlDrawn = false;
+	//}
+	//else if (m_level.IsBox(actX, actY))
+	//{
+	//	if (m_input.BinaryChoice("SEARCH CHEST?")) {
+	//		//random items?
+	//		ChestLoot();
+	//		///PlayPickupEffect();
+	//		m_level.ClearSpace(actX, actY);
+	//	}
+	//	else {}
+	//	system("cls");
+	//	lvlDrawn = false;
+	//}
+	//else if (m_level.IsDoor(actX, actY))
+	//{
+	//	if(m_player.HasKey())
+	//	{
+	//		if (m_input.BinaryChoice("USE KEY ON DOOR?")) {
+	//			m_level.ClearSpace(actX, actY);
+	//			m_player.UseKey();
+	//			///PlayDoorOpenEffect();
+	//			cout << '\r' << " [DOOR OPENED]" << endl;
+	//			system("pause");
+	//		}
+	//	}
+	//	else
+	//	{
+	//		///PlayDoorClosedEffect();
+	//		cout << '\r' << " [DOOR LOCKED]" << endl;
+	//		system("pause");
+	//	}
+	//	system("cls");
+	//	lvlDrawn = false;
+	//}
 	
 }
 

@@ -4,6 +4,5 @@ class Goal : public PlacableActor
 {
 public:
 	Goal(int x, int y);
-
-	virtual void Draw() override;
+	virtual ActorType GetType() override { return ActorType::Goal; }
 };

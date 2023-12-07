@@ -17,11 +17,11 @@
 using namespace std;
 
 constexpr char WAL = (char)219;
-constexpr char KEY = (char)126;
-constexpr char DOR = (char)35;
 constexpr char GOL = (char)234;
-constexpr char MAT = (char)232;
-constexpr char BOX = (char)239; 
+//constexpr char KEY = (char)126;
+//constexpr char DOR = (char)35;
+//constexpr char MAT = (char)232;
+//constexpr char BOX = (char)239; 
 
 Level::Level()
 	: m_pLevelData(nullptr)
@@ -41,12 +41,12 @@ Level::~Level()
 	{
 		delete[] m_pLevelData;
 		m_pLevelData = nullptr;
-	}
 
-	while (!m_pActors.empty())
-	{
-		delete m_pActors.back();
-		m_pActors.pop_back();
+		while (!m_pActors.empty())
+		{
+			delete m_pActors.back();
+			m_pActors.pop_back();
+		}
 	}
 }
 
@@ -134,73 +134,38 @@ bool Level::Load(string levelName, int* playerX, int* playerY)
 }
 
 
-/*POLYMORPHIC*/
-//void Level::Draw()
+//void Level::Draw(int x, int y)
 //{
-//	HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
-//	m_visuals.ResetTextColor();
-//
-//	m_visuals.ResetCursor(); /*required for correct map placement*/
-//	m_visuals.DrawTop();
-//	for (int y = 0; y < m_height; ++y)
-//	{
-//		m_visuals.DrawLeft(y);
-//		for (int x = 0; x < m_width; ++x)
-//		{
-//			int indexToPrint = GetIndexFromCoordinates(x, y);
-//			cout << m_pLevelData[indexToPrint];
-//		}
-//		m_visuals.DrawRight(y);
-//		cout << endl;
-//	}
-//	m_visuals.DrawBottom();
-//	m_visuals.DrawControls();
-//
-//	COORD actorCursorPosition;
-//	for (auto actor = m_pActors.begin(); actor != m_pActors.end(); ++actor)
-//	{
-//		if ((*actor)->IsActive())
-//		{
-//			actorCursorPosition.X = (*actor)->GetXPosition();
-//			actorCursorPosition.Y = (*actor)->GetYPosition();
-//			SetConsoleCursorPosition(console, actorCursorPosition);
-//			(*actor)->Draw();
-//		}
-//	}
+//	int index = GetIndexFromCoordinates(x, y);
+//	cout << m_pLevelData[index];
 //}
-
-void Level::Draw(int x, int y)
-{
-	int index = GetIndexFromCoordinates(x, y);
-	cout << m_pLevelData[index];
-}
 
 bool Level::IsSpace(int x, int y)
 {
 	return m_pLevelData[GetIndexFromCoordinates(x, y)] == ' ';
 }
-bool Level::IsWall(int x, int y)
-{
-	return m_pLevelData[GetIndexFromCoordinates(x, y)] == WAL;
-}
-
-
-bool Level::IsDoor(int x, int y)
-{
-	return m_pLevelData[GetIndexFromCoordinates(x, y)] == DOR;
-}
-bool Level::IsKey(int x, int y)
-{
-	return m_pLevelData[GetIndexFromCoordinates(x, y)] == KEY;
-}
-bool Level::IsMat(int x, int y)
-{
-	return m_pLevelData[GetIndexFromCoordinates(x, y)] == MAT;
-}
-bool Level::IsBox(int x, int y)
-{
-	return m_pLevelData[GetIndexFromCoordinates(x, y)] == BOX;
-}
+//bool Level::IsWall(int x, int y)
+//{
+//	return m_pLevelData[GetIndexFromCoordinates(x, y)] == WAL;
+//}
+//
+//
+//bool Level::IsDoor(int x, int y)
+//{
+//	return m_pLevelData[GetIndexFromCoordinates(x, y)] == DOR;
+//}
+//bool Level::IsKey(int x, int y)
+//{
+//	return m_pLevelData[GetIndexFromCoordinates(x, y)] == KEY;
+//}
+//bool Level::IsMat(int x, int y)
+//{
+//	return m_pLevelData[GetIndexFromCoordinates(x, y)] == MAT;
+//}
+//bool Level::IsBox(int x, int y)
+//{
+//	return m_pLevelData[GetIndexFromCoordinates(x, y)] == BOX;
+//}
 bool Level::IsGoal(int x, int y)
 {
 	return m_pLevelData[GetIndexFromCoordinates(x, y)] == GOL;
@@ -212,6 +177,11 @@ void Level::ClearSpace(int x, int y)
 }
 void Level::ClearLevel() 
 {
+	while (!m_pActors.empty())
+	{
+		delete m_pActors.back();
+		m_pActors.pop_back();
+	}
 	m_levelsCleared++;
 }
 
@@ -222,8 +192,148 @@ char Level::GetSpaceAtPosition(int x, int y)
 
 
 /*POLYMORPHIC*/
+void Level::Draw(bool drawn)
+{
+	HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
+	m_visuals.ResetTextColor();
+	m_visuals.ResetCursor(); /*required for correct map placement*/
+	if (!drawn)
+	{
+		m_visuals.DrawTop();
+		for (int y = 0; y < m_height; ++y)
+		{
+			m_visuals.DrawLeft(y);
+			for (int x = 0; x < m_width; ++x)
+			{
+				int indexToPrint = GetIndexFromCoordinates(x, y);
+				cout << m_pLevelData[indexToPrint];
+			}
+			m_visuals.DrawRight(y);
+		}
+		m_visuals.DrawBottom();
+		m_visuals.DrawMazeControls();
+
+
+	COORD actorCursorPosition;
+	for (auto actor = m_pActors.begin(); actor != m_pActors.end(); ++actor)
+	{
+		if ((*actor)->IsActive())
+		{
+			actorCursorPosition.X = (*actor)->GetXPosition();
+			actorCursorPosition.Y = (*actor)->GetYPosition();
+			SetConsoleCursorPosition(console, actorCursorPosition);
+			(*actor)->Draw();
+		}
+	}
+	}
+}
+/*POLYMORPHIC*/
+bool Level::Convert(int* playerX, int* playerY)
+{
+	bool anyWarnings = false;
+	for (int y = 0; y < m_height; y++)
+	{
+		for (int x = 0; x < m_width; x++)
+		{
+			int index = GetIndexFromCoordinates(x, y);
+
+			//Level conversion key
+			switch (m_pLevelData[index]) {
+			case '+':
+			case '-':
+			case '|':
+			case 'O':
+			case 'o':
+				m_pLevelData[index] = WAL;
+				break;
+			case 'D':
+			case 'd':
+				m_pLevelData[index] = ' ';
+				m_pActors.push_back(new Door(x, y));
+				break;
+			case '*':
+			case 'K':
+			case 'k':
+				m_pLevelData[index] = ' ';
+				m_pActors.push_back(new Key(x, y));
+				break;
+			case 'M':
+			case 'm':
+				m_pLevelData[index] = ' '; /*<MAT*/
+				m_pActors.push_back(new Ore(x, y));
+				break;
+			case 'C':
+			case 'c':
+				m_pLevelData[index] = ' ';
+				m_pActors.push_back(new Chest(x, y));
+				break;
+			case 'X':
+			case 'x':
+				m_pLevelData[index] = GOL;
+				m_pActors.push_back(new Goal(x, y));
+				m_holeY = y;
+				m_holeX = x;
+				break;
+			case '@':
+			case 'P':
+			case 'p':
+				m_pLevelData[index] = ' ';
+
+				if (playerX != nullptr && playerY != nullptr)
+				{
+					*playerX = x;
+					*playerY = y;
+				}
+				break;
+			case ' ':
+				break;
+			default:
+				cout << "Invalid character in level file: " << m_pLevelData[index] << endl;
+				anyWarnings = true;
+				break;
+			}
+		}
+	}
+	return anyWarnings;
+}
+
+PlacableActor* Level::UpdateActors(int x, int y)
+{
+	PlacableActor* collidedActor = nullptr;
+
+	for (auto actor = m_pActors.begin(); actor != m_pActors.end(); ++actor)
+	{
+		(*actor)->Update(); //updates all actors
+
+		if (x == (*actor)->GetXPosition() && y == (*actor)->GetYPosition())
+		{
+			//only collide with one actor
+			assert(collidedActor == nullptr);
+			collidedActor = (*actor);
+		}
+	}
+	return collidedActor;
+}
+
+PlacableActor* Level::GetActorAtPos(int x, int y)
+{
+	PlacableActor* targetActor = nullptr;
+	for (auto actor = m_pActors.begin(); actor != m_pActors.end(); ++actor)
+	{
+		if (x == (*actor)->GetXPosition() && y == (*actor)->GetYPosition())
+		{
+			//only collide with one actor
+			assert(targetActor == nullptr);
+			targetActor = (*actor);
+		}
+	}
+	return targetActor;
+}
+
+//
 //bool Level::Convert(int* playerX, int* playerY)
 //{
+//	//Convert file line-by-line and check for unknown characters
 //	bool anyWarnings = false;
 //	for (int y = 0; y < m_height; y++)
 //	{
@@ -243,28 +353,23 @@ char Level::GetSpaceAtPosition(int x, int y)
 //			case 'D':
 //			case 'd':
 //				m_pLevelData[index] = DOR;
-//				m_pActors.push_back(new Door(x, y, AColor::SolidGreen, AColor::SolidRed));
 //				break;
 //			case '*':
 //			case 'K':
 //			case 'k':
-//				m_pActors.push_back(new Key(x, y, 14));
 //				m_pLevelData[index] = KEY;
 //				break;
 //			case 'M':
 //			case 'm':
-//				m_pLevelData[index] = ' '; /*<MAT*/
-//				m_pActors.push_back(new Enemy(x, y, 2,0));
+//				m_pLevelData[index] = MAT;
 //				break;
 //			case 'C':
 //			case 'c':
 //				m_pLevelData[index] = BOX;
-//				m_pActors.push_back(new Chest(x, y, 6));
 //				break;
 //			case 'X':
 //			case 'x':
 //				m_pLevelData[index] = GOL;
-//				m_pActors.push_back(new Goal(x, y));
 //				m_holeY = y;
 //				m_holeX = x;
 //				break;
@@ -272,7 +377,6 @@ char Level::GetSpaceAtPosition(int x, int y)
 //			case 'P':
 //			case 'p':
 //				m_pLevelData[index] = ' ';
-//
 //				if (playerX != nullptr && playerY != nullptr)
 //				{
 //					*playerX = x;
@@ -290,88 +394,6 @@ char Level::GetSpaceAtPosition(int x, int y)
 //	}
 //	return anyWarnings;
 //}
-
-//PlacableActor* Level::UpdateActors(int x, int y)
-//{
-//	PlacableActor* collidedActor = nullptr;
-//
-//	for (auto actor = m_pActors.begin(); actor != m_pActors.end(); ++actor)
-//	{
-//		(*actor)->Update(); //updates all actors
-//
-//		if (x == (*actor)->GetXPosition() && y == (*actor)->GetYPosition())
-//		{
-//			//only collide with one actor
-//			assert(collidedActor == nullptr);
-//			collidedActor = (*actor);
-//		}
-//	}
-//	return collidedActor;
-//}
-
-bool Level::Convert(int* playerX, int* playerY)
-{
-	//Convert file line-by-line and check for unknown characters
-	bool anyWarnings = false;
-	for (int y = 0; y < m_height; y++)
-	{
-		for (int x = 0; x < m_width; x++)
-		{
-			int index = GetIndexFromCoordinates(x, y);
-
-			//Level conversion key
-			switch (m_pLevelData[index]) {
-			case '+':
-			case '-':
-			case '|':
-			case 'O':
-			case 'o':
-				m_pLevelData[index] = WAL;
-				break;
-			case 'D':
-			case 'd':
-				m_pLevelData[index] = DOR;
-				break;
-			case '*':
-			case 'K':
-			case 'k':
-				m_pLevelData[index] = KEY;
-				break;
-			case 'M':
-			case 'm':
-				m_pLevelData[index] = MAT;
-				break;
-			case 'C':
-			case 'c':
-				m_pLevelData[index] = BOX;
-				break;
-			case 'X':
-			case 'x':
-				m_pLevelData[index] = GOL;
-				m_holeY = y;
-				m_holeX = x;
-				break;
-			case '@':
-			case 'P':
-			case 'p':
-				m_pLevelData[index] = ' ';
-				if (playerX != nullptr && playerY != nullptr)
-				{
-					*playerX = x;
-					*playerY = y;
-				}
-				break;
-			case ' ':
-				break;
-			default:
-				cout << "Invalid character in level file: " << m_pLevelData[index] << endl;
-				anyWarnings = true;
-				break;
-			}
-		}
-	}
-	return anyWarnings;
-}
 
 
 int Level::GetIndexFromCoordinates(int x, int y)
