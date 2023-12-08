@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "PlacableActor.h"
+#include "WorldActor.h"
 #include "Point.h"
 #include "Visuals.h"
 #include "Input.h"
@@ -17,7 +17,7 @@ enum class Direction
 class Item;
 class Key;
 
-class Player : public PlacableActor
+class Player : public WorldActor
 {
 	Input m_input;
 	Point m_position;

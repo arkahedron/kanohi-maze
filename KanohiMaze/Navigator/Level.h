@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-class PlacableActor;
+class WorldActor;
 
 class Level
 {
@@ -14,7 +14,7 @@ class Level
 	std::string m_defaultLevel;
 	char* m_pLevelData;
 
-	std::vector<PlacableActor*> m_pActors;
+	std::vector<WorldActor*> m_pActors;
 
 public:
 	Level();
@@ -32,8 +32,8 @@ public:
 	void Draw(bool drawn = false);
 	//void Draw(int x, int y);
 
-	PlacableActor* UpdateActors(int x, int y);
-	PlacableActor* GetActorAtPos(int x, int y);
+	WorldActor* UpdateActors(int x, int y);
+	WorldActor* GetActorAtPos(int x, int y);
 
 	bool IsSpace(int x, int y);
 	/*bool IsWall(int x, int y);

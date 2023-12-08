@@ -1,8 +1,8 @@
 #pragma once
-#include "PlacableActor.h"
+#include "WorldActor.h"
 #include "Item.h"
 
-class Key : public PlacableActor, public Item
+class Key : public WorldActor, public Item
 {
 public:
 	Key(int x = 0, int y = 0);

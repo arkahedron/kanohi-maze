@@ -1,7 +1,7 @@
 #pragma once
-#include "PlacableActor.h"
+#include "WorldActor.h"
 
-class Door : public PlacableActor
+class Door : public WorldActor
 {
 public:
 	Door(int x = 0, int y = 0);

@@ -1,8 +1,8 @@
-#include "PlacableActor.h"
+#include "WorldActor.h"
 
 
 
-PlacableActor::PlacableActor(int x, int y, AColor color, ASymbol symbol)
+WorldActor::WorldActor(int x, int y, AColor color, ASymbol symbol)
 	: /*m_pPlayerRef(nullptr) ,*/
 	 m_pPosition(new Point(x, y))
 	, m_IsSolid(false)
@@ -12,49 +12,49 @@ PlacableActor::PlacableActor(int x, int y, AColor color, ASymbol symbol)
 {
 
 }
-PlacableActor::~PlacableActor()
+WorldActor::~WorldActor()
 {
 	//delete m_pPosition;
 	//m_pPosition = nullptr;
 }
 
 
-int PlacableActor::GetXPosition()
+int WorldActor::GetXPosition()
 {
 	return m_pPosition->x;
 }
-int PlacableActor::GetYPosition()
+int WorldActor::GetYPosition()
 {
 	return m_pPosition->y;
 }
-int* PlacableActor::GetXPositionPointer()
+int* WorldActor::GetXPositionPointer()
 {
 	return &(m_pPosition->x);
 }
-int* PlacableActor::GetYPositionPointer()
+int* WorldActor::GetYPositionPointer()
 {
 	return &(m_pPosition->y);
 }
-void PlacableActor::SetPosition(int x, int y)
+void WorldActor::SetPosition(int x, int y)
 {
 	m_pPosition->x = x;
 	m_pPosition->y = y;
 }
-void PlacableActor::Place(int x, int y)
+void WorldActor::Place(int x, int y)
 {
 	m_pPosition->x = x;
 	m_pPosition->y = y;
 	m_IsActive = true;
 }
 
-void PlacableActor::Remove()
+void WorldActor::Remove()
 {
 	m_IsActive = false; 
 	m_pPosition->x = -1;
 	m_pPosition->y = -1;
 }
 
-void PlacableActor::Draw()
+void WorldActor::Draw()
 {
 	if (m_IsActive)
 	{
@@ -64,7 +64,7 @@ void PlacableActor::Draw()
 	}
 }
 
-void PlacableActor::Update()
+void WorldActor::Update()
 {
 	Draw();
 }

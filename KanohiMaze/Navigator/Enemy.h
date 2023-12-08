@@ -1,6 +1,6 @@
 #pragma once
-#include "PlacableActor.h"
-class Enemy : public PlacableActor
+#include "WorldActor.h"
+class Enemy : public WorldActor
 {
 public:
 	Enemy(int x, int y, int deltaX = 0, int deltaY = 0);

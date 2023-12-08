@@ -58,7 +58,7 @@ bool Game::Update()
 	int newPlayerY = m_player.GetYPosition();
 
 	//Actor the player might be overlapping, validate it when using it
-	PlacableActor* ingressActor;
+	WorldActor* ingressActor;
 	
 	if (input == 'e' || input == 'E')
 	{
@@ -154,7 +154,7 @@ bool Game::Update()
 /*POLYMORPHIC*/
 //bool Game::HandleCollision(int newPlayerX, int newPlayerY)
 //{
-//	PlacableActor* collidedActor = m_level.UpdateActors(newPlayerX, newPlayerY);
+//	WorldActor* collidedActor = m_level.UpdateActors(newPlayerX, newPlayerY);
 //	if (collidedActor != nullptr && collidedActor->IsActive())
 //	{
 //		switch (collidedActor->GetType())
@@ -274,7 +274,7 @@ void Game::Interact(int x, int y)
 	//Interact with space player is facing
 	char interactedWith = m_level.GetSpaceAtPosition(actX, actY);
 
-	PlacableActor* actRef =  m_level.GetActorAtPos(actX, actY);
+	WorldActor* actRef =  m_level.GetActorAtPos(actX, actY);
 	if (actRef != nullptr) {
 		ActorType actTypeRef = actRef->GetType();
 	

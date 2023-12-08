@@ -12,7 +12,7 @@ char kPlayerSymbol = 48;
 constexpr int kStartingLives = 3;
 
 Player::Player()
-	: PlacableActor(0,0, AColor::Teal, ASymbol::pDown)
+	: WorldActor(0,0, AColor::Teal, ASymbol::pDown)
 	, playerFacing(Direction::Down)
 	, exited(false)
 	, menuIsOpen(false)

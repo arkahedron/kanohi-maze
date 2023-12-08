@@ -13,11 +13,11 @@ enum class ActorType
 	Player,
 };
 
-class PlacableActor
+class WorldActor
 {
 public:
-	PlacableActor(int x, int y, AColor color = AColor::Regular, ASymbol symbol = ASymbol::Space);
-	virtual ~PlacableActor();
+	WorldActor(int x, int y, AColor color = AColor::Regular, ASymbol symbol = ASymbol::Space);
+	virtual ~WorldActor();
 
 	int GetXPosition();
 	int GetYPosition();

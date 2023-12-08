@@ -297,9 +297,9 @@ bool Level::Convert(int* playerX, int* playerY)
 	return anyWarnings;
 }
 
-PlacableActor* Level::UpdateActors(int x, int y)
+WorldActor* Level::UpdateActors(int x, int y)
 {
-	PlacableActor* collidedActor = nullptr;
+	WorldActor* collidedActor = nullptr;
 
 	for (auto actor = m_pActors.begin(); actor != m_pActors.end(); ++actor)
 	{
@@ -315,9 +315,9 @@ PlacableActor* Level::UpdateActors(int x, int y)
 	return collidedActor;
 }
 
-PlacableActor* Level::GetActorAtPos(int x, int y)
+WorldActor* Level::GetActorAtPos(int x, int y)
 {
-	PlacableActor* targetActor = nullptr;
+	WorldActor* targetActor = nullptr;
 	for (auto actor = m_pActors.begin(); actor != m_pActors.end(); ++actor)
 	{
 		if (x == (*actor)->GetXPosition() && y == (*actor)->GetYPosition())

@@ -2,7 +2,7 @@
 #include "Player.h"
 
 Door::Door(int x, int y)
-	: PlacableActor(x, y, AColor::White, ASymbol::Door)
+	: WorldActor(x, y, AColor::White, ASymbol::Door)
 	, m_isOpen(false)
 	, m_openColor(AColor::Green)
 {
