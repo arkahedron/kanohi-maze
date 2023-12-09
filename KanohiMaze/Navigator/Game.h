@@ -1,5 +1,5 @@
 #pragma once
-#include "Level.h"
+//#include "Level.h"
 
 #include "Input.h"
 #include "Visuals.h"
@@ -7,10 +7,11 @@
 #include <string>
 
 class Player;
+class Level;
 
 class Game
 {
-	Level m_level;
+	Level* m_level;
 	Player* m_player;
 	Input m_input;
 	Visuals m_visuals;
@@ -22,7 +23,7 @@ public:
 	Game();
 	~Game();
 
-	Level GetLevelRef() { return m_level; };
+	//Level GetLevelRef() { return m_level; };
 	//Player* GetPlayerRef() { return m_player; };
 
 	int roomsCleared;

@@ -3,6 +3,7 @@
 #include <conio.h>
 #include <windows.h>
 
+#include "Level.h"
 #include "Player.h"
 #include "Enemy.h"
 #include "Key.h"
@@ -23,7 +24,8 @@ Game::Game()
 	, roomsCleared(0)
 {
 	m_player = Player::GetInstance();
-	m_visuals.SetLevelRef(&m_level);
+	m_level = Level::GetInstance();
+	//m_visuals.SetLevelRef(&m_level);
 	//m_player->SetPlayerRef(&m_player);
 }
 Game::~Game()
@@ -33,8 +35,8 @@ Game::~Game()
 
 bool Game::Load()
 {
-	m_levelName = m_level.SelectNewLevel();
-	return m_level.Load(m_levelName, m_player->m_WorldActor.GetXPositionPointer(), m_player->m_WorldActor.GetYPositionPointer());
+	m_levelName = m_level->SelectNewLevel();
+	return m_level->Load(m_levelName, m_player->m_WorldActor.GetXPositionPointer(), m_player->m_WorldActor.GetYPositionPointer());
 }
 void Game::Run()
 {
@@ -68,7 +70,7 @@ bool Game::Update()
 	}
 
 	//Restoring correct symbol on space after player moves from it
-	ingressActor = m_level.GetActorAtPos(newPlayerX, newPlayerY);
+	ingressActor = m_level->GetActorAtPos(newPlayerX, newPlayerY);
 	if (ingressActor != nullptr) 
 	{ ingressActor->Draw(); }
 	else 
@@ -101,9 +103,9 @@ bool Game::Update()
 	//Move player and check for unique space
 	bool pathableSpace = false;
 	
-	ingressActor = m_level.GetActorAtPos(newPlayerX, newPlayerY);
+	ingressActor = m_level->GetActorAtPos(newPlayerX, newPlayerY);
 
-	if (m_level.IsSpace(newPlayerX, newPlayerY))
+	if (m_level->IsSpace(newPlayerX, newPlayerY))
 	{
 		if (ingressActor != nullptr) {
 			bool isImpassable = ingressActor->GetSolidity();
@@ -119,19 +121,19 @@ bool Game::Update()
 		//Confine player to level edges
 		if (newPlayerX < 0)
 			newPlayerX = 0;
-		else if (newPlayerX == m_level.m_width)
-			newPlayerX = m_level.m_width - 1;
+		else if (newPlayerX == m_level->m_width)
+			newPlayerX = m_level->m_width - 1;
 		if (newPlayerY < 0)
 			newPlayerY = 0;
-		else if (newPlayerY == m_level.m_height)
-			newPlayerY = m_level.m_height - 1;
+		else if (newPlayerY == m_level->m_height)
+			newPlayerY = m_level->m_height - 1;
 		m_player->m_WorldActor.SetPosition(newPlayerX, newPlayerY);
 	}
-	else if (m_level.IsGoal(newPlayerX, newPlayerY))
+	else if (m_level->IsGoal(newPlayerX, newPlayerY))
 	{
-		m_level.ClearSpace(newPlayerX, newPlayerY);
+		m_level->ClearSpace(newPlayerX, newPlayerY);
 		m_player->m_WorldActor.SetPosition(newPlayerX, newPlayerY);
-		m_level.ClearLevel();
+		m_level->ClearLevel();
 		roomsCleared++;
 		lvlDrawn = false;
 		return true;
@@ -156,7 +158,7 @@ bool Game::Update()
 /*POLYMORPHIC*/
 //bool Game::HandleCollision(int newPlayerX, int newPlayerY)
 //{
-//	WorldActor* collidedActor = m_level.UpdateActors(newPlayerX, newPlayerY);
+//	WorldActor* collidedActor = m_level->UpdateActors(newPlayerX, newPlayerY);
 //	if (collidedActor != nullptr && collidedActor->IsActive())
 //	{
 //		switch (collidedActor->GetType())
@@ -175,7 +177,7 @@ bool Game::Update()
 //		{
 //			Goal* collidedGoal = dynamic_cast<Goal*>(collidedActor);
 //			assert(collidedGoal);
-//			m_level.ClearLevel();
+//			m_level->ClearLevel();
 //			roomsCleared++;
 //			lvlDrawn = false;
 //			return true;
@@ -184,11 +186,11 @@ bool Game::Update()
 //			break;
 //		}
 //	}
-//	else if (m_level.IsSpace(newPlayerX, newPlayerY))
+//	else if (m_level->IsSpace(newPlayerX, newPlayerY))
 //	{
 //		m_player->SetPosition(newPlayerX, newPlayerY);
 //	}
-//	else if (m_level.IsWall(newPlayerX, newPlayerY))
+//	else if (m_level->IsWall(newPlayerX, newPlayerY))
 //	{ /*hit wall, do nothing*/ }
 //	return false;
 //}
@@ -199,7 +201,7 @@ void Game::Draw()
 	HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
 	//system("cls");
 
-	m_level.Draw(lvlDrawn);
+	m_level->Draw(lvlDrawn);
 
 	lvlDrawn = true;
 	COORD actorCursorPosition;
@@ -210,7 +212,7 @@ void Game::Draw()
 	
 	COORD currentCursorPosition;
 	currentCursorPosition.X = 0;
-	currentCursorPosition.Y = m_level.m_height + 5;
+	currentCursorPosition.Y = m_level->m_height + 5;
 	SetConsoleCursorPosition(console, currentCursorPosition);
 }
 
@@ -221,10 +223,10 @@ void Game::Draw()
 //	{
 //		m_visuals.ResetCursor(); /*required for correct map placement*/
 //		m_visuals.DrawTop();
-//		for (int y = 0; y < m_level.m_height; y++)
+//		for (int y = 0; y < m_level->m_height; y++)
 //		{
 //			m_visuals.DrawLeft(y);
-//			for (int x = 0; x < m_level.m_width; x++)
+//			for (int x = 0; x < m_level->m_width; x++)
 //			{
 //				//Actual Per-Space print
 //				if (m_player->GetXPosition() == x && m_player->GetYPosition() == y) 
@@ -234,17 +236,17 @@ void Game::Draw()
 //				else
 //				{
 //					//Colorize other unique symbols
-//					if (m_level.IsDoor(x, y)) {
+//					if (m_level->IsDoor(x, y)) {
 //						if (m_player->HasKey()) { m_visuals.ColorText(AColor::DarkGreen); }
 //						else { m_visuals.ColorText(AColor::DarkRed); }
 //					}
-//					else if (m_level.IsKey(x, y)) { m_visuals.ColorText(AColor::Yellow); }
-//					else if (m_level.IsMat(x, y)) { m_visuals.ColorText(AColor::Grey); }
-//					else if (m_level.IsBox(x, y)) { m_visuals.ColorText(AColor::Orange); }
-//					else if (m_level.IsGoal(x, y)) { m_visuals.ColorText(AColor::White); }
+//					else if (m_level->IsKey(x, y)) { m_visuals.ColorText(AColor::Yellow); }
+//					else if (m_level->IsMat(x, y)) { m_visuals.ColorText(AColor::Grey); }
+//					else if (m_level->IsBox(x, y)) { m_visuals.ColorText(AColor::Orange); }
+//					else if (m_level->IsGoal(x, y)) { m_visuals.ColorText(AColor::White); }
 //					else { m_visuals.ResetTextColor(); }
 //					//Print relevant symbol and reset color to base
-//					m_level.Draw(x, y);
+//					m_level->Draw(x, y);
 //					m_visuals.ResetTextColor();
 //				}
 //			}
@@ -274,9 +276,9 @@ void Game::Interact(int x, int y)
 	}
 
 	//Interact with space player is facing
-	char interactedWith = m_level.GetSpaceAtPosition(actX, actY);
+	char interactedWith = m_level->GetSpaceAtPosition(actX, actY);
 
-	WorldActor* actRef =  m_level.GetActorAtPos(actX, actY);
+	WorldActor* actRef =  m_level->GetActorAtPos(actX, actY);
 	if (actRef != nullptr) {
 		ActorType actTypeRef = actRef->GetType();
 	
@@ -287,7 +289,7 @@ void Game::Interact(int x, int y)
 			{
 				if (m_input.BinaryChoice("USE KEY ON DOOR?")) {
 					actRef->Remove();
-					m_level.ClearSpace(actX, actY);
+					m_level->ClearSpace(actX, actY);
 					m_player->UseKey();
 					///PlayDoorOpenEffect();
 					cout << '\r' << " [DOOR OPENED]" << endl;
@@ -311,7 +313,7 @@ void Game::Interact(int x, int y)
 			if (m_input.BinaryChoice("COLLECT KEY?")) {
 				m_player->PickupKey(1);
 				actRef->Remove();
-				m_level.ClearSpace(actX, actY);
+				m_level->ClearSpace(actX, actY);
 				///PlayPickupEffect();
 				//m_visuals.SubText("KEY COLLECTED");
 
@@ -326,7 +328,7 @@ void Game::Interact(int x, int y)
 				ChestLoot();
 				///PlayPickupEffect();
 				actRef->Remove();
-				m_level.ClearSpace(actX, actY);
+				m_level->ClearSpace(actX, actY);
 			}
 			else {}
 			system("cls");
@@ -336,7 +338,7 @@ void Game::Interact(int x, int y)
 			if (m_input.BinaryChoice("COLLECT ORE?")) {
 				m_player->PickupMat(1);
 				actRef->Remove();
-				m_level.ClearSpace(actX, actY);
+				m_level->ClearSpace(actX, actY);
 				///PlayPickupEffect();
 				//m_visuals.SubText("ORE COLLECTED");
 			}
@@ -353,11 +355,11 @@ void Game::Interact(int x, int y)
 
 
 
-	//if (m_level.IsKey(actX, actY))
+	//if (m_level->IsKey(actX, actY))
 	//{
 	//	if (m_input.BinaryChoice("COLLECT KEY?")) {
 	//		m_player->PickupKey(1);
-	//		m_level.ClearSpace(actX, actY);
+	//		m_level->ClearSpace(actX, actY);
 	//		///PlayPickupEffect();
 	//		//m_visuals.SubText("KEY COLLECTED");
 	//	}
@@ -365,11 +367,11 @@ void Game::Interact(int x, int y)
 	//	system("cls");
 	//	lvlDrawn = false;
 	//}
-	//else if (m_level.IsMat(actX, actY))
+	//else if (m_level->IsMat(actX, actY))
 	//{
 	//	if (m_input.BinaryChoice("COLLECT ORE?")) {
 	//		m_player->PickupMat(1);
-	//		m_level.ClearSpace(actX, actY);
+	//		m_level->ClearSpace(actX, actY);
 	//		///PlayPickupEffect();
 	//		//m_visuals.SubText("ORE COLLECTED");
 	//	}
@@ -377,24 +379,24 @@ void Game::Interact(int x, int y)
 	//	system("cls");
 	//	lvlDrawn = false;
 	//}
-	//else if (m_level.IsBox(actX, actY))
+	//else if (m_level->IsBox(actX, actY))
 	//{
 	//	if (m_input.BinaryChoice("SEARCH CHEST?")) {
 	//		//random items?
 	//		ChestLoot();
 	//		///PlayPickupEffect();
-	//		m_level.ClearSpace(actX, actY);
+	//		m_level->ClearSpace(actX, actY);
 	//	}
 	//	else {}
 	//	system("cls");
 	//	lvlDrawn = false;
 	//}
-	//else if (m_level.IsDoor(actX, actY))
+	//else if (m_level->IsDoor(actX, actY))
 	//{
 	//	if(m_player->HasKey())
 	//	{
 	//		if (m_input.BinaryChoice("USE KEY ON DOOR?")) {
-	//			m_level.ClearSpace(actX, actY);
+	//			m_level->ClearSpace(actX, actY);
 	//			m_player->UseKey();
 	//			///PlayDoorOpenEffect();
 	//			cout << '\r' << " [DOOR OPENED]" << endl;

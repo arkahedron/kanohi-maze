@@ -24,14 +24,6 @@ Player::Player()
 {
 
 }
-Player* Player::instance = nullptr;
-Player* Player::GetInstance()
-{
-	if (instance == nullptr) {
-		instance = new Player();
-	}
-	return instance;
-}
 Player::~Player()
 {
 //	while (!m_pItems.empty())
@@ -40,7 +32,14 @@ Player::~Player()
 //		m_pItems.pop_back();
 //	}
 }
-
+Player* Player::instance = nullptr;
+Player* Player::GetInstance()
+{
+	if (instance == nullptr) {
+		instance = new Player();
+	}
+	return instance;
+}
 
 void Player::SetFacingDirection(Direction pFacing)
 {

@@ -49,6 +49,14 @@ Level::~Level()
 		}
 	}
 }
+Level* Level::instance = nullptr;
+Level* Level::GetInstance()
+{
+	if (instance == nullptr) {
+		instance = new Level();
+	}
+	return instance;
+}
 
 string Level::SelectNewLevel()
 {

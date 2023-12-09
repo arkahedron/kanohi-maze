@@ -16,9 +16,12 @@ class Level
 
 	std::vector<WorldActor*> m_pActors;
 
-public:
+protected:
 	Level();
 	~Level();
+	static Level* instance;
+public:
+	static Level* GetInstance();
 
 	int m_height;
 	int m_width;

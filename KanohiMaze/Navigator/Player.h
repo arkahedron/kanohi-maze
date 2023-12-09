@@ -20,17 +20,14 @@ class Key;
 
 class Player
 {
-	
 	Input m_input;
 	Point m_position;
 	Visuals m_visuals;
 protected:
-	static Player* instance;
 	Player();
 	~Player();
+	static Player* instance;
 public:
-
-
 	static Player* GetInstance();
 
 	WorldActor m_WorldActor;
@@ -58,9 +55,6 @@ public:
 
 	int GetLives() { return lives; }
 	void DecrementLives() { lives--; }
-
-
-
 
 };
 
