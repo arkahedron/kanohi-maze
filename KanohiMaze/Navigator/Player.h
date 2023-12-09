@@ -14,19 +14,26 @@ enum class Direction
 	Right = 62, 
 };
 
+class WorldActor;
 class Item;
 class Key;
 
-class Player : public WorldActor
+class Player
 {
+	
 	Input m_input;
 	Point m_position;
 	Visuals m_visuals;
-
-public:
+protected:
+	static Player* instance;
 	Player();
 	~Player();
+public:
 
+
+	static Player* GetInstance();
+
+	WorldActor m_WorldActor;
 	std::vector<Item*> m_pItems;
 
 	bool menuIsOpen;
@@ -46,10 +53,14 @@ public:
 
 	char GoodDraw();
 
+	void ListInventory();
 	void OpenMenu();
 
 	int GetLives() { return lives; }
 	void DecrementLives() { lives--; }
 
-	virtual ActorType GetType() override { return ActorType::Player; }
+
+
+
 };
+

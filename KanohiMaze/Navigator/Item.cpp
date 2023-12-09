@@ -10,7 +10,9 @@ Item::Item(string name, ItemType type, Rarity rarity, Element element)
 	, m_rarity(rarity)
 	, m_element(element)
 	, m_name(name)
+	, m_FullName(name)
 {
+	UpdateFullName();
 	/*either implement trait rolling into constructor or reroll after creation*/
 }
 Item::~Item() {}
@@ -48,10 +50,17 @@ void Item::RollRarity(int range)
 	m_rarity = static_cast<Rarity>(ePick);
 }
 
-
+string Item::UpdateFullName()
+{
+	string tRarity = RarityToStr(m_rarity);
+	string tElement = ElementToStr(m_element);
+	string tName = m_name;
+	m_FullName = tRarity + tElement + tName;
+	return m_FullName;
+}
 
 void Item::Draw() {
-
+	cout << m_FullName;
 }
 
 void Item::Print()

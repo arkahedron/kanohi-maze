@@ -1,16 +1,17 @@
 #pragma once
 #include "Level.h"
-#include "Player.h"
+
 #include "Input.h"
 #include "Visuals.h"
 #include "Randomizer.h"
 #include <string>
 
+class Player;
 
 class Game
 {
 	Level m_level;
-	Player m_player;
+	Player* m_player;
 	Input m_input;
 	Visuals m_visuals;
 	Randomizer m_randomizer;
@@ -22,7 +23,7 @@ public:
 	~Game();
 
 	Level GetLevelRef() { return m_level; };
-	Player GetPlayerRef() { return m_player; };
+	//Player* GetPlayerRef() { return m_player; };
 
 	int roomsCleared;
 	bool lvlDrawn;
@@ -35,7 +36,7 @@ public:
 
 	void ChestLoot();
 
-	int GetPlayerLives() { return m_player.lives; }
+	//int GetPlayerLives() { return m_player->lives; }
 
 private:
 	bool Update();

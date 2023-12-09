@@ -3,5 +3,5 @@
 Chest::Chest(int x, int y)
 	: WorldActor(x, y, AColor::Orange, ASymbol::Chest)
 {
-	m_IsSolid = true;
+	m_IsSolid = false;
 }

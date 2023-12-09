@@ -3,6 +3,7 @@
 #include <conio.h>
 #include <windows.h>
 
+#include "Player.h"
 #include "Enemy.h"
 #include "Key.h"
 #include "Door.h"
@@ -21,8 +22,9 @@ Game::Game()
 	, lvlDrawn(false)
 	, roomsCleared(0)
 {
+	m_player = Player::GetInstance();
 	m_visuals.SetLevelRef(&m_level);
-	//m_player.SetPlayerRef(&m_player);
+	//m_player->SetPlayerRef(&m_player);
 }
 Game::~Game()
 {
@@ -32,13 +34,13 @@ Game::~Game()
 bool Game::Load()
 {
 	m_levelName = m_level.SelectNewLevel();
-	return m_level.Load(m_levelName, m_player.GetXPositionPointer(), m_player.GetYPositionPointer());
+	return m_level.Load(m_levelName, m_player->m_WorldActor.GetXPositionPointer(), m_player->m_WorldActor.GetYPositionPointer());
 }
 void Game::Run()
 {
 	Draw();
 	levelEnd = Update();
-	exitedGame = m_player.exited;
+	exitedGame = m_player->exited;
 
 	if (levelEnd)
 	{
@@ -54,8 +56,8 @@ void Game::Unload()
 bool Game::Update()
 {
 	char input = (char)_getch();
-	int newPlayerX = m_player.GetXPosition();
-	int newPlayerY = m_player.GetYPosition();
+	int newPlayerX = m_player->m_WorldActor.GetXPosition();
+	int newPlayerY = m_player->m_WorldActor.GetYPosition();
 
 	//Actor the player might be overlapping, validate it when using it
 	WorldActor* ingressActor;
@@ -78,21 +80,21 @@ bool Game::Update()
 	switch (input) 
 	{
 	case '\t':
-		m_player.OpenMenu();
+		m_player->OpenMenu();
 		lvlDrawn = false;
 		break;
 	case 'w': newPlayerY--;
 	case 'W':
-	{ m_player.SetFacingDirection(Direction::Up); break; }
+	{ m_player->SetFacingDirection(Direction::Up); break; }
 	case 's': newPlayerY++;
 	case 'S':
-	{ m_player.SetFacingDirection(Direction::Down); break; }
+	{ m_player->SetFacingDirection(Direction::Down); break; }
 	case 'a': newPlayerX--;
 	case 'A':
-	{ m_player.SetFacingDirection(Direction::Left); break; }
+	{ m_player->SetFacingDirection(Direction::Left); break; }
 	case 'd': newPlayerX++;
 	case 'D':
-	{ m_player.SetFacingDirection(Direction::Right); break; }
+	{ m_player->SetFacingDirection(Direction::Right); break; }
 	default: break;
 	}
 
@@ -123,23 +125,23 @@ bool Game::Update()
 			newPlayerY = 0;
 		else if (newPlayerY == m_level.m_height)
 			newPlayerY = m_level.m_height - 1;
-		m_player.SetPosition(newPlayerX, newPlayerY);
+		m_player->m_WorldActor.SetPosition(newPlayerX, newPlayerY);
 	}
 	else if (m_level.IsGoal(newPlayerX, newPlayerY))
 	{
 		m_level.ClearSpace(newPlayerX, newPlayerY);
-		m_player.SetPosition(newPlayerX, newPlayerY);
+		m_player->m_WorldActor.SetPosition(newPlayerX, newPlayerY);
 		m_level.ClearLevel();
 		roomsCleared++;
 		lvlDrawn = false;
 		return true;
 	}
 	else {}
-	//m_player.Draw();
-	//m_visuals.DrawAtSpace(m_player.GetXPosition(), m_player.GetYPosition(), m_player.GoodDraw());
+	//m_player->Draw();
+	//m_visuals.DrawAtSpace(m_player->GetXPosition(), m_player->GetYPosition(), m_player->GoodDraw());
 	m_visuals.ResetTextColor();
 
-	if (newPlayerX == m_player.GetXPosition() && newPlayerY == m_player.GetYPosition())
+	if (newPlayerX == m_player->m_WorldActor.GetXPosition() && newPlayerY == m_player->m_WorldActor.GetYPosition())
 	{
 		return false;
 	}
@@ -164,9 +166,9 @@ bool Game::Update()
 //			Enemy* collidedEnemy = dynamic_cast<Enemy*>(collidedActor);
 //			assert(collidedEnemy);
 //			collidedEnemy->Remove();
-//			m_player.SetPosition(newPlayerX, newPlayerY);
-//			m_player.DecrementLives();
-//			if(m_player.GetLives() < 0) { return true;}
+//			m_player->SetPosition(newPlayerX, newPlayerY);
+//			m_player->DecrementLives();
+//			if(m_player->GetLives() < 0) { return true;}
 //			break;
 //		}
 //		case ActorType::Goal:
@@ -184,7 +186,7 @@ bool Game::Update()
 //	}
 //	else if (m_level.IsSpace(newPlayerX, newPlayerY))
 //	{
-//		m_player.SetPosition(newPlayerX, newPlayerY);
+//		m_player->SetPosition(newPlayerX, newPlayerY);
 //	}
 //	else if (m_level.IsWall(newPlayerX, newPlayerY))
 //	{ /*hit wall, do nothing*/ }
@@ -201,10 +203,10 @@ void Game::Draw()
 
 	lvlDrawn = true;
 	COORD actorCursorPosition;
-	actorCursorPosition.X = m_player.GetXPosition();
-	actorCursorPosition.Y = m_player.GetYPosition();
+	actorCursorPosition.X = m_player->m_WorldActor.GetXPosition();
+	actorCursorPosition.Y = m_player->m_WorldActor.GetYPosition();
 	SetConsoleCursorPosition(console, actorCursorPosition);
-	m_player.Draw();
+	m_player->m_WorldActor.Draw();
 	
 	COORD currentCursorPosition;
 	currentCursorPosition.X = 0;
@@ -225,15 +227,15 @@ void Game::Draw()
 //			for (int x = 0; x < m_level.m_width; x++)
 //			{
 //				//Actual Per-Space print
-//				if (m_player.GetXPosition() == x && m_player.GetYPosition() == y) 
+//				if (m_player->GetXPosition() == x && m_player->GetYPosition() == y) 
 //				{
-//					cout << m_player.GoodDraw();/*old player draw*/
+//					cout << m_player->GoodDraw();/*old player draw*/
 //				}
 //				else
 //				{
 //					//Colorize other unique symbols
 //					if (m_level.IsDoor(x, y)) {
-//						if (m_player.HasKey()) { m_visuals.ColorText(AColor::DarkGreen); }
+//						if (m_player->HasKey()) { m_visuals.ColorText(AColor::DarkGreen); }
 //						else { m_visuals.ColorText(AColor::DarkRed); }
 //					}
 //					else if (m_level.IsKey(x, y)) { m_visuals.ColorText(AColor::Yellow); }
@@ -258,7 +260,7 @@ void Game::Interact(int x, int y)
 {
 	int actX = x;
 	int actY = y;
-	switch (m_player.playerFacing)
+	switch (m_player->playerFacing)
 	{
 	case Direction::Up:
 	{ actY--; break; }
@@ -281,12 +283,12 @@ void Game::Interact(int x, int y)
 		switch (actTypeRef)
 		{
 		case ActorType::Door:
-			if (m_player.HasKey())
+			if (m_player->HasKey())
 			{
 				if (m_input.BinaryChoice("USE KEY ON DOOR?")) {
 					actRef->Remove();
 					m_level.ClearSpace(actX, actY);
-					m_player.UseKey();
+					m_player->UseKey();
 					///PlayDoorOpenEffect();
 					cout << '\r' << " [DOOR OPENED]" << endl;
 					system("pause");
@@ -307,11 +309,12 @@ void Game::Interact(int x, int y)
 			break;
 		case ActorType::Key:
 			if (m_input.BinaryChoice("COLLECT KEY?")) {
-				m_player.PickupKey(1);
+				m_player->PickupKey(1);
 				actRef->Remove();
 				m_level.ClearSpace(actX, actY);
 				///PlayPickupEffect();
 				//m_visuals.SubText("KEY COLLECTED");
+
 			}
 			else {}
 			system("cls");
@@ -331,7 +334,7 @@ void Game::Interact(int x, int y)
 			break;
 		case ActorType::Ore:
 			if (m_input.BinaryChoice("COLLECT ORE?")) {
-				m_player.PickupMat(1);
+				m_player->PickupMat(1);
 				actRef->Remove();
 				m_level.ClearSpace(actX, actY);
 				///PlayPickupEffect();
@@ -353,7 +356,7 @@ void Game::Interact(int x, int y)
 	//if (m_level.IsKey(actX, actY))
 	//{
 	//	if (m_input.BinaryChoice("COLLECT KEY?")) {
-	//		m_player.PickupKey(1);
+	//		m_player->PickupKey(1);
 	//		m_level.ClearSpace(actX, actY);
 	//		///PlayPickupEffect();
 	//		//m_visuals.SubText("KEY COLLECTED");
@@ -365,7 +368,7 @@ void Game::Interact(int x, int y)
 	//else if (m_level.IsMat(actX, actY))
 	//{
 	//	if (m_input.BinaryChoice("COLLECT ORE?")) {
-	//		m_player.PickupMat(1);
+	//		m_player->PickupMat(1);
 	//		m_level.ClearSpace(actX, actY);
 	//		///PlayPickupEffect();
 	//		//m_visuals.SubText("ORE COLLECTED");
@@ -388,11 +391,11 @@ void Game::Interact(int x, int y)
 	//}
 	//else if (m_level.IsDoor(actX, actY))
 	//{
-	//	if(m_player.HasKey())
+	//	if(m_player->HasKey())
 	//	{
 	//		if (m_input.BinaryChoice("USE KEY ON DOOR?")) {
 	//			m_level.ClearSpace(actX, actY);
-	//			m_player.UseKey();
+	//			m_player->UseKey();
 	//			///PlayDoorOpenEffect();
 	//			cout << '\r' << " [DOOR OPENED]" << endl;
 	//			system("pause");
@@ -423,7 +426,7 @@ void Game::ChestLoot() {
 		m_visuals.ColorText(AColor::Yellow);
 		cout << " KEY";
 		m_visuals.ResetTextColor();
-		m_player.PickupKey(1);
+		m_player->PickupKey(1);
 		break;
 	}
 	case 2:
@@ -432,7 +435,7 @@ void Game::ChestLoot() {
 		m_visuals.ColorText(AColor::Grey);
 		cout << " ORE";
 		m_visuals.ResetTextColor();
-		m_player.PickupMat(1);
+		m_player->PickupMat(1);
 		break;
 	}
 	case 3:
@@ -441,7 +444,7 @@ void Game::ChestLoot() {
 		m_visuals.ColorText(AColor::Grey);
 		cout << " ORE";
 		m_visuals.ResetTextColor();
-		m_player.PickupMat(2);
+		m_player->PickupMat(2);
 		break;
 	}
 	default:

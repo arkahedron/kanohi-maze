@@ -223,6 +223,11 @@ void Level::Draw(bool drawn)
 			actorCursorPosition.Y = (*actor)->GetYPosition();
 			SetConsoleCursorPosition(console, actorCursorPosition);
 			(*actor)->Draw();
+			if ((*actor)->GetType() == ActorType::Door)
+			{
+				(*actor)->Update();
+			}
+			
 		}
 	}
 	}

@@ -27,13 +27,14 @@ public:
 
 	bool GetSolidity() { return m_IsSolid; }
 	AColor GetColor() { return m_color; }
+	void SetSymbol(char symbol) { m_symbol = static_cast<ASymbol>(symbol); }
 	ASymbol GetSymbol() { return m_symbol; }
 
 	bool IsActive() { return m_IsActive; }
 	void Place(int x, int y);
 	void Remove();
 
-	virtual ActorType GetType() = 0;
+	virtual ActorType GetType() { return ActorType::Player; };
 	//virtual void Interact();
 	
 	virtual void Draw();

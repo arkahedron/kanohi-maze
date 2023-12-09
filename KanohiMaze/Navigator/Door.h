@@ -1,6 +1,7 @@
 #pragma once
 #include "WorldActor.h"
 
+class Player;
 class Door : public WorldActor
 {
 public:
@@ -10,10 +11,9 @@ public:
 	bool IsOpen() { return m_isOpen; }
 	void Open() { m_isOpen = true; }
 
-	//void Update() override;
+	void Update() override;
 	void Unlock();
 
 private:
 	bool m_isOpen;
-	AColor m_openColor;
 };

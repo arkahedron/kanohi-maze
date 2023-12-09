@@ -2,6 +2,8 @@
 #include <iostream>
 #include <Windows.h>
 #include <conio.h>
+#include <algorithm>
+#include <vector>
 
 #include "Key.h"
 #include "Ore.h"
@@ -12,15 +14,23 @@ char kPlayerSymbol = 48;
 constexpr int kStartingLives = 3;
 
 Player::Player()
-	: WorldActor(0,0, AColor::Teal, ASymbol::pDown)
-	, playerFacing(Direction::Down)
+	: playerFacing(Direction::Down)
 	, exited(false)
 	, menuIsOpen(false)
 	, keys(0)
 	, mats(0)
 	, lives(kStartingLives)
+	, m_WorldActor(WorldActor(0, 0, AColor::Teal, ASymbol::pDown))
 {
 
+}
+Player* Player::instance = nullptr;
+Player* Player::GetInstance()
+{
+	if (instance == nullptr) {
+		instance = new Player();
+	}
+	return instance;
 }
 Player::~Player()
 {
@@ -31,11 +41,12 @@ Player::~Player()
 //	}
 }
 
+
 void Player::SetFacingDirection(Direction pFacing)
 {
 	playerFacing = pFacing;
 	kPlayerSymbol = (int)playerFacing;
-	m_symbol = static_cast<ASymbol>(kPlayerSymbol);
+	m_WorldActor.SetSymbol(kPlayerSymbol);
 }
 
 
@@ -87,6 +98,54 @@ char Player::GoodDraw()
 	return kPlayerSymbol;
 }
 
+//void Player::ListInventory() 
+//{
+//	for (auto item = m_pItems.begin(); item != m_pItems.end(); ++item)
+//	{
+//		if ((*item)->GetName() == "Key")
+//		{
+//			cout << endl << "   - ";
+//			m_visuals.ColorText(AColor::Yellow);
+//			(*item)->Print();
+//			m_visuals.ResetTextColor();
+//		}
+//		if ((*item)->GetName() == "Ore")
+//		{
+//			cout << endl << "   - ";
+//			m_visuals.ColorText(AColor::Yellow);
+//			(*item)->Print();
+//			m_visuals.ResetTextColor();
+//		}
+//	}
+//}
+
+void Player::ListInventory()
+{
+	//vector<std::string> uniqueItems;
+	//for (auto item = m_pItems.begin(); item != m_pItems.end(); ++item)
+	//{
+	//	string uItem = (*item)->GetFullName();
+	//	uniqueItems.push_back(uItem);
+	//}
+	//std::sort(uniqueItems.begin(), uniqueItems.end());
+	//auto last = std::unique(m_pItems.begin(), m_pItems.end());
+	////uniqueItems.erase(last, uniqueItems.end());
+	//for (auto item = uniqueItems.begin(); item != uniqueItems.end(); ++item)
+	//{
+	//	int iCount = std::count(uniqueItems.begin(), uniqueItems.end(), item);
+	//	cout << " - x" << iCount;
+	//	//(*item)->Print();
+	//}
+
+	for (auto item = m_pItems.begin(); item != m_pItems.end(); ++item)
+	{
+	
+			cout << endl << "   - ";
+			(*item)->Print();
+	}
+
+}
+
 void Player::OpenMenu()
 {
 	menuIsOpen = true;
@@ -95,39 +154,7 @@ void Player::OpenMenu()
 		cout << endl << "  ----[MENU]----" << endl;
 
 		cout << endl << "  +-{Inventory}-+";
-
-		for (auto item = m_pItems.begin(); item != m_pItems.end(); ++item)
-		{
-			if((*item)->GetName() == "Key")
-			{
-				cout << endl << "   - ";
-				m_visuals.ColorText(AColor::Yellow);
-				(*item)->Print();
-				m_visuals.ResetTextColor();
-			}
-			if ((*item)->GetName() == "Ore")
-			{
-				cout << endl << "   - ";
-				m_visuals.ColorText(AColor::Yellow);
-				(*item)->Print();
-				m_visuals.ResetTextColor();
-			}
-		}
-
-		//if (keys > 0) {
-		//	cout << endl << " - x" << keys;
-		//	m_visuals.ColorText(AColor::Yellow);
-		//	cout << " KEY";
-		//	m_visuals.ResetTextColor();
-		//}
-		//if (mats > 0) {
-		//	cout << endl << " - x" << mats;
-		//	m_visuals.ColorText(AColor::Grey);
-		//	cout << " ORE";
-		//	m_visuals.ResetTextColor();
-		//}
-
-
+		ListInventory();
 		cout << endl << "  +-------------+" << endl;
 
 		//Menu control prints
