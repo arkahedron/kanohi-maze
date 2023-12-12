@@ -9,4 +9,5 @@ public:
 
 	virtual ActorType GetType() override { return ActorType::Ore; }
 
+	void Interact() override;
 };

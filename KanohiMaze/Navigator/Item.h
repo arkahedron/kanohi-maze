@@ -42,8 +42,6 @@ class Item
 {
 
 public:
-	Visuals m_visuals;
-	Randomizer m_randomizer;
 
 	Item(std::string name, ItemType type, Rarity rarity = Rarity::SCRAP, Element element = Element::NONE);
 	~Item();
@@ -62,7 +60,9 @@ public:
 	std::string GetName() { return m_name; };
 	std::string GetFullName() { return m_FullName; };
 
-protected:
+protected:	
+	Visuals m_visuals;
+	Randomizer m_randomizer;
 	std::string m_name;
 	std::string m_FullName;
 	ItemType m_type;

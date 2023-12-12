@@ -22,8 +22,8 @@ class Player
 {
 	Input m_input;
 	Point m_position;
-	Visuals m_visuals;
 protected:
+	Visuals m_visuals;
 	Player();
 	~Player();
 	static Player* instance;

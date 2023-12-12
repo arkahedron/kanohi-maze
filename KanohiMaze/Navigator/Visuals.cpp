@@ -45,8 +45,13 @@ void Visuals::ResetCursor(COORD cPos)
 void Visuals::WipeLastLines(int x)
 {
 	COORD replace = FindCursorPos();
-	replace.Y -= x;
-	ResetCursor(replace);
+	for (int y = 0; y < x; y++)
+	{
+		printf("\33[2K");
+		replace.Y -= 1;
+		ResetCursor(replace);
+	}
+	printf("\33[2K");
 }
 
 void Visuals::PrintOutActor(char actor, AColor color)

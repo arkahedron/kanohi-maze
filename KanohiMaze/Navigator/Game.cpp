@@ -131,7 +131,6 @@ bool Game::Update()
 	}
 	else if (m_level->IsGoal(newPlayerX, newPlayerY))
 	{
-		m_level->ClearSpace(newPlayerX, newPlayerY);
 		m_player->m_WorldActor.SetPosition(newPlayerX, newPlayerY);
 		m_level->ClearLevel();
 		roomsCleared++;
@@ -204,10 +203,10 @@ void Game::Draw()
 	m_level->Draw(lvlDrawn);
 
 	lvlDrawn = true;
-	COORD actorCursorPosition;
-	actorCursorPosition.X = m_player->m_WorldActor.GetXPosition();
-	actorCursorPosition.Y = m_player->m_WorldActor.GetYPosition();
-	SetConsoleCursorPosition(console, actorCursorPosition);
+	//COORD actorCursorPosition;
+	//actorCursorPosition.X = m_player->m_WorldActor.GetXPosition();
+	//actorCursorPosition.Y = m_player->m_WorldActor.GetYPosition();
+	//SetConsoleCursorPosition(console, actorCursorPosition);
 	m_player->m_WorldActor.Draw();
 	
 	COORD currentCursorPosition;
@@ -280,76 +279,11 @@ void Game::Interact(int x, int y)
 
 	WorldActor* actRef =  m_level->GetActorAtPos(actX, actY);
 	if (actRef != nullptr) {
-		ActorType actTypeRef = actRef->GetType();
-	
-		switch (actTypeRef)
+		if (actRef->IsActive())
 		{
-		case ActorType::Door:
-			if (m_player->HasKey())
-			{
-				if (m_input.BinaryChoice("USE KEY ON DOOR?")) {
-					actRef->Remove();
-					m_level->ClearSpace(actX, actY);
-					m_player->UseKey();
-					///PlayDoorOpenEffect();
-					cout << '\r' << " [DOOR OPENED]" << endl;
-					system("pause");
-				}
-			}
-			else
-			{
-				///PlayDoorClosedEffect();
-				cout << '\r' << " [DOOR LOCKED]" << endl;
-				system("pause");
-			}
-			system("cls");
+			actRef->Interact();
+			/*system("cls");*/
 			lvlDrawn = false;
-			break;
-		case ActorType::Enemy:
-			break;
-		case ActorType::Goal:
-			break;
-		case ActorType::Key:
-			if (m_input.BinaryChoice("COLLECT KEY?")) {
-				m_player->PickupKey(1);
-				actRef->Remove();
-				m_level->ClearSpace(actX, actY);
-				///PlayPickupEffect();
-				//m_visuals.SubText("KEY COLLECTED");
-
-			}
-			else {}
-			system("cls");
-			lvlDrawn = false;
-			break;
-		case ActorType::Chest:
-			if (m_input.BinaryChoice("SEARCH CHEST?")) {
-				//random items?
-				ChestLoot();
-				///PlayPickupEffect();
-				actRef->Remove();
-				m_level->ClearSpace(actX, actY);
-			}
-			else {}
-			system("cls");
-			lvlDrawn = false;
-			break;
-		case ActorType::Ore:
-			if (m_input.BinaryChoice("COLLECT ORE?")) {
-				m_player->PickupMat(1);
-				actRef->Remove();
-				m_level->ClearSpace(actX, actY);
-				///PlayPickupEffect();
-				//m_visuals.SubText("ORE COLLECTED");
-			}
-			else {}
-			system("cls");
-			lvlDrawn = false;
-			break;
-		case ActorType::Player:
-			break;
-		default:
-			break;
 		}
 	}
 
@@ -413,45 +347,4 @@ void Game::Interact(int x, int y)
 	//	lvlDrawn = false;
 	//}
 	
-}
-
-
-void Game::ChestLoot() {
-	//loot table: 1 key, 1 ore, 2 ore
-
-	cout << '\r' << " [FOUND x";
-	switch (int chestRoll = m_randomizer.Generate(1, 3))
-	{
-	case 1:
-	{
-		cout << "1";
-		m_visuals.ColorText(AColor::Yellow);
-		cout << " KEY";
-		m_visuals.ResetTextColor();
-		m_player->PickupKey(1);
-		break;
-	}
-	case 2:
-	{
-		cout << "1";
-		m_visuals.ColorText(AColor::Grey);
-		cout << " ORE";
-		m_visuals.ResetTextColor();
-		m_player->PickupMat(1);
-		break;
-	}
-	case 3:
-	{
-		cout << "2";
-		m_visuals.ColorText(AColor::Grey);
-		cout << " ORE";
-		m_visuals.ResetTextColor();
-		m_player->PickupMat(2);
-		break;
-	}
-	default:
-		break;
-	}
-	cout << "]" << endl;
-	system("pause");
 }

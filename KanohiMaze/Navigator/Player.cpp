@@ -26,11 +26,11 @@ Player::Player()
 }
 Player::~Player()
 {
-//	while (!m_pItems.empty())
-//	{
-//		delete m_pItems.back();
-//		m_pItems.pop_back();
-//	}
+	while (!m_pItems.empty())
+	{
+		delete m_pItems.back();
+		m_pItems.pop_back();
+	}
 }
 Player* Player::instance = nullptr;
 Player* Player::GetInstance()

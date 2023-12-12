@@ -1,6 +1,7 @@
 #pragma once
 #include "Point.h"
 #include "Visuals.h"
+#include "Input.h"
 
 enum class ActorType
 {
@@ -13,6 +14,7 @@ enum class ActorType
 	Player,
 };
 
+class Player;
 class WorldActor
 {
 public:
@@ -35,7 +37,7 @@ public:
 	void Remove();
 
 	virtual ActorType GetType() { return ActorType::Player; };
-	//virtual void Interact();
+	virtual void Interact();
 	
 	virtual void Draw();
 	virtual void Update();
@@ -43,6 +45,7 @@ public:
 	//void SetPlayerRef(Player* pRef) { m_pPlayerRef = pRef; };
 protected:
 	Visuals m_visuals;
+	Input m_input;
 	Point* m_pPosition;
 	//Player* m_pPlayerRef;
 	

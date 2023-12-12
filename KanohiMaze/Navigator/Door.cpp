@@ -1,5 +1,6 @@
 #include "Door.h"
 #include "Player.h"
+#include <iostream>
 
 Door::Door(int x, int y)
 	: WorldActor(x, y, AColor::Red, ASymbol::Door)
@@ -20,6 +21,32 @@ void Door::Update()
 	Draw();
 }
 
+void Door::Interact()
+{
+	if (bool playerHasKey = Player::GetInstance()->HasKey())
+	{
+		if (m_input.BinaryChoice("USE KEY ON DOOR?")) {
+			Player::GetInstance()->UseKey();
+			///PlayDoorOpenEffect();
+			std::cout << '\r' << " [DOOR OPENED]" << std::endl;
+			Remove();
+			
+			system("pause");
+			m_visuals.WipeLastLines(1);
+			
+		}
+		else { /* m_visuals.WipeLastLines(1); */ }
+	}
+	else
+	{
+		///PlayDoorClosedEffect();
+		std::cout << " [DOOR LOCKED]" << std::endl;
+		system("pause");
+		m_visuals.WipeLastLines(2);
+	}
+	
+	Draw();
+}
 
 void Door::Unlock()
 {

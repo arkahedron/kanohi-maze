@@ -14,8 +14,8 @@ WorldActor::WorldActor(int x, int y, AColor color, ASymbol symbol)
 }
 WorldActor::~WorldActor()
 {
-	//delete m_pPosition;
-	//m_pPosition = nullptr;
+	delete m_pPosition;
+	m_pPosition = nullptr;
 }
 
 
@@ -49,9 +49,16 @@ void WorldActor::Place(int x, int y)
 
 void WorldActor::Remove()
 {
-	m_IsActive = false; 
-	m_pPosition->x = -1;
-	m_pPosition->y = -1;
+	m_IsActive = false;
+	m_IsSolid = false;
+	//m_pPosition->x = -1;
+	//m_pPosition->y = -1;
+	Update();
+}
+
+void WorldActor::Interact()
+{
+	Update();
 }
 
 void WorldActor::Draw()
@@ -61,6 +68,10 @@ void WorldActor::Draw()
 		m_visuals.ColorText(m_color);
 		m_visuals.DrawAtSpace(m_pPosition->x, m_pPosition->y, (char)m_symbol);
 		m_visuals.ResetTextColor();
+	}
+	else 
+	{
+		m_visuals.DrawAtSpace(m_pPosition->x, m_pPosition->y, ' ');
 	}
 }
 

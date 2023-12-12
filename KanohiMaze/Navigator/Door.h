@@ -1,7 +1,7 @@
 #pragma once
 #include "WorldActor.h"
 
-class Player;
+
 class Door : public WorldActor
 {
 public:
@@ -12,6 +12,7 @@ public:
 	void Open() { m_isOpen = true; }
 
 	void Update() override;
+	void Interact() override;
 	void Unlock();
 
 private:

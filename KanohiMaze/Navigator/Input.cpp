@@ -34,11 +34,13 @@ bool Input::BinaryChoice(string prompt)
 	case 'y':
 	case 'Y':
 	case 'E':
+		m_visuals.WipeLastLines(1);
 		return true;
 		break;
 	case 'n':
 	case 'N':
 	case 'Q':
+		m_visuals.WipeLastLines(1);
 		return false;
 		break;
 	default:
