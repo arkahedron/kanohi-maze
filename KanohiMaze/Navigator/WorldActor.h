@@ -37,7 +37,7 @@ public:
 	void Remove();
 
 	virtual ActorType GetType() { return ActorType::Player; };
-	virtual void Interact();
+	virtual bool Interact();
 	
 	virtual void Draw();
 	virtual void Update();

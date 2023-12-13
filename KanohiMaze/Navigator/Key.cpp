@@ -9,7 +9,7 @@ Key::Key(int x, int y)
 
 }
 
-void Key::Interact()
+bool Key::Interact()
 {
 	if (m_input.BinaryChoice("COLLECT KEY?")) {
 		Player::GetInstance()->PickupKey(1);
@@ -17,8 +17,8 @@ void Key::Interact()
 		Remove();
 		///PlayPickupEffect();
 		//m_visuals.SubText("KEY COLLECTED");
-
+		return true;
 	}
-	else {}
+	else { return false; }
 	Update();
 }

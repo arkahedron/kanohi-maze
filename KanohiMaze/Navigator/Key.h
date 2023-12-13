@@ -8,5 +8,5 @@ public:
 	Key(int x = 0, int y = 0);
 	virtual ActorType GetType() override { return ActorType::Key; }
 
-	void Interact() override;
+	bool Interact() override;
 };

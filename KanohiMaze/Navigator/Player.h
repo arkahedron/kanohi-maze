@@ -14,6 +14,7 @@ enum class Direction
 	Right = 62, 
 };
 
+class Level;
 class WorldActor;
 class Item;
 class Key;
@@ -52,6 +53,9 @@ public:
 
 	void ListInventory();
 	void OpenMenu();
+
+	bool HandleMovement();
+	void Interact();
 
 	int GetLives() { return lives; }
 	void DecrementLives() { lives--; }

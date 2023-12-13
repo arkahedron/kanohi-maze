@@ -32,6 +32,7 @@ Level::Level()
 	, m_levelsCleared(0)
 	, m_levelToLoad(" ")
 	, m_defaultLevel("Entry.txt")
+	, m_levelDrawn(false)
 {
 	m_visuals.SetLevelRef(this);
 }
@@ -200,12 +201,12 @@ char Level::GetSpaceAtPosition(int x, int y)
 
 
 /*POLYMORPHIC*/
-void Level::Draw(bool drawn)
+void Level::Draw()
 {
 	HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
 	m_visuals.ResetTextColor();
 	m_visuals.ResetCursor(); /*required for correct map placement*/
-	if (!drawn)
+	if (!m_levelDrawn)
 	{
 		m_visuals.DrawTop();
 		for (int y = 0; y < m_height; ++y)
@@ -238,6 +239,7 @@ void Level::Draw(bool drawn)
 			
 		}
 	}
+	m_levelDrawn = true;
 	}
 }
 /*POLYMORPHIC*/

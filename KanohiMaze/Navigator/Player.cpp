@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <vector>
 
+#include "Level.h"
 #include "Key.h"
 #include "Ore.h"
 
@@ -189,4 +190,124 @@ void Player::OpenMenu()
 			}
 		}
 	} while (menuIsOpen);
+}
+
+bool Player::HandleMovement()
+{
+	char input = (char)_getch();
+	int newPlayerX = m_WorldActor.GetXPosition();
+	int newPlayerY = m_WorldActor.GetYPosition();
+
+	if (input == 'e' || input == 'E')
+	{
+		Interact();
+	}
+	//Restoring correct symbol on space after player moves from it
+	WorldActor* ingressActor;
+	ingressActor = Level::GetInstance()->GetActorAtPos(newPlayerX, newPlayerY);
+	if (ingressActor != nullptr) { ingressActor->Draw(); }
+	else { m_visuals.DrawAtSpace(newPlayerX, newPlayerY, ' '); }
+
+	//Movement inputs
+	switch (input)
+	{
+	case '\t':
+		OpenMenu();
+		Level::GetInstance()->SetDrawnState(false);
+		break;
+	case 'w': newPlayerY--;
+	case 'W':
+	{ SetFacingDirection(Direction::Up); break; }
+	case 's': newPlayerY++;
+	case 'S':
+	{ SetFacingDirection(Direction::Down); break; }
+	case 'a': newPlayerX--;
+	case 'A':
+	{ SetFacingDirection(Direction::Left); break; }
+	case 'd': newPlayerX++;
+	case 'D':
+	{ SetFacingDirection(Direction::Right); break; }
+	default: break;
+	}
+
+	//Move player and check for unique space
+	bool pathableSpace = false;
+
+	ingressActor = Level::GetInstance()->GetActorAtPos(newPlayerX, newPlayerY);
+
+	if (Level::GetInstance()->IsSpace(newPlayerX, newPlayerY))
+	{
+		if (ingressActor != nullptr) {
+			bool isImpassable = ingressActor->GetSolidity();
+			if (isImpassable == true)
+			{ pathableSpace = false; }
+			else { pathableSpace = true; }
+		}
+		else { pathableSpace = true; }
+	}
+	else { pathableSpace = false; }
+
+	if (pathableSpace)
+	{
+		//Confine player to level edges
+		if (newPlayerX < 0)
+			newPlayerX = 0;
+		else if (newPlayerX == Level::GetInstance()->m_width)
+			newPlayerX = Level::GetInstance()->m_width - 1;
+		if (newPlayerY < 0)
+			newPlayerY = 0;
+		else if (newPlayerY == Level::GetInstance()->m_height)
+			newPlayerY = Level::GetInstance()->m_height - 1;
+		m_WorldActor.SetPosition(newPlayerX, newPlayerY);
+	}
+	else if (Level::GetInstance()->IsGoal(newPlayerX, newPlayerY))
+	{
+		Level::GetInstance()->ClearLevel();
+		Level::GetInstance()->SetDrawnState(false);
+		return true;
+	}
+	else {}
+	//m_player->Draw();
+	//m_visuals.DrawAtSpace(m_player->GetXPosition(), m_player->GetYPosition(), m_player->GoodDraw());
+	m_visuals.ResetTextColor();
+
+	if (newPlayerX == m_WorldActor.GetXPosition() && newPlayerY == m_WorldActor.GetYPosition())
+	{
+		return false;
+	}
+	//else
+	//{
+	//	return HandleCollision(newPlayerX, newPlayerY);
+	//}
+
+	return false;
+}
+
+void Player::Interact()
+{
+	int actX = m_WorldActor.GetXPosition();
+	int actY = m_WorldActor.GetYPosition();
+	switch (playerFacing)
+	{
+	case Direction::Up:
+	{ actY--; break; }
+	case Direction::Down:
+	{ actY++; break; }
+	case Direction::Left:
+	{ actX--; break; }
+	case Direction::Right:
+	{ actX++; break; }
+	default: break;
+	}
+	//Interact with space player is facing
+	WorldActor* actRef = Level::GetInstance()->GetActorAtPos(actX, actY);
+	if (actRef != nullptr) {
+		if (actRef->IsActive())
+		{
+			bool enactedChange = actRef->Interact();
+			/*system("cls");*/
+			if (enactedChange == true)
+			{ Level::GetInstance()->SetDrawnState(false); }
+		}
+	}
 }

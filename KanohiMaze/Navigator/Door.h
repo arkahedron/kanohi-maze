@@ -12,7 +12,7 @@ public:
 	void Open() { m_isOpen = true; }
 
 	void Update() override;
-	void Interact() override;
+	bool Interact() override;
 	void Unlock();
 
 private:

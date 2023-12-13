@@ -56,9 +56,10 @@ void WorldActor::Remove()
 	Update();
 }
 
-void WorldActor::Interact()
+bool WorldActor::Interact()
 {
 	Update();
+	return false;
 }
 
 void WorldActor::Draw()

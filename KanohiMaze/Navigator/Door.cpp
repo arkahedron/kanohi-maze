@@ -21,30 +21,27 @@ void Door::Update()
 	Draw();
 }
 
-void Door::Interact()
+bool Door::Interact()
 {
 	if (bool playerHasKey = Player::GetInstance()->HasKey())
 	{
 		if (m_input.BinaryChoice("USE KEY ON DOOR?")) {
 			Player::GetInstance()->UseKey();
 			///PlayDoorOpenEffect();
-			std::cout << '\r' << " [DOOR OPENED]" << std::endl;
+			std::cout << "\r\33[2K" << " [DOOR OPENED]" << std::endl;
 			Remove();
-			
-			system("pause");
-			m_visuals.WipeLastLines(1);
-			
+			return true;
+			//m_visuals.WipeLastLines(1);
 		}
-		else { /* m_visuals.WipeLastLines(1); */ }
+		else { return false; /* m_visuals.WipeLastLines(1); */ }
 	}
 	else
 	{
 		///PlayDoorClosedEffect();
-		std::cout << " [DOOR LOCKED]" << std::endl;
-		system("pause");
-		m_visuals.WipeLastLines(2);
+		std::cout << "\r\33[2K" << " [DOOR LOCKED]" << std::endl;
+		return false;
+		//m_visuals.WipeLastLines(1);
 	}
-	
 	Draw();
 }
 

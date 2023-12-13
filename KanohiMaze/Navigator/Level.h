@@ -32,7 +32,10 @@ public:
 	std::string SelectNewLevel();
 
 	bool Load(std::string levelName, int* playerX, int* playerY);
-	void Draw(bool drawn = false);
+
+	void SetDrawnState(bool isDrawn) { m_levelDrawn = isDrawn; };
+	bool GetDrawnState() { return m_levelDrawn; };
+	void Draw();
 	//void Draw(int x, int y);
 
 	WorldActor* UpdateActors(int x, int y);
@@ -53,6 +56,7 @@ public:
 	char GetSpaceAtPosition(int x, int y);
 
 private:
+	bool m_levelDrawn;
 	bool Convert(int* playerX, int* playerY);
 	int GetIndexFromCoordinates(int x, int y);
 

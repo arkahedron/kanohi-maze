@@ -10,23 +10,23 @@ Chest::Chest(int x, int y)
 	m_IsSolid = true;
 }
 
-void Chest::Interact()
+bool Chest::Interact()
 {
 	if (m_input.BinaryChoice("SEARCH CHEST?")) {
 		//random items?
 		GenLoot();
 		///PlayPickupEffect();
 		Remove();
-		
+		return true;
 	}
-	else { }
+	else { return false; }
 	Update();
 }
 
 void Chest::GenLoot() {
 	//loot table: 1 key, 1 ore, 2 ore
 
-	cout << '\r' << " [FOUND x";
+	cout << "\r\33[2K" << " [FOUND x";
 	switch (int chestRoll = m_randomizer.Generate(1, 3))
 	{
 	case 1:
@@ -60,6 +60,5 @@ void Chest::GenLoot() {
 		break;
 	}
 	cout << "]" << endl;
-	system("pause");
-	m_visuals.WipeLastLines(1);
+	//m_visuals.WipeLastLines(1);
 }

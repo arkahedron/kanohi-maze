@@ -8,7 +8,7 @@ public:
 	Chest(int x, int y);
 	virtual ActorType GetType() override { return ActorType::Chest; }
 
-	void Interact() override;
+	bool Interact() override;
 
 private:
 	Randomizer m_randomizer;
