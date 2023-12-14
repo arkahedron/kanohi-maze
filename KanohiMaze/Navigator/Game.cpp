@@ -25,8 +25,6 @@ Game::Game()
 {
 	m_player = Player::GetInstance();
 	m_level = Level::GetInstance();
-	//m_visuals.SetLevelRef(&m_level);
-	//m_player->SetPlayerRef(&m_player);
 }
 Game::~Game()
 {
@@ -52,10 +50,6 @@ void Game::Run()
 	exitedGame = m_player->exited;
 
 	if (levelEnd) { cout << endl << "EXITING MAZE"; }
-}
-void Game::Unload()
-{
-
 }
 
 /*POLYMORPHIC*/

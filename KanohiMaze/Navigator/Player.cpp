@@ -23,7 +23,17 @@ Player::Player()
 	, lives(kStartingLives)
 	, m_WorldActor(WorldActor(0, 0, AColor::Teal, ASymbol::pDown))
 {
+	Loot* l_keys = new Loot();
+	l_keys->fullName = "Key";
+	//l_keys.rarity = Rarity::NONE;
+	l_keys->quantity = 0;
 
+	//Loot l_ores;
+	//l_ores.name = "Ore";
+	//l_ores.quantity = 0;
+
+	inv_array.push_back(l_keys);
+	//inventory_array.push_back(l_ores);
 }
 Player::~Player()
 {
@@ -49,54 +59,65 @@ void Player::SetFacingDirection(Direction pFacing)
 	m_WorldActor.SetSymbol(kPlayerSymbol);
 }
 
-
-bool Player::HasKey()
+void Player::PickupItem(Item* pItem)
 {
-	for (auto item = m_pItems.begin(); item != m_pItems.end(); ++item)
+	m_pItems.push_back(pItem);
+
+	string cifName = pItem->GetFullName();
+	auto it = std::find_if(inv_array.begin(), inv_array.end(), [cifName](const auto& itemRef) {return itemRef->fullName == cifName; });
+	if (it != inv_array.end())
 	{
-		if ((*item)->GetName() == "Key")
-		{
-			return true;
-		}
+		(*it)->quantity++;
 	}
-	return false;
-	//return ((keys > 0) ? true : false); 
-}
-void Player::PickupKey(int amt)
-{
-	m_pItems.push_back(new Key());
-	keys += amt; 
-}
-void Player::UseKey()
-{ 
-	for ( auto item = m_pItems.begin(); item != m_pItems.end(); ++item)
+	else
 	{
-		if ((*item)->GetName() == "Key")
-		{
-			m_pItems.erase(item);
-			break;
+		Loot* newItem = new Loot();
+		newItem->fullName = cifName;
+		newItem->quantity = 1;
+		inv_array.push_back(newItem);
+	}
+}
+
+
+
+
+
+
+bool Player::FindKey(bool spendKey)
+{
+	int currentKeys = inv_array[0]->quantity;
+	if (currentKeys > 0) 
+	{
+		if(spendKey == true)
+		{ 
+			inv_array[0]->quantity--; 
+
+			for (auto item = m_pItems.begin(); item != m_pItems.end(); ++item)
+			{
+				if ((*item)->GetName() == "Key")
+				{
+					m_pItems.erase(item);
+					break;
+				}
+			}
+
 		}
+		return true;
 	}
-	keys--; 
+	else 
+	{ return false; }
 }
-void Player::PickupMat(int amt)
-{
-	for (int i = 0; i < amt; i++)
-	{	
-		Ore* newOre = new Ore();
-		newOre->RollRarity(1);
-		m_pItems.push_back(newOre);
-	}
-	
-	mats += amt; 
-}
-
-
-char Player::GoodDraw()
-{
-	m_visuals.ColorText(AColor::Teal);
-	return kPlayerSymbol;
-}
+//void Player::UseKey()
+//{ 
+//	for ( auto item = m_pItems.begin(); item != m_pItems.end(); ++item)
+//	{
+//		if ((*item)->GetName() == "Key")
+//		{
+//			m_pItems.erase(item);
+//			break;
+//		}
+//	}
+//}
 
 //void Player::ListInventory() 
 //{

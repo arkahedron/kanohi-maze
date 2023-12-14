@@ -12,8 +12,7 @@ Key::Key(int x, int y)
 bool Key::Interact()
 {
 	if (m_input.BinaryChoice("COLLECT KEY?")) {
-		Player::GetInstance()->PickupKey(1);
-		m_IsActive = false;
+		Player::GetInstance()->PickupItem(this);
 		Remove();
 		///PlayPickupEffect();
 		//m_visuals.SubText("KEY COLLECTED");

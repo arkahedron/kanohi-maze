@@ -80,7 +80,6 @@ int main()
 
 				if (exitedMaze) { break;  }
 			}
-			myGame.Unload();
 			levelComplete = false;
 		}
 	} while (!exitedMaze);

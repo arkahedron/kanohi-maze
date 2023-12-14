@@ -99,34 +99,37 @@ void Item::Print()
 	}
 	m_visuals.ResetTextColor();
 	cout << m_name;
-	if(m_element != Element::NONE)
-	{
-		cout << " of ";
 		switch (m_element)
 		{
 		case Element::NONE:
 			break;
 		case Element::ICE:
+			cout << " of ";
 			m_visuals.ColorText(AColor::Teal);
 			cout << "Ice";
 			break;
 		case Element::WATER:
+			cout << " of ";
 			m_visuals.ColorText(AColor::Blue);
 			cout << "Water";
 			break;
 		case Element::AIR:
+			cout << " of ";
 			m_visuals.ColorText(AColor::Green);
 			::cout << "Air";
 			break;
 		case Element::FIRE:
+			cout << " of ";
 			m_visuals.ColorText(AColor::Red);
 			cout << "Fire";
 			break;
 		case Element::STONE:
+			cout << " of ";
 			m_visuals.ColorText(AColor::Orange);
 			cout << "Stone";
 			break;
 		case Element::EARTH:
+			cout << " of ";
 			m_visuals.ColorText(AColor::Grey);
 			cout << "Earth";
 			break;
@@ -134,7 +137,6 @@ void Item::Print()
 			m_visuals.ResetTextColor();
 			break;
 		}
-	}
 	m_visuals.ResetTextColor();
 	//cout << m_type;
 }

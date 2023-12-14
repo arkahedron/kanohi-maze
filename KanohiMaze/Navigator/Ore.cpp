@@ -11,8 +11,8 @@ Ore::Ore(int x, int y)
 bool Ore::Interact()
 {
 	if (m_input.BinaryChoice("COLLECT ORE?")) {
-		Player::GetInstance()->PickupMat(1);
-		m_IsActive = false;
+		RollRarity(1);
+		Player::GetInstance()->PickupItem(this);
 		Remove();
 		///PlayPickupEffect();
 		//m_visuals.SubText("ORE COLLECTED");

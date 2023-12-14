@@ -14,6 +14,7 @@ enum class ActorType
 	Player,
 };
 
+class Item;
 class Player;
 class WorldActor
 {

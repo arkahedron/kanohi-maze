@@ -19,6 +19,13 @@ class WorldActor;
 class Item;
 class Key;
 
+struct Loot {
+	std::string fullName;
+	//Rarity rarity;
+	int quantity;
+};
+
+
 class Player
 {
 	Input m_input;
@@ -34,6 +41,10 @@ public:
 	WorldActor m_WorldActor;
 	std::vector<Item*> m_pItems;
 
+	std::vector<Loot*> inv_array;
+
+
+
 	bool menuIsOpen;
 	bool exited;
 	int keys;
@@ -43,13 +54,11 @@ public:
 
 	void SetFacingDirection(Direction pFacing);
 
-	bool HasKey();
-	void PickupKey(int amt);
-	void UseKey();
+	void PickupItem(Item* pItem);
 
-	void PickupMat(int amt);
-
-	char GoodDraw();
+	bool FindKey(bool spendKey = false);
+	//bool HasKey();
+	//void UseKey();
 
 	void ListInventory();
 	void OpenMenu();
