@@ -1,9 +1,11 @@
-#include "Level.h"
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include <conio.h>
 #include <windows.h>
+#include <string>
+
+#include "Level.h"
 #include "Player.h"
 #include "Enemy.h"
 #include "Key.h"
@@ -18,10 +20,6 @@ using namespace std;
 
 constexpr char WAL = (char)219;
 constexpr char GOL = (char)234;
-//constexpr char KEY = (char)126;
-//constexpr char DOR = (char)35;
-//constexpr char MAT = (char)232;
-//constexpr char BOX = (char)239; 
 
 Level::Level()
 	: m_pLevelData(nullptr)
@@ -142,39 +140,14 @@ bool Level::Load(string levelName, int* playerX, int* playerY)
 
 }
 
-
-//void Level::Draw(int x, int y)
-//{
-//	int index = GetIndexFromCoordinates(x, y);
-//	cout << m_pLevelData[index];
-//}
-
+char Level::GetSpaceAtPosition(int x, int y)
+{
+	return m_pLevelData[GetIndexFromCoordinates(x, y)];
+}
 bool Level::IsSpace(int x, int y)
 {
 	return m_pLevelData[GetIndexFromCoordinates(x, y)] == ' ';
 }
-//bool Level::IsWall(int x, int y)
-//{
-//	return m_pLevelData[GetIndexFromCoordinates(x, y)] == WAL;
-//}
-//
-//
-//bool Level::IsDoor(int x, int y)
-//{
-//	return m_pLevelData[GetIndexFromCoordinates(x, y)] == DOR;
-//}
-//bool Level::IsKey(int x, int y)
-//{
-//	return m_pLevelData[GetIndexFromCoordinates(x, y)] == KEY;
-//}
-//bool Level::IsMat(int x, int y)
-//{
-//	return m_pLevelData[GetIndexFromCoordinates(x, y)] == MAT;
-//}
-//bool Level::IsBox(int x, int y)
-//{
-//	return m_pLevelData[GetIndexFromCoordinates(x, y)] == BOX;
-//}
 bool Level::IsGoal(int x, int y)
 {
 	return m_pLevelData[GetIndexFromCoordinates(x, y)] == GOL;
@@ -186,21 +159,21 @@ void Level::ClearSpace(int x, int y)
 }
 void Level::ClearLevel() 
 {
-	while (!m_pActors.empty())
+	if (m_pLevelData != nullptr)
 	{
-		delete m_pActors.back();
-		m_pActors.pop_back();
+		delete[] m_pLevelData;
+		m_pLevelData = nullptr;
+
+		while (!m_pActors.empty())
+		{
+			delete m_pActors.back();
+			m_pActors.pop_back();
+		}
 	}
+
 	m_levelsCleared++;
 }
 
-char Level::GetSpaceAtPosition(int x, int y) 
-{
-	return m_pLevelData[GetIndexFromCoordinates(x, y)];
-}
-
-
-/*POLYMORPHIC*/
 void Level::Draw()
 {
 	HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -223,7 +196,7 @@ void Level::Draw()
 		m_visuals.DrawMazeControls();
 
 
-	COORD actorCursorPosition;
+		COORD actorCursorPosition = {(0),(0)};
 	for (auto actor = m_pActors.begin(); actor != m_pActors.end(); ++actor)
 	{
 		if ((*actor)->IsActive())
@@ -242,7 +215,40 @@ void Level::Draw()
 	m_levelDrawn = true;
 	}
 }
-/*POLYMORPHIC*/
+
+WorldActor* Level::UpdateActors(int x, int y)
+{
+	WorldActor* collidedActor = nullptr;
+
+	for (auto actor = m_pActors.begin(); actor != m_pActors.end(); ++actor)
+	{
+		(*actor)->Update(); //updates all actors
+
+		if (x == (*actor)->GetXPosition() && y == (*actor)->GetYPosition())
+		{
+			//only collide with one actor
+			assert(collidedActor == nullptr);
+			collidedActor = (*actor);
+		}
+	}
+	return collidedActor;
+}
+
+WorldActor* Level::GetActorAtPos(int x, int y)
+{
+	WorldActor* targetActor = nullptr;
+	for (auto actor = m_pActors.begin(); actor != m_pActors.end(); ++actor)
+	{
+		if (x == (*actor)->GetXPosition() && y == (*actor)->GetYPosition())
+		{
+			//only collide with one actor
+			assert(targetActor == nullptr);
+			targetActor = (*actor);
+		}
+	}
+	return targetActor;
+}
+
 bool Level::Convert(int* playerX, int* playerY)
 {
 	bool anyWarnings = false;
@@ -311,105 +317,6 @@ bool Level::Convert(int* playerX, int* playerY)
 	}
 	return anyWarnings;
 }
-
-WorldActor* Level::UpdateActors(int x, int y)
-{
-	WorldActor* collidedActor = nullptr;
-
-	for (auto actor = m_pActors.begin(); actor != m_pActors.end(); ++actor)
-	{
-		(*actor)->Update(); //updates all actors
-
-		if (x == (*actor)->GetXPosition() && y == (*actor)->GetYPosition())
-		{
-			//only collide with one actor
-			assert(collidedActor == nullptr);
-			collidedActor = (*actor);
-		}
-	}
-	return collidedActor;
-}
-
-WorldActor* Level::GetActorAtPos(int x, int y)
-{
-	WorldActor* targetActor = nullptr;
-	for (auto actor = m_pActors.begin(); actor != m_pActors.end(); ++actor)
-	{
-		if (x == (*actor)->GetXPosition() && y == (*actor)->GetYPosition())
-		{
-			//only collide with one actor
-			assert(targetActor == nullptr);
-			targetActor = (*actor);
-		}
-	}
-	return targetActor;
-}
-
-//
-//bool Level::Convert(int* playerX, int* playerY)
-//{
-//	//Convert file line-by-line and check for unknown characters
-//	bool anyWarnings = false;
-//	for (int y = 0; y < m_height; y++)
-//	{
-//		for (int x = 0; x < m_width; x++)
-//		{
-//			int index = GetIndexFromCoordinates(x, y);
-//
-//			//Level conversion key
-//			switch (m_pLevelData[index]) {
-//			case '+':
-//			case '-':
-//			case '|':
-//			case 'O':
-//			case 'o':
-//				m_pLevelData[index] = WAL;
-//				break;
-//			case 'D':
-//			case 'd':
-//				m_pLevelData[index] = DOR;
-//				break;
-//			case '*':
-//			case 'K':
-//			case 'k':
-//				m_pLevelData[index] = KEY;
-//				break;
-//			case 'M':
-//			case 'm':
-//				m_pLevelData[index] = MAT;
-//				break;
-//			case 'C':
-//			case 'c':
-//				m_pLevelData[index] = BOX;
-//				break;
-//			case 'X':
-//			case 'x':
-//				m_pLevelData[index] = GOL;
-//				m_holeY = y;
-//				m_holeX = x;
-//				break;
-//			case '@':
-//			case 'P':
-//			case 'p':
-//				m_pLevelData[index] = ' ';
-//				if (playerX != nullptr && playerY != nullptr)
-//				{
-//					*playerX = x;
-//					*playerY = y;
-//				}
-//				break;
-//			case ' ':
-//				break;
-//			default:
-//				cout << "Invalid character in level file: " << m_pLevelData[index] << endl;
-//				anyWarnings = true;
-//				break;
-//			}
-//		}
-//	}
-//	return anyWarnings;
-//}
-
 
 int Level::GetIndexFromCoordinates(int x, int y)
 {

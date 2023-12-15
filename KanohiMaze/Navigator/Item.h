@@ -40,17 +40,17 @@ constexpr const char* ElementToStr(Element e) noexcept
 
 class Item
 {
-
+	Visuals m_visuals;
+	Randomizer m_randomizer;
 public:
 
-	Item(std::string name, ItemType type, Rarity rarity = Rarity::SCRAP, Element element = Element::NONE);
+	Item(std::string name, ItemType type, Rarity rarity = Rarity::NONE, Element element = Element::NONE);
 	~Item();
 
 	void RollElement();
 	void RollRarity(int range = 2); /*Rarity ranges are 1-3*/
 
 	std::string UpdateFullName();
-	void Draw();
 	void Print();
 
 	void ListLootData();
@@ -61,8 +61,7 @@ public:
 	std::string GetFullName() { return m_FullName; };
 
 protected:	
-	Visuals m_visuals;
-	Randomizer m_randomizer;
+
 	std::string m_name;
 	std::string m_FullName;
 	ItemType m_type;

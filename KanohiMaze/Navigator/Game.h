@@ -31,8 +31,6 @@ public:
 	bool Load();
 	void Run();
 
-	//int GetPlayerLives() { return m_player->lives; }
-
 private:
 
 };

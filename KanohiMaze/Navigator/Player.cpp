@@ -20,19 +20,18 @@ Player::Player()
 	, menuIsOpen(false)
 	, keys(0)
 	, mats(0)
-	, lives(kStartingLives)
 	, m_WorldActor(WorldActor(0, 0, AColor::Teal, ASymbol::pDown))
 {
-	Loot* l_keys = new Loot();
-	l_keys->fullName = "Key";
-	//l_keys.rarity = Rarity::NONE;
-	l_keys->quantity = 0;
+	//Loot* l_keys = new Loot();
+	//l_keys->fullName = "Key";
+	////l_keys.rarity = Rarity::NONE;
+	//l_keys->quantity = 0;
 
-	//Loot l_ores;
-	//l_ores.name = "Ore";
-	//l_ores.quantity = 0;
+	////Loot l_ores;
+	////l_ores.name = "Ore";
+	////l_ores.quantity = 0;
 
-	inv_array.push_back(l_keys);
+	//inv_array.push_back(l_keys);
 	//inventory_array.push_back(l_ores);
 }
 Player::~Player()
@@ -59,33 +58,63 @@ void Player::SetFacingDirection(Direction pFacing)
 	m_WorldActor.SetSymbol(kPlayerSymbol);
 }
 
+Item* Player::CreatePickedItem()
+{
+	Key nItem;
+	PickupItem(&nItem);
+	return &nItem;
+}
+
 void Player::PickupItem(Item* pItem)
 {
 	m_pItems.push_back(pItem);
 
-	string cifName = pItem->GetFullName();
-	auto it = std::find_if(inv_array.begin(), inv_array.end(), [cifName](const auto& itemRef) {return itemRef->fullName == cifName; });
-	if (it != inv_array.end())
+	if (pItem->GetName() == "Key")
 	{
-		(*it)->quantity++;
+		keys++;
 	}
-	else
-	{
-		Loot* newItem = new Loot();
-		newItem->fullName = cifName;
-		newItem->quantity = 1;
-		inv_array.push_back(newItem);
-	}
+
+	//string cifName = pItem->GetFullName();
+	//auto it = std::find_if(inv_array.begin(), inv_array.end(), [cifName](const auto& itemRef) {return itemRef->fullName == cifName; });
+	//if (it != inv_array.end())
+	//{
+	//	(*it)->quantity++;
+	//}
+	//else
+	//{
+	//	Loot* newItem = new Loot();
+	//	newItem->fullName = cifName;
+	//	newItem->quantity = 1;
+	//	inv_array.push_back(newItem);
+	//}
 }
-
-
-
-
 
 
 bool Player::FindKey(bool spendKey)
 {
-	int currentKeys = inv_array[0]->quantity;
+	if (keys > 0)
+	{
+		if (spendKey == true)
+		{
+			for (auto item = m_pItems.begin(); item != m_pItems.end(); ++item)
+			{
+				if ((*item)->GetName() == "Key")
+				{	
+					this->keys--;
+					m_pItems.erase(item);
+					break;
+				}
+			}
+			
+		}
+		return true;
+	}
+	else 
+	{
+		return false;
+	}
+
+	/*int currentKeys = inv_array[0]->quantity;
 	if (currentKeys > 0) 
 	{
 		if(spendKey == true)
@@ -105,7 +134,7 @@ bool Player::FindKey(bool spendKey)
 		return true;
 	}
 	else 
-	{ return false; }
+	{ return false; }*/
 }
 //void Player::UseKey()
 //{ 
@@ -142,6 +171,17 @@ bool Player::FindKey(bool spendKey)
 
 void Player::ListInventory()
 {
+	if (m_pItems.size() != 0)
+	{
+		for (auto item = m_pItems.begin(); item != m_pItems.end(); ++item)
+		{
+			if (*item != nullptr)
+			{
+			cout << endl << "   - ";
+			(*item)->Print();
+			}
+		}
+	}
 	//vector<std::string> uniqueItems;
 	//for (auto item = m_pItems.begin(); item != m_pItems.end(); ++item)
 	//{
@@ -157,14 +197,6 @@ void Player::ListInventory()
 	//	cout << " - x" << iCount;
 	//	//(*item)->Print();
 	//}
-
-	for (auto item = m_pItems.begin(); item != m_pItems.end(); ++item)
-	{
-	
-			cout << endl << "   - ";
-			(*item)->Print();
-	}
-
 }
 
 void Player::OpenMenu()
@@ -177,6 +209,7 @@ void Player::OpenMenu()
 		cout << endl << "  +-{Inventory}-+";
 		ListInventory();
 		cout << endl << "  +-------------+" << endl;
+		cout.flush();
 
 		//Menu control prints
 		cout << endl << "  ";
@@ -204,6 +237,7 @@ void Player::OpenMenu()
 			{
 			case '\t':
 				menuIsOpen = false;
+				Level::GetInstance()->SetDrawnState(false);
 				system("cls");
 				break;
 			default:

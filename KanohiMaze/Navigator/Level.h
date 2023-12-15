@@ -35,28 +35,22 @@ public:
 
 	void SetDrawnState(bool isDrawn) { m_levelDrawn = isDrawn; };
 	bool GetDrawnState() { return m_levelDrawn; };
-	void Draw();
-	//void Draw(int x, int y);
 
-	WorldActor* UpdateActors(int x, int y);
-	WorldActor* GetActorAtPos(int x, int y);
-
+	char GetSpaceAtPosition(int x, int y);
 	bool IsSpace(int x, int y);
-	/*bool IsWall(int x, int y);
-
-	bool IsDoor(int x, int y);
-	bool IsKey(int x, int y);
-	bool IsMat(int x, int y);
-	bool IsBox(int x, int y);*/
 	bool IsGoal(int x, int y);
 
 	void ClearSpace(int x, int y);
 	void ClearLevel();
 
-	char GetSpaceAtPosition(int x, int y);
+	void Draw();
+
+	WorldActor* UpdateActors(int x, int y);
+	WorldActor* GetActorAtPos(int x, int y);
 
 private:
 	bool m_levelDrawn;
+
 	bool Convert(int* playerX, int* playerY);
 	int GetIndexFromCoordinates(int x, int y);
 

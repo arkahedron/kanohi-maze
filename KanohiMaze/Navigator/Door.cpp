@@ -50,11 +50,3 @@ bool Door::Interact()
 	}
 	Draw();
 }
-
-void Door::Unlock()
-{
-	m_IsSolid = false;
-	
-	Update();
-
-}

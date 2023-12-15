@@ -19,11 +19,11 @@ class WorldActor;
 class Item;
 class Key;
 
-struct Loot {
-	std::string fullName;
-	//Rarity rarity;
-	int quantity;
-};
+//struct Loot {
+//	std::string fullName;
+//	//Rarity rarity;
+//	int quantity;
+//};
 
 
 class Player
@@ -41,19 +41,17 @@ public:
 	WorldActor m_WorldActor;
 	std::vector<Item*> m_pItems;
 
-	std::vector<Loot*> inv_array;
-
-
+	//std::vector<Loot*> inv_array;
 
 	bool menuIsOpen;
 	bool exited;
 	int keys;
 	int mats;
-	int lives;
 	Direction playerFacing;
 
 	void SetFacingDirection(Direction pFacing);
 
+	Item* CreatePickedItem();
 	void PickupItem(Item* pItem);
 
 	bool FindKey(bool spendKey = false);
@@ -65,9 +63,6 @@ public:
 
 	bool HandleMovement();
 	void Interact();
-
-	int GetLives() { return lives; }
-	void DecrementLives() { lives--; }
 
 };
 

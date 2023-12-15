@@ -3,8 +3,7 @@
 
 Key::Key(int x, int y)
 	: WorldActor(x, y, AColor::Yellow, ASymbol::Key)
-	, Item("Key", ItemType::CONSUMABLE, Rarity::NONE)
-
+	, Item("Key", ItemType::CONSUMABLE)
 {
 
 }
@@ -12,7 +11,9 @@ Key::Key(int x, int y)
 bool Key::Interact()
 {
 	if (m_input.BinaryChoice("COLLECT KEY?")) {
-		Player::GetInstance()->PickupItem(this);
+		Item* nKey = new Key();
+		Player::GetInstance()->PickupItem(nKey);
+		//Player::GetInstance()->PickupItem(this);
 		Remove();
 		///PlayPickupEffect();
 		//m_visuals.SubText("KEY COLLECTED");

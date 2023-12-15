@@ -13,7 +13,6 @@ public:
 
 	void Update() override;
 	bool Interact() override;
-	void Unlock();
 
 private:
 	bool m_isOpen;

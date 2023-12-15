@@ -3,7 +3,7 @@
 
 Ore::Ore(int x, int y)
 	: WorldActor(x, y, AColor::Grey, ASymbol::Ore)
-	, Item("Ore", ItemType::RESOURCE, Rarity::SCRAP)
+	, Item("Ore", ItemType::RESOURCE, Rarity::SCRAP, Element::NONE)
 {
 
 }
@@ -11,8 +11,10 @@ Ore::Ore(int x, int y)
 bool Ore::Interact()
 {
 	if (m_input.BinaryChoice("COLLECT ORE?")) {
-		RollRarity(1);
-		Player::GetInstance()->PickupItem(this);
+		Item* nOre = new Ore();
+		nOre->RollRarity(1);
+		Player::GetInstance()->PickupItem(nOre);
+		//Player::GetInstance()->PickupItem(this);
 		Remove();
 		///PlayPickupEffect();
 		//m_visuals.SubText("ORE COLLECTED");

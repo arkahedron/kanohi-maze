@@ -8,13 +8,13 @@ using namespace std;
 
 static const HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
 
-constexpr char kHorizontalBorder = 205;
-constexpr char kTopLeftBorder = 201;
-constexpr char kTopRightBorder = 187;
-constexpr char kBottomLeftBorder = 200;
-constexpr char kBottomRightBorder = 188;
-constexpr char kVerticalBorder = 186;
-constexpr char kHole = 206;
+constexpr unsigned char kHorizontalBorder = 205;
+constexpr unsigned char kTopLeftBorder = 201;
+constexpr unsigned char kTopRightBorder = 187;
+constexpr unsigned char kBottomLeftBorder = 200;
+constexpr unsigned char kBottomRightBorder = 188;
+constexpr unsigned char kVerticalBorder = 186;
+constexpr unsigned char kHole = 206;
 
 Visuals::Visuals()
 	: levelRef(nullptr)

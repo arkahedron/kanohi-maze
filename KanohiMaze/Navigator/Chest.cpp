@@ -46,6 +46,7 @@ void Chest::GenLoot() {
 		m_visuals.ColorText(AColor::Grey);
 		cout << " ORE";
 		Item* nOre = new Ore();
+		nOre->RollRarity(3);
 		Player::GetInstance()->PickupItem(nOre);
 		break;
 	}

@@ -1,5 +1,6 @@
 #include "Item.h"
 #include <iostream>
+#include <string>
 
 using namespace std;
 
@@ -12,10 +13,12 @@ Item::Item(string name, ItemType type, Rarity rarity, Element element)
 	, m_name(name)
 	, m_FullName(name)
 {
-	UpdateFullName();
 	/*either implement trait rolling into constructor or reroll after creation*/
 }
-Item::~Item() {}
+Item::~Item() 
+{
+	
+}
 
 
 void Item::RollElement()
@@ -48,57 +51,70 @@ void Item::RollRarity(int range)
 	ePick += m_randomizer.Modulate();
 	ePick = abs(ePick);
 	m_rarity = static_cast<Rarity>(ePick);
+	UpdateFullName();
 }
 
 string Item::UpdateFullName()
 {
-	string tRarity = RarityToStr(m_rarity);
-	string tElement = ElementToStr(m_element);
+
 	string tName = m_name;
+
+	string tRarity = "";
+	if(m_rarity != Rarity::NONE)
+	{ string tRarity = RarityToStr(m_rarity); }
+
+	string tElement = "";
+	if(m_element != Element::NONE)
+	{ tElement = ElementToStr(m_element); }
+	
 	m_FullName = tRarity + tElement + tName;
+
 	return m_FullName;
 }
 
-void Item::Draw() {
-	cout << m_FullName;
-}
+
 
 void Item::Print()
 {
 	m_visuals.ResetTextColor();
-	switch (m_rarity)
-	{
-	case Rarity::NONE:
-		break;
-	case Rarity::SCRAP:
-		a_scraps++;
-		cout << "Scrap ";
-		break;
-	case Rarity::DECENT:
-		m_visuals.ColorText(AColor::White);
-		a_usefuls++;
-		cout << "Decent ";
-		break;
-	case Rarity::GREAT:
-		m_visuals.ColorText(AColor::Yellow);
-		a_greats++;
-		cout << "Great ";
-		break;
-	case Rarity::EPIC:
-		m_visuals.ColorText(AColor::Purple);
-		a_epics++;
-		cout << "Epic ";
-		break;
-	case Rarity::ANCIENT:
-		m_visuals.ColorText(AColor::Pink);
-		a_ancients++;
-		cout << " Ancient ";
-		break;
-	default:
-		break;
+	if (m_rarity != Rarity::NONE)
+	{	
+		switch (m_rarity)
+		{
+		case Rarity::NONE:
+			break;
+		case Rarity::SCRAP:
+			a_scraps++;
+			cout << "Scrap ";
+			break;
+		case Rarity::DECENT:
+			m_visuals.ColorText(AColor::White);
+			a_usefuls++;
+			cout << "Decent ";
+			break;
+		case Rarity::GREAT:
+			m_visuals.ColorText(AColor::Yellow);
+			a_greats++;
+			cout << "Great ";
+			break;
+		case Rarity::EPIC:
+			m_visuals.ColorText(AColor::Purple);
+			a_epics++;
+			cout << "Epic ";
+			break;
+		case Rarity::ANCIENT:
+			m_visuals.ColorText(AColor::Pink);
+			a_ancients++;
+			cout << " Ancient ";
+			break;
+		default:
+			break;
+		}
+		m_visuals.ResetTextColor();
 	}
-	m_visuals.ResetTextColor();
 	cout << m_name;
+	if (m_element != Element::NONE)
+	{
 		switch (m_element)
 		{
 		case Element::NONE:
@@ -134,10 +150,10 @@ void Item::Print()
 			cout << "Earth";
 			break;
 		default:
-			m_visuals.ResetTextColor();
 			break;
 		}
-	m_visuals.ResetTextColor();
+		m_visuals.ResetTextColor();
+	}
 	//cout << m_type;
 }
 
