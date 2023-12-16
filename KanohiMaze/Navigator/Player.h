@@ -19,13 +19,6 @@ class WorldActor;
 class Item;
 class Key;
 
-//struct Loot {
-//	std::string fullName;
-//	//Rarity rarity;
-//	int quantity;
-//};
-
-
 class Player
 {
 	Input m_input;
@@ -41,7 +34,7 @@ public:
 	WorldActor m_WorldActor;
 	std::vector<Item*> m_pItems;
 
-	//std::vector<Loot*> inv_array;
+	std::vector<std::vector<Item*>> m_inventory{};
 
 	bool menuIsOpen;
 	bool exited;

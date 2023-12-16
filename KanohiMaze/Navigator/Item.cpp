@@ -11,7 +11,7 @@ Item::Item(string name, ItemType type, Rarity rarity, Element element)
 	, m_rarity(rarity)
 	, m_element(element)
 	, m_name(name)
-	, m_FullName(name)
+	, m_FullName(name = "nothing")
 {
 	/*either implement trait rolling into constructor or reroll after creation*/
 }
@@ -61,7 +61,7 @@ string Item::UpdateFullName()
 
 	string tRarity = "";
 	if(m_rarity != Rarity::NONE)
-	{ string tRarity = RarityToStr(m_rarity); }
+	{ tRarity = RarityToStr(m_rarity); }
 
 	string tElement = "";
 	if(m_element != Element::NONE)

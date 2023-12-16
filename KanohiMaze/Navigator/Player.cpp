@@ -67,26 +67,65 @@ Item* Player::CreatePickedItem()
 
 void Player::PickupItem(Item* pItem)
 {
-	m_pItems.push_back(pItem);
-
+	//m_pItems.push_back(pItem);
+	pItem->UpdateFullName();
 	if (pItem->GetName() == "Key")
 	{
 		keys++;
 	}
 
 	//string cifName = pItem->GetFullName();
-	//auto it = std::find_if(inv_array.begin(), inv_array.end(), [cifName](const auto& itemRef) {return itemRef->fullName == cifName; });
-	//if (it != inv_array.end())
+	//auto it = std::find_if(m_inv.begin(), m_inv.end(), [cifName](const auto& itemRef) {return itemRef->fullName == cifName; });
+	//if (it != m_inv.end())
 	//{
-	//	(*it)->quantity++;
 	//}
 	//else
 	//{
-	//	Loot* newItem = new Loot();
-	//	newItem->fullName = cifName;
-	//	newItem->quantity = 1;
-	//	inv_array.push_back(newItem);
 	//}
+
+
+	string refItemName = pItem->GetFullName();
+	int i = 0;
+	bool exists = false;
+	if (m_inventory.size() != 0)
+	{
+		//m_inventory.resize(m_inventory.size() + 1);
+		for (std::vector<std::vector<Item*>>::iterator it = m_inventory.begin(); it != m_inventory.end(); ++it)
+		{
+			string compItemName = (*it)[0]->GetFullName(); 
+			if (refItemName == compItemName)
+			{
+				it->push_back(pItem);
+				//m_inventory.push_back(*it);
+				exists = true;
+				break;
+			}
+			else
+			{
+				exists = false;
+			}
+			i++;
+		}
+		if (!exists)
+		{
+			vector<Item*> tempVI;
+			tempVI.push_back(pItem);
+			m_inventory.push_back(tempVI);
+		}
+	}
+	else
+	{
+		vector<Item*> tempVI;
+		tempVI.push_back(pItem);
+		m_inventory.push_back(tempVI);
+	}
+
+	/*m_inventory[0].push_back(pItem);
+
+	for (std::vector<std::vector<Item*>>::iterator it = m_inventory.begin(); it != m_inventory.end(); ++it)
+	{
+		it->resize(m_inventory.size()+1);
+	}*/
 }
 
 
@@ -171,16 +210,34 @@ bool Player::FindKey(bool spendKey)
 
 void Player::ListInventory()
 {
-	if (m_pItems.size() != 0)
+	//if (m_pItems.size() != 0)
+	//{
+	//	for (auto item = m_pItems.begin(); item != m_pItems.end(); ++item)
+	//	{
+	//		if (*item != nullptr)
+	//		{
+	//		cout << endl << "   - ";
+	//		(*item)->Print();
+	//		}
+	//	}
+	//}
+
+	if (m_inventory.size() != 0)
 	{
-		for (auto item = m_pItems.begin(); item != m_pItems.end(); ++item)
+		for (std::vector<std::vector<Item*>>::iterator it = m_inventory.begin(); it != m_inventory.end(); ++it)
 		{
-			if (*item != nullptr)
-			{
 			cout << endl << "   - ";
-			(*item)->Print();
-			}
+			cout << "x" << it->size() << " ";
+			(*it)[0]->Print();
 		}
+		//for (auto item = m_pItems.begin(); item != m_pItems.end(); ++item)
+		//{
+		//	if (*item != nullptr)
+		//	{
+		//		cout << endl << "   - ";
+		//		(*item)->Print();
+		//	}
+		//}
 	}
 	//vector<std::string> uniqueItems;
 	//for (auto item = m_pItems.begin(); item != m_pItems.end(); ++item)
