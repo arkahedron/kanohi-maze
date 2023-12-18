@@ -41,11 +41,11 @@ Level::~Level()
 		delete[] m_pLevelData;
 		m_pLevelData = nullptr;
 
-		while (!m_pActors.empty())
-		{
-			delete m_pActors.back();
-			m_pActors.pop_back();
-		}
+	}
+	while (!m_pActors.empty())
+	{
+		delete m_pActors.back();
+		m_pActors.pop_back();
 	}
 }
 Level* Level::instance = nullptr;
@@ -83,6 +83,12 @@ string Level::SelectNewLevel()
 		lvlSelect = fileListArray[m_randomizer.Generate(0, lvlIndex)];
 		string selectedLevel(lvlSelect.begin(), lvlSelect.end());
 		//cout << endl << selectedLevel << endl;
+
+		//while (!fileListArray.empty())
+		//{
+		//	delete &fileListArray.back();
+		//	fileListArray.pop_back();
+		//}
 
 		if (selectedLevel == m_levelToLoad || selectedLevel == m_defaultLevel) {
 			return SelectNewLevel();
@@ -164,11 +170,11 @@ void Level::ClearLevel()
 		delete[] m_pLevelData;
 		m_pLevelData = nullptr;
 
-		while (!m_pActors.empty())
-		{
-			delete m_pActors.back();
-			m_pActors.pop_back();
-		}
+	}
+	while (!m_pActors.empty())
+	{
+		delete m_pActors.back();
+		m_pActors.pop_back();
 	}
 
 	m_levelsCleared++;
@@ -239,11 +245,12 @@ WorldActor* Level::GetActorAtPos(int x, int y)
 	WorldActor* targetActor = nullptr;
 	for (auto actor = m_pActors.begin(); actor != m_pActors.end(); ++actor)
 	{
-		if (x == (*actor)->GetXPosition() && y == (*actor)->GetYPosition())
+		if ((*actor) != nullptr)
 		{
-			//only collide with one actor
-			assert(targetActor == nullptr);
-			targetActor = (*actor);
+			if (x == (*actor)->GetXPosition() && y == (*actor)->GetYPosition())
+			{
+				targetActor = (*actor);
+			}
 		}
 	}
 	return targetActor;

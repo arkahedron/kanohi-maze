@@ -105,7 +105,7 @@ void Item::Print()
 		case Rarity::ANCIENT:
 			m_visuals.ColorText(AColor::Pink);
 			a_ancients++;
-			cout << " Ancient ";
+			cout << "Ancient ";
 			break;
 		default:
 			break;

@@ -1,10 +1,8 @@
 #include "WorldActor.h"
 
 
-
 WorldActor::WorldActor(int x, int y, AColor color, ASymbol symbol)
-	: /*m_pPlayerRef(nullptr) ,*/
-	 m_pPosition(new Point(x, y))
+	: m_pPosition(new Point(x, y))
 	, m_IsSolid(false)
 	, m_IsActive(true)
 	, m_color(color)
@@ -21,11 +19,11 @@ WorldActor::~WorldActor()
 
 int WorldActor::GetXPosition()
 {
-	return m_pPosition->x;
+		return m_pPosition->x;
 }
 int WorldActor::GetYPosition()
 {
-	return m_pPosition->y;
+		return m_pPosition->y;
 }
 int* WorldActor::GetXPositionPointer()
 {

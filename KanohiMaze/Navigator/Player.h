@@ -38,8 +38,7 @@ public:
 
 	bool menuIsOpen;
 	bool exited;
-	int keys;
-	int mats;
+
 	Direction playerFacing;
 
 	void SetFacingDirection(Direction pFacing);

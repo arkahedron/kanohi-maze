@@ -74,8 +74,8 @@ int main()
 				exitedMaze = myGame.exitedGame;
 
 				//Temp Score Updates
-				Player::GetInstance()->mats;
-				Player::GetInstance()->keys;
+				//Player::GetInstance()->mats;
+				//Player::GetInstance()->keys;
 				s_Rooms = myGame.roomsCleared;
 
 				if (exitedMaze) { break;  }

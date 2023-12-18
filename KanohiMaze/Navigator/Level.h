@@ -19,7 +19,7 @@ class Level
 protected:
 	Level();
 	~Level();
-	static Level* instance;
+	
 public:
 	static Level* GetInstance();
 
@@ -49,6 +49,7 @@ public:
 	WorldActor* GetActorAtPos(int x, int y);
 
 private:
+	static Level* instance;
 	bool m_levelDrawn;
 
 	bool Convert(int* playerX, int* playerY);

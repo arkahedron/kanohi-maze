@@ -18,21 +18,9 @@ Player::Player()
 	: playerFacing(Direction::Down)
 	, exited(false)
 	, menuIsOpen(false)
-	, keys(0)
-	, mats(0)
 	, m_WorldActor(WorldActor(0, 0, AColor::Teal, ASymbol::pDown))
 {
-	//Loot* l_keys = new Loot();
-	//l_keys->fullName = "Key";
-	////l_keys.rarity = Rarity::NONE;
-	//l_keys->quantity = 0;
-
-	////Loot l_ores;
-	////l_ores.name = "Ore";
-	////l_ores.quantity = 0;
-
-	//inv_array.push_back(l_keys);
-	//inventory_array.push_back(l_ores);
+	
 }
 Player::~Player()
 {
@@ -67,193 +55,69 @@ Item* Player::CreatePickedItem()
 
 void Player::PickupItem(Item* pItem)
 {
-	//m_pItems.push_back(pItem);
-	pItem->UpdateFullName();
-	if (pItem->GetName() == "Key")
-	{
-		keys++;
-	}
-
-	//string cifName = pItem->GetFullName();
-	//auto it = std::find_if(m_inv.begin(), m_inv.end(), [cifName](const auto& itemRef) {return itemRef->fullName == cifName; });
-	//if (it != m_inv.end())
-	//{
-	//}
-	//else
-	//{
-	//}
-
-
-	string refItemName = pItem->GetFullName();
-	int i = 0;
 	bool exists = false;
+
+	pItem->UpdateFullName();
+	string refItemName = pItem->GetFullName();
 	if (m_inventory.size() != 0)
 	{
-		//m_inventory.resize(m_inventory.size() + 1);
-		for (std::vector<std::vector<Item*>>::iterator it = m_inventory.begin(); it != m_inventory.end(); ++it)
+		for (vector<vector<Item*>>::iterator it = m_inventory.begin(); it != m_inventory.end(); ++it)
 		{
 			string compItemName = (*it)[0]->GetFullName(); 
 			if (refItemName == compItemName)
 			{
 				it->push_back(pItem);
-				//m_inventory.push_back(*it);
 				exists = true;
 				break;
 			}
-			else
-			{
-				exists = false;
-			}
-			i++;
-		}
-		if (!exists)
-		{
-			vector<Item*> tempVI;
-			tempVI.push_back(pItem);
-			m_inventory.push_back(tempVI);
 		}
 	}
-	else
+	if (!exists)
 	{
 		vector<Item*> tempVI;
 		tempVI.push_back(pItem);
 		m_inventory.push_back(tempVI);
 	}
-
-	/*m_inventory[0].push_back(pItem);
-
-	for (std::vector<std::vector<Item*>>::iterator it = m_inventory.begin(); it != m_inventory.end(); ++it)
-	{
-		it->resize(m_inventory.size()+1);
-	}*/
 }
-
 
 bool Player::FindKey(bool spendKey)
 {
-	if (keys > 0)
-	{
-		if (spendKey == true)
-		{
-			for (auto item = m_pItems.begin(); item != m_pItems.end(); ++item)
-			{
-				if ((*item)->GetName() == "Key")
-				{	
-					this->keys--;
-					m_pItems.erase(item);
-					break;
-				}
-			}
-			
-		}
-		return true;
-	}
-	else 
-	{
-		return false;
-	}
-
-	/*int currentKeys = inv_array[0]->quantity;
-	if (currentKeys > 0) 
-	{
-		if(spendKey == true)
-		{ 
-			inv_array[0]->quantity--; 
-
-			for (auto item = m_pItems.begin(); item != m_pItems.end(); ++item)
-			{
-				if ((*item)->GetName() == "Key")
-				{
-					m_pItems.erase(item);
-					break;
-				}
-			}
-
-		}
-		return true;
-	}
-	else 
-	{ return false; }*/
-}
-//void Player::UseKey()
-//{ 
-//	for ( auto item = m_pItems.begin(); item != m_pItems.end(); ++item)
-//	{
-//		if ((*item)->GetName() == "Key")
-//		{
-//			m_pItems.erase(item);
-//			break;
-//		}
-//	}
-//}
-
-//void Player::ListInventory() 
-//{
-//	for (auto item = m_pItems.begin(); item != m_pItems.end(); ++item)
-//	{
-//		if ((*item)->GetName() == "Key")
-//		{
-//			cout << endl << "   - ";
-//			m_visuals.ColorText(AColor::Yellow);
-//			(*item)->Print();
-//			m_visuals.ResetTextColor();
-//		}
-//		if ((*item)->GetName() == "Ore")
-//		{
-//			cout << endl << "   - ";
-//			m_visuals.ColorText(AColor::Yellow);
-//			(*item)->Print();
-//			m_visuals.ResetTextColor();
-//		}
-//	}
-//}
-
-void Player::ListInventory()
-{
-	//if (m_pItems.size() != 0)
-	//{
-	//	for (auto item = m_pItems.begin(); item != m_pItems.end(); ++item)
-	//	{
-	//		if (*item != nullptr)
-	//		{
-	//		cout << endl << "   - ";
-	//		(*item)->Print();
-	//		}
-	//	}
-	//}
+	bool hasKey = false;
 
 	if (m_inventory.size() != 0)
 	{
-		for (std::vector<std::vector<Item*>>::iterator it = m_inventory.begin(); it != m_inventory.end(); ++it)
+		for (vector<vector<Item*>>::iterator it = m_inventory.begin(); it != m_inventory.end(); ++it)
+		{
+			string compItemName = (*it)[0]->GetFullName();
+			if (compItemName == "Key")
+			{
+				if (it->size() > 0)
+				{
+					if (spendKey == true)
+					{
+						it->pop_back();
+						if (it->empty()){ m_inventory.erase(it); }
+					}
+					hasKey = true;
+					break;
+				}
+			}
+		}
+	}
+	return hasKey;
+}
+
+void Player::ListInventory()
+{
+	if (m_inventory.size() != 0)
+	{
+		for (vector<vector<Item*>>::iterator it = m_inventory.begin(); it != m_inventory.end(); ++it)
 		{
 			cout << endl << "   - ";
 			cout << "x" << it->size() << " ";
 			(*it)[0]->Print();
 		}
-		//for (auto item = m_pItems.begin(); item != m_pItems.end(); ++item)
-		//{
-		//	if (*item != nullptr)
-		//	{
-		//		cout << endl << "   - ";
-		//		(*item)->Print();
-		//	}
-		//}
 	}
-	//vector<std::string> uniqueItems;
-	//for (auto item = m_pItems.begin(); item != m_pItems.end(); ++item)
-	//{
-	//	string uItem = (*item)->GetFullName();
-	//	uniqueItems.push_back(uItem);
-	//}
-	//std::sort(uniqueItems.begin(), uniqueItems.end());
-	//auto last = std::unique(m_pItems.begin(), m_pItems.end());
-	////uniqueItems.erase(last, uniqueItems.end());
-	//for (auto item = uniqueItems.begin(); item != uniqueItems.end(); ++item)
-	//{
-	//	int iCount = std::count(uniqueItems.begin(), uniqueItems.end(), item);
-	//	cout << " - x" << iCount;
-	//	//(*item)->Print();
-	//}
 }
 
 void Player::OpenMenu()
@@ -261,11 +125,11 @@ void Player::OpenMenu()
 	menuIsOpen = true;
 	do {
 		system("cls");
-		cout << endl << "  ----[MENU]----" << endl;
+		cout << endl << "  ------{MENU}------" << endl;
 
-		cout << endl << "  +-{Inventory}-+";
+		cout << endl << "  +---{Inventory}---+";
 		ListInventory();
-		cout << endl << "  +-------------+" << endl;
+		cout << endl << "  +-----------------+" << endl;
 		cout.flush();
 
 		//Menu control prints
@@ -416,10 +280,14 @@ void Player::Interact()
 	if (actRef != nullptr) {
 		if (actRef->IsActive())
 		{
-			bool enactedChange = actRef->Interact();
+			bool enactedChange = false;
+			enactedChange = actRef->Interact();
 			/*system("cls");*/
 			if (enactedChange == true)
-			{ Level::GetInstance()->SetDrawnState(false); }
+			{
+				Level::GetInstance()->SetDrawnState(false);
+			}
 		}
 	}
+	actRef = nullptr;
 }
