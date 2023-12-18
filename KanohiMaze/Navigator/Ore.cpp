@@ -15,8 +15,6 @@ bool Ore::Interact()
 		nOre->RollRarity(1);
 		Player::GetInstance()->PickupItem(nOre);
 		Remove();
-		///PlayPickupEffect();
-		//m_visuals.SubText("ORE COLLECTED");
 		return true;
 	}
 	else { return false; }

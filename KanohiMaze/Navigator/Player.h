@@ -30,6 +30,7 @@ protected:
 	static Player* instance;
 public:
 	static Player* GetInstance();
+	void DestroyPlayer() { delete instance; instance = nullptr; }
 
 	WorldActor m_WorldActor;
 	std::vector<Item*> m_pItems;

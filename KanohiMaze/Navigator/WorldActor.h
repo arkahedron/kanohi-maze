@@ -48,7 +48,6 @@ protected:
 	Visuals m_visuals;
 	Input m_input;
 	Point* m_pPosition;
-	//Player* m_pPlayerRef;
 	
 	
 	bool m_IsSolid;

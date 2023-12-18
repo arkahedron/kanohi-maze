@@ -49,9 +49,8 @@ void WorldActor::Remove()
 {
 	m_IsActive = false;
 	m_IsSolid = false;
-	//m_pPosition->x = -1;
-	//m_pPosition->y = -1;
-	Update();
+	m_visuals.DrawAtSpace(m_pPosition->x, m_pPosition->y, ' ');
+	/* delete this; */
 }
 
 bool WorldActor::Interact()

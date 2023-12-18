@@ -9,6 +9,7 @@
 #include <random>
 
 #include "Game.h"
+#include "Level.h"
 #include "Player.h"
 #include "Input.h"
 #include "Item.h"
@@ -60,23 +61,23 @@ int main()
 {
 	if (false) { TestMode(); }
 
-	Game myGame;
+	Game mazeGame;
 	cout << " ---{ WELCOME TO KANOHI MAZE }---" << endl;
 	system("pause");
 	do {
 
-		if (myGame.Load())
+		if (mazeGame.Load())
 		{
 			while (!levelComplete)
 			{
-				myGame.Run();
-				levelComplete = myGame.levelEnd;
-				exitedMaze = myGame.exitedGame;
+				mazeGame.Run();
+				levelComplete = mazeGame.levelEnd;
+				exitedMaze = mazeGame.exitedGame;
 
 				//Temp Score Updates
 				//Player::GetInstance()->mats;
 				//Player::GetInstance()->keys;
-				s_Rooms = myGame.roomsCleared;
+				s_Rooms = mazeGame.roomsCleared;
 
 				if (exitedMaze) { break;  }
 			}
@@ -85,42 +86,14 @@ int main()
 	} while (!exitedMaze);
 	system("cls");
 	cout << endl << " Exiting maze..." << endl;
-	////Post-game results?
+
+	//Post-game results?
 	PrintScores();
 
+	//Destroy singletons to free up their used memory
+	Player::GetInstance()->DestroyPlayer();
+	Level::GetInstance()->DestroyLevel();
+	
 	system("pause");
 
 }
-
-
-
-
-////Play state effects
-//void PlayDoorClosedEffect()
-//{
-//	/*
-//	Beep(400, 75);
-//	Beep(300, 75);
-//	*/
-//}
-//void PlayDoorOpenEffect()
-//{
-//	/*
-//	Beep(900, 200);
-//	*/
-//}
-//void PlayPickupEffect()
-//{	
-//	/*
-//	Beep(600, 200);
-//	*/
-//}
-//void PlayWinEffect()
-//{
-//	/*
-//	Beep(900, 150);
-//	Beep(1100, 150);
-//	Beep(1300, 200);
-//	Beep(1600, 400);
-//	*/
-//}

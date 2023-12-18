@@ -228,14 +228,20 @@ WorldActor* Level::UpdateActors(int x, int y)
 
 	for (auto actor = m_pActors.begin(); actor != m_pActors.end(); ++actor)
 	{
-		(*actor)->Update(); //updates all actors
-
-		if (x == (*actor)->GetXPosition() && y == (*actor)->GetYPosition())
+		if ((*actor)->IsActive())
 		{
-			//only collide with one actor
-			assert(collidedActor == nullptr);
-			collidedActor = (*actor);
+			(*actor)->Update(); //updates all actors
+			if ((*actor)->GetXPositionPointer() != nullptr && (*actor)->GetYPositionPointer() != nullptr)
+			{
+				if (x == (*actor)->GetXPosition() && y == (*actor)->GetYPosition())
+				{
+					//only collide with one actor
+					assert(collidedActor == nullptr);
+					collidedActor = (*actor);
+				}
+			}
 		}
+		else { delete (*actor); }
 	}
 	return collidedActor;
 }
@@ -245,11 +251,14 @@ WorldActor* Level::GetActorAtPos(int x, int y)
 	WorldActor* targetActor = nullptr;
 	for (auto actor = m_pActors.begin(); actor != m_pActors.end(); ++actor)
 	{
-		if ((*actor) != nullptr)
+		if ((*actor) != NULL)
 		{
-			if (x == (*actor)->GetXPosition() && y == (*actor)->GetYPosition())
+			if ((*actor)->GetXPositionPointer() != nullptr && (*actor)->GetYPositionPointer() != nullptr)
 			{
-				targetActor = (*actor);
+				if (x == (*actor)->GetXPosition() && y == (*actor)->GetYPosition())
+				{
+					targetActor = (*actor);
+				}
 			}
 		}
 	}

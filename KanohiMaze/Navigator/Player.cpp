@@ -179,7 +179,7 @@ bool Player::HandleMovement()
 		Interact();
 	}
 	//Restoring correct symbol on space after player moves from it
-	WorldActor* ingressActor;
+	static WorldActor* ingressActor;
 	ingressActor = Level::GetInstance()->GetActorAtPos(newPlayerX, newPlayerY);
 	if (ingressActor != nullptr) { ingressActor->Draw(); }
 	else { m_visuals.DrawAtSpace(newPlayerX, newPlayerY, ' '); }

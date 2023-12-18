@@ -14,8 +14,6 @@ bool Key::Interact()
 		Item* nKey = new Key();
 		Player::GetInstance()->PickupItem(nKey);
 		Remove();
-		///PlayPickupEffect();
-		//m_visuals.SubText("KEY COLLECTED");
 		return true;
 	}
 	else { return false; }

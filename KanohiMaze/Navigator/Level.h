@@ -22,6 +22,7 @@ protected:
 	
 public:
 	static Level* GetInstance();
+	void DestroyLevel() { delete instance; instance = nullptr; }
 
 	int m_height;
 	int m_width;
