@@ -65,8 +65,6 @@ int main()
 	Game myGame;
 	StateMachineCore gameStateMachine(&myGame);
 
-	cout << " ---{ WELCOME TO KANOHI MAZE }---" << endl;
-
 	myGame.Initialize(&gameStateMachine);
 
 	myGame.RunGameLoop();

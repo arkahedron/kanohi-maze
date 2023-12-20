@@ -15,6 +15,8 @@ constexpr unsigned char kBottomLeftBorder = 200;
 constexpr unsigned char kBottomRightBorder = 188;
 constexpr unsigned char kVerticalBorder = 186;
 constexpr unsigned char kHole = 206;
+constexpr unsigned char WAL = (char)219;
+constexpr unsigned char GOL = (char)234;
 
 Visuals::Visuals()
 	: levelRef(nullptr)

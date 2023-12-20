@@ -62,7 +62,7 @@ bool ArchivesState::Update(bool processInput)
 		cout << endl << " Exiting maze..." << endl;
 		m_pOwner->LoadScene(StateMachineCore::SceneName::MainMenu);
 
-		return true; 
+		return false; 
 	}
 	
 	return false;

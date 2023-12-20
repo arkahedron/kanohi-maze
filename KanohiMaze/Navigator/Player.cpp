@@ -125,7 +125,7 @@ void Player::OpenMenu()
 	menuIsOpen = true;
 	do {
 		system("cls");
-		cout << endl << "  ------{MENU}------" << endl;
+		//cout << endl << "  ------{MENU}------" << endl;
 
 		cout << endl << "  +---{Inventory}---+";
 		ListInventory();
@@ -178,8 +178,8 @@ bool Player::HandleMovement()
 	{
 		Interact();
 	}
-	else
-	{
+	//else
+	//{
 
 		//Restoring correct symbol on space after player moves from it
 		static WorldActor* ingressActor;
@@ -247,7 +247,7 @@ bool Player::HandleMovement()
 			return true;
 		}
 		else {}
-	}
+	//}
 	//m_player->Draw();
 	//m_visuals.DrawAtSpace(m_player->GetXPosition(), m_player->GetYPosition(), m_player->GoodDraw());
 	m_visuals.ResetTextColor();
