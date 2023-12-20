@@ -16,17 +16,62 @@
 
 using namespace std;
 
+#include "GameStateMachine.h"
+
 Game::Game()
-	: levelEnd(false)
+	: m_pStateMachine(nullptr)
+	, levelEnd(false)
 	, exitedGame(false)
 	, m_levelName("Entry.txt")
 	, m_visuals()
 	, lvlDrawn(false)
-	, roomsCleared(0)
 {
 	m_player = Player::GetInstance();
 	m_level = Level::GetInstance();
 }
+
+void Game::Initialize(GameStateMachine* pStateMachine)
+{
+	if(pStateMachine)
+	{
+		pStateMachine->Init();
+		m_pStateMachine = pStateMachine;
+	}
+}
+void Game::RunGameLoop()
+{
+	bool isGameOver = false;
+
+	while (!isGameOver)
+	{
+		m_pStateMachine->DrawCurrentState();
+
+		isGameOver = Update();
+	}
+}
+void Game::Deinitialize()
+{
+	if(m_pStateMachine)
+	{
+		m_pStateMachine->CleanUp();
+	}
+}
+bool Game::Update(bool processInput)
+{
+	return m_pStateMachine->UpdateCurrentState(processInput);
+}
+
+
+//Game::Game()
+//	: levelEnd(false)
+//	, exitedGame(false)
+//	, m_levelName("Entry.txt")
+//	, m_visuals()
+//	, lvlDrawn(false)
+//{
+//	m_player = Player::GetInstance();
+//	m_level = Level::GetInstance();
+//}
 Game::~Game()
 {
 

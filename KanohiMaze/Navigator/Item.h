@@ -45,7 +45,7 @@ class Item
 public:
 
 	Item(std::string name, ItemType type, Rarity rarity = Rarity::NONE, Element element = Element::NONE);
-	~Item();
+	virtual ~Item();
 
 	void RollElement();
 	void RollRarity(int range = 2); /*Rarity ranges are 1-3*/

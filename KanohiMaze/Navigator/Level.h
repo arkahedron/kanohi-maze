@@ -34,14 +34,13 @@ public:
 
 	bool Load(std::string levelName, int* playerX, int* playerY);
 
-	void SetDrawnState(bool isDrawn) { m_levelDrawn = isDrawn; };
-	bool GetDrawnState() { return m_levelDrawn; };
+	void SetDrawnState(bool isDrawn);
 
 	char GetSpaceAtPosition(int x, int y);
 	bool IsSpace(int x, int y);
 	bool IsGoal(int x, int y);
 
-	void ClearSpace(int x, int y);
+	void ClearSpace(int x, int y, WorldActor* actorToDelete = nullptr);
 	void ClearLevel();
 
 	void Draw();

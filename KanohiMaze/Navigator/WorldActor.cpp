@@ -1,5 +1,11 @@
 #include "WorldActor.h"
 
+#include <iostream>
+#include <string>
+
+#include "Level.h"
+
+class Level;
 
 WorldActor::WorldActor(int x, int y, AColor color, ASymbol symbol)
 	: m_pPosition(new Point(x, y))
@@ -12,6 +18,7 @@ WorldActor::WorldActor(int x, int y, AColor color, ASymbol symbol)
 }
 WorldActor::~WorldActor()
 {
+	//std::cout << "...deleting " << (char)m_symbol;
 	delete m_pPosition;
 	m_pPosition = nullptr;
 }
@@ -49,8 +56,9 @@ void WorldActor::Remove()
 {
 	m_IsActive = false;
 	m_IsSolid = false;
-	m_visuals.DrawAtSpace(m_pPosition->x, m_pPosition->y, ' ');
-	/* delete this; */
+	Level::GetInstance()->ClearSpace(m_pPosition->x, m_pPosition->y, this);
+	delete this;
+
 }
 
 bool WorldActor::Interact()

@@ -159,9 +159,23 @@ bool Level::IsGoal(int x, int y)
 	return m_pLevelData[GetIndexFromCoordinates(x, y)] == GOL;
 }
 
-void Level::ClearSpace(int x, int y)
+void Level::ClearSpace(int x, int y, WorldActor* actorToDelete)
 {
 	m_pLevelData[GetIndexFromCoordinates(x, y)] = ' ';
+	
+	if (actorToDelete != nullptr)
+	{
+		for (auto actor = m_pActors.begin(); actor != m_pActors.end(); ++actor)
+		{
+			WorldActor* refActor = (*actor);
+			if (refActor == actorToDelete)
+			{
+				m_pActors.erase(actor);
+				break;
+			}
+		}
+	}
+	m_visuals.DrawAtSpace(x, y, ' ');
 }
 void Level::ClearLevel() 
 {
@@ -176,49 +190,53 @@ void Level::ClearLevel()
 		delete m_pActors.back();
 		m_pActors.pop_back();
 	}
-
+	SetDrawnState(false);
 	m_levelsCleared++;
 }
 
 void Level::Draw()
 {
-	HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
-	m_visuals.ResetTextColor();
-	m_visuals.ResetCursor(); /*required for correct map placement*/
-	if (!m_levelDrawn)
+	if (m_pLevelData)
 	{
-		m_visuals.DrawTop();
-		for (int y = 0; y < m_height; ++y)
+		HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
+		m_visuals.ResetTextColor();
+		m_visuals.ResetCursor(); /*required for correct map placement*/
+		if (!m_levelDrawn)
 		{
-			m_visuals.DrawLeft(y);
-			for (int x = 0; x < m_width; ++x)
+			m_visuals.DrawTop();
+			for (int y = 0; y < m_height; ++y)
 			{
-				int indexToPrint = GetIndexFromCoordinates(x, y);
-				cout << m_pLevelData[indexToPrint];
+				m_visuals.DrawLeft(y);
+				for (int x = 0; x < m_width; ++x)
+				{
+					int indexToPrint = GetIndexFromCoordinates(x, y);
+					cout << m_pLevelData[indexToPrint];
+				}
+				m_visuals.DrawRight(y);
 			}
-			m_visuals.DrawRight(y);
-		}
-		m_visuals.DrawBottom();
-		m_visuals.DrawMazeControls();
+			m_visuals.DrawBottom();
+			m_visuals.DrawMazeControls();
 
 
-		COORD actorCursorPosition = {(0),(0)};
-	for (auto actor = m_pActors.begin(); actor != m_pActors.end(); ++actor)
-	{
-		if ((*actor)->IsActive())
+			COORD actorCursorPosition = {(0),(0)};
+		for (auto actor = m_pActors.begin(); actor != m_pActors.end(); ++actor)
 		{
-			actorCursorPosition.X = (*actor)->GetXPosition();
-			actorCursorPosition.Y = (*actor)->GetYPosition();
-			SetConsoleCursorPosition(console, actorCursorPosition);
-			(*actor)->Draw();
-			if ((*actor)->GetType() == ActorType::Door)
+			if ((*actor)->IsActive())
 			{
-				(*actor)->Update();
-			}
+				actorCursorPosition.X = (*actor)->GetXPosition();
+				actorCursorPosition.Y = (*actor)->GetYPosition();
+				SetConsoleCursorPosition(console, actorCursorPosition);
+				(*actor)->Draw();
+				if ((*actor)->GetType() == ActorType::Door)
+				{
+					(*actor)->Update();
+				}
 			
+			}
 		}
-	}
-	m_levelDrawn = true;
+		m_levelDrawn = true;
+		}
+		Player::GetInstance()->m_WorldActor.Draw();
 	}
 }
 
@@ -230,7 +248,8 @@ WorldActor* Level::UpdateActors(int x, int y)
 	{
 		if ((*actor)->IsActive())
 		{
-			(*actor)->Update(); //updates all actors
+			//updates all actors
+			(*actor)->Update(); 
 			if ((*actor)->GetXPositionPointer() != nullptr && (*actor)->GetYPositionPointer() != nullptr)
 			{
 				if (x == (*actor)->GetXPosition() && y == (*actor)->GetYPosition())
@@ -251,14 +270,11 @@ WorldActor* Level::GetActorAtPos(int x, int y)
 	WorldActor* targetActor = nullptr;
 	for (auto actor = m_pActors.begin(); actor != m_pActors.end(); ++actor)
 	{
-		if ((*actor) != NULL)
+		if ((*actor)->IsActive())
 		{
-			if ((*actor)->GetXPositionPointer() != nullptr && (*actor)->GetYPositionPointer() != nullptr)
+			if (x == (*actor)->GetXPosition() && y == (*actor)->GetYPosition())
 			{
-				if (x == (*actor)->GetXPosition() && y == (*actor)->GetYPosition())
-				{
-					targetActor = (*actor);
-				}
+				targetActor = (*actor);
 			}
 		}
 	}
@@ -338,3 +354,6 @@ int Level::GetIndexFromCoordinates(int x, int y)
 {
 	return x + y * m_width;
 }
+
+void Level::SetDrawnState(bool isDrawn) 
+{ m_levelDrawn = isDrawn; };

@@ -42,6 +42,7 @@ public:
 	
 	virtual void Draw();
 	virtual void Update();
+	bool m_IsActive;
 
 	//void SetPlayerRef(Player* pRef) { m_pPlayerRef = pRef; };
 protected:
@@ -51,7 +52,7 @@ protected:
 	
 	
 	bool m_IsSolid;
-	bool m_IsActive;
+
 	AColor m_color;
 	ASymbol m_symbol;
 

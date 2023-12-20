@@ -130,6 +130,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ArchivesState.cpp" />
     <ClCompile Include="Chest.cpp" />
     <ClCompile Include="Door.cpp" />
     <ClCompile Include="Enemy.cpp" />
@@ -139,24 +140,31 @@
     <ClCompile Include="Item.cpp" />
     <ClCompile Include="Key.cpp" />
     <ClCompile Include="Level.cpp" />
+    <ClCompile Include="MainMenuState.cpp" />
     <ClCompile Include="Navigator.cpp" />
     <ClCompile Include="Ore.cpp" />
+    <ClCompile Include="StateMachineCore.cpp" />
     <ClCompile Include="WorldActor.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Randomizer.cpp" />
     <ClCompile Include="Visuals.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ArchivesState.h" />
     <ClInclude Include="Door.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="GameState.h" />
+    <ClInclude Include="GameStateMachine.h" />
     <ClInclude Include="Goal.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="Item.h" />
     <ClInclude Include="Key.h" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="Chest.h" />
+    <ClInclude Include="MainMenuState.h" />
     <ClInclude Include="Ore.h" />
+    <ClInclude Include="StateMachineCore.h" />
     <ClInclude Include="WorldActor.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Point.h" />
