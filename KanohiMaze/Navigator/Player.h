@@ -5,6 +5,8 @@
 #include "Visuals.h"
 #include "Input.h"
 
+using namespace std;
+
 enum class Direction 
 { 
 	none = 0,
@@ -33,9 +35,9 @@ public:
 	void DestroyPlayer() { delete instance; instance = nullptr; }
 
 	WorldActor m_WorldActor;
-	std::vector<Item*> m_pItems;
 
-	std::vector<std::vector<Item*>> m_inventory{};
+	vector<string> m_itemList;
+	vector<vector<Item*>> m_inventory{};
 
 	bool menuIsOpen;
 	bool exited;
@@ -48,8 +50,6 @@ public:
 	void PickupItem(Item* pItem);
 
 	bool FindKey(bool spendKey = false);
-	//bool HasKey();
-	//void UseKey();
 
 	void ListInventory();
 	void OpenMenu();

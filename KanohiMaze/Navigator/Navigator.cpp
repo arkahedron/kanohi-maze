@@ -77,7 +77,6 @@ int main()
 	Player::GetInstance()->DestroyPlayer();
 	Level::GetInstance()->DestroyLevel();
 
-	system("pause");
 }
 
 

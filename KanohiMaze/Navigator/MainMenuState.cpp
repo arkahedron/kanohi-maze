@@ -84,15 +84,12 @@ int MainMenuState::MenuSelector()
 {
 	string Menu[3] = { "Load Save", "New  Game", "Exit Game" };
 	int pick = 0;
-	int selectedOption = pick;
-	bool hasSelected = false;
-	while (!hasSelected)
+	while (true)
 	{
 		system("cls");
 		m_visuals.ResetTextColor();
 		m_visuals.ResetCursor();
-		cout << "\n";
-		cout << "  " << string(15, WAL) << endl;
+		cout << endl << "  " << string(15, WAL) << endl;
 		cout << "  " << WAL << "[KANOHI MAZE]" << WAL << endl;
 		cout << "  " << string(15, WAL) << endl;
 		cout << "  " << string(2, WAL) << " MAIN MENU " << string(2, WAL) << endl;
@@ -161,7 +158,7 @@ string MainMenuState::CreateSaveFile()
 {
 	string saveName;
 
-	cout << "\r Name your character: ";
+	cout << "\n\r Name your character: ";
 	cin >> saveName;
 	string characterName = saveName;
 	saveName.append(".txt");
@@ -215,62 +212,76 @@ string MainMenuState::FindSaveFiles()
 	else 
 	{
 		cout << endl << " No valid saves found!" << endl;
-		system("pause");
+		Sleep(900);
 		return " ";
 	}
 
-	for(int i = 0; i < saveIndex; i++)
+	if (saveIndex > 0)
 	{
-		saveSelect = sfListArray[i];
-		string saveListItem(saveSelect.begin(), saveSelect.end());
-		saveListItem.erase(saveListItem.find_last_of("."), string::npos);
-		cout << endl << " - " << saveListItem;
+		//bool enclose = false;
+		vector<wstring> MenuList = sfListArray;
+		unsigned int lMax = MenuList.size();
+		int pick = 0;
+
+		while (true)
+		{
+			cout << "\n  SELECT SAVE: \n";
+			//if (enclose) { cout << "  " << string(15, WAL) << endl; }
+			for (int i = 0; i < lMax; ++i)
+			{
+				saveSelect = sfListArray[i];
+				string saveListItem(saveSelect.begin(), saveSelect.end());
+				saveListItem.erase(saveListItem.find_last_of("."), string::npos);
+				//if (enclose) { cout << string(2, WAL); }
+				cout << "   ";
+				if (i == pick) {
+					m_visuals.ColorText(AColor::Inverted);
+					cout << ">" << saveListItem << " ";
+				}
+				else {
+					m_visuals.ResetTextColor();
+					cout << "" << saveListItem << " ";
+				}
+				m_visuals.ResetTextColor();
+				//if (enclose) { cout << string(2, WAL); }
+				cout << endl;
+			}
+			//if (enclose) { cout << "  " << string(15, WAL) << endl; }
+
+			while (true)
+			{
+				saveSelect = sfListArray[pick];
+				int input = _getch();
+				if (input == 'w' || (char)input == kUpKey)
+				{
+					pick -= 1;
+					if (pick == -1) { pick = lMax-1; }
+					break;
+				}
+				else if (input == 's' || (char)input == kDownKey)
+				{
+					pick += 1;
+					if (pick == lMax) { pick = 0; }
+					break;
+				}
+				else if (input == 'e' || input == kEnterKey)
+				{
+					string saveInput(saveSelect.begin(), saveSelect.end());
+					return saveInput;
+					break;
+				}
+				else if (input == kEscapeKey)
+				{
+					return " ";
+					break;
+				}
+			}
+			Sleep(120);
+			m_visuals.WipeLastLines(lMax+2);
+		}
+		return " ";
 	}
-	cout << endl << " Select which save file to load: ";
-
-	string saveInput;
-	cin >> saveInput;
-	saveInput.append(".txt");
-	return saveInput;
-
-
-	//while (!fileListArray.empty())
-	//{
-	//	delete &fileListArray.back();
-	//	fileListArray.pop_back();
-	//}
-
-	//string selectedSave;
-	//int saveNum = 0;
-	//
-	//	cout << " What level would you like to load?" << endl;
-	//
-	//	//Search for and print out potential valid text files as saves
-	//	WIN32_FIND_DATA FindFileData;
-	//	HANDLE hFind = FindFirstFile(L"../Saves/*", &FindFileData);
-	//	if (hFind != INVALID_HANDLE_VALUE) {
-	//		do {
-	//			if (!(FindFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
-	//			{
-	//				wstring wsLevel(FindFileData.cFileName);
-	//				string saveStr(wsLevel.begin(), wsLevel.end());
-	//				if (bool isTextFile = (saveStr.substr(saveStr.find_last_of(".") + 1) == "txt"))
-	//				{
-	//					saveStr.erase(saveStr.find_last_of("."), string::npos);
-	//					saveNum++;
-	//					cout << " > " << saveNum << ": " << saveStr << endl;
-	//				}
-	//			}
-	//		} while (FindNextFile(hFind, &FindFileData) != 0);
-	//		FindClose(hFind);
-	//
-	//		//Player input to select level, will be overhauled once map tethering is implemented
-	//		string saveInput;
-	//		cin >> saveInput;
-	//		saveInput.append(".txt");
-	//		return saveInput;
-	//	}
-	//	else { cout << " No valid levels found!" << endl; }
+	else { return " "; }
 }
 
 bool MainMenuState::LoadSaveFile(string saveName)
@@ -298,8 +309,7 @@ bool MainMenuState::LoadSaveFile(string saveName)
 		return true;
 	}
 	else {
-		cout << " Invalid save file, please try again!" << endl;
-		Sleep(900);
+		//cout << " Invalid save file, please try again!" << endl;
 		return false;
 	}
 }

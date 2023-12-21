@@ -1,6 +1,9 @@
 #pragma once
 #include <string>
+#include <vector>
 #include "Visuals.h"
+
+using namespace std;
 
 class Input
 {
@@ -11,5 +14,8 @@ public:
 	Input();
 	~Input();
 
-	bool BinaryChoice(std::string);
+	bool BinaryChoice(string);
+
+	string VerticalMenu(vector<string> stringList, COORD buffer, bool enclose = false);
+
 };

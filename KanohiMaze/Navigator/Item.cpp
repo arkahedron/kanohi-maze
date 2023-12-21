@@ -61,11 +61,17 @@ string Item::UpdateFullName()
 
 	string tRarity = "";
 	if(m_rarity != Rarity::NONE)
-	{ tRarity = RarityToStr(m_rarity); }
+	{ 
+		tRarity = RarityToStr(m_rarity); 
+		tRarity = tRarity + " ";
+	}
 
 	string tElement = "";
 	if(m_element != Element::NONE)
-	{ tElement = ElementToStr(m_element); }
+	{ 
+		tElement = ElementToStr(m_element); 
+		tElement = " " + tElement;
+	}
 	
 	m_FullName = tRarity + tElement + tName;
 

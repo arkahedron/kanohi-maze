@@ -24,11 +24,11 @@ Player::Player()
 }
 Player::~Player()
 {
-	while (!m_pItems.empty())
+	/*while (!m_pItems.empty())
 	{
 		delete m_pItems.back();
 		m_pItems.pop_back();
-	}
+	}*/
 }
 Player* Player::instance = nullptr;
 Player* Player::GetInstance()
@@ -113,6 +113,9 @@ void Player::ListInventory()
 	{
 		for (vector<vector<Item*>>::iterator it = m_inventory.begin(); it != m_inventory.end(); ++it)
 		{
+			string itemNameList = (*it)[0]->GetFullName();
+			m_itemList.push_back(itemNameList);
+
 			cout << endl << "   - ";
 			cout << "x" << it->size() << " ";
 			(*it)[0]->Print();
@@ -126,9 +129,13 @@ void Player::OpenMenu()
 	do {
 		system("cls");
 		//cout << endl << "  ------{MENU}------" << endl;
+		//COORD invBuffer = { (2),(3) };
+		//m_input.VerticalMenu(m_itemList, invBuffer);
+
 
 		cout << endl << "  +---{Inventory}---+";
 		ListInventory();
+
 		cout << endl << "  +-----------------+" << endl;
 		cout.flush();
 
