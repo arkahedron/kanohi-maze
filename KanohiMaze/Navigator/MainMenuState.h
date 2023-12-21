@@ -6,6 +6,7 @@
 #include <string>
 
 class StateMachineCore;
+class SaveManager;
 
 class MainMenuState : public GameState
 {
@@ -22,8 +23,5 @@ public:
 
 	int MenuSelector();
 
-	std::string CreateSaveFile();
-	std::string FindSaveFiles();
-	bool LoadSaveFile(std::string saveToLoad);
 };
 

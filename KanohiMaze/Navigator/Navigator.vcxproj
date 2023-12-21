@@ -143,6 +143,7 @@
     <ClCompile Include="MainMenuState.cpp" />
     <ClCompile Include="Navigator.cpp" />
     <ClCompile Include="Ore.cpp" />
+    <ClCompile Include="SaveManager.cpp" />
     <ClCompile Include="StateMachineCore.cpp" />
     <ClCompile Include="WorldActor.cpp" />
     <ClCompile Include="Player.cpp" />
@@ -164,6 +165,7 @@
     <ClInclude Include="Chest.h" />
     <ClInclude Include="MainMenuState.h" />
     <ClInclude Include="Ore.h" />
+    <ClInclude Include="SaveManager.h" />
     <ClInclude Include="StateMachineCore.h" />
     <ClInclude Include="WorldActor.h" />
     <ClInclude Include="Player.h" />

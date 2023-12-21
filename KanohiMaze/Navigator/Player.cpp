@@ -4,7 +4,9 @@
 #include <conio.h>
 #include <algorithm>
 #include <vector>
+#include <sstream>
 
+#include "SaveManager.h"
 #include "Level.h"
 #include "Key.h"
 #include "Ore.h"
@@ -46,11 +48,27 @@ void Player::SetFacingDirection(Direction pFacing)
 	m_WorldActor.SetSymbol(kPlayerSymbol);
 }
 
-Item* Player::CreatePickedItem()
+void Player::CreateNewItem(int itemType, int rarity)
 {
-	Key nItem;
-	PickupItem(&nItem);
-	return &nItem;
+	int type = itemType;
+	switch (type)
+	{
+	case 0:
+	{
+		Item* nKey = new Key();
+		PickupItem(nKey);
+	} break;
+	case 1:
+	{
+		Item* nOre = new Ore();
+		nOre->SetRarity(rarity);
+		PickupItem(nOre);
+	} break;
+	default:
+		break;
+	}
+
+	//return &nItem;
 }
 
 void Player::PickupItem(Item* pItem)
@@ -113,14 +131,78 @@ void Player::ListInventory()
 	{
 		for (vector<vector<Item*>>::iterator it = m_inventory.begin(); it != m_inventory.end(); ++it)
 		{
-			string itemNameList = (*it)[0]->GetFullName();
-			m_itemList.push_back(itemNameList);
 
 			cout << endl << "   - ";
 			cout << "x" << it->size() << " ";
 			(*it)[0]->Print();
+
 		}
 	}
+}
+
+
+vector<string> Player::split(const string& s, char delim)
+{
+	vector<string> result;
+	stringstream ss(s);
+	string item;
+
+	while (getline(ss, item, delim))
+	{
+		result.push_back(item);
+	}
+	return result;
+}
+
+void Player::LoadInventory()
+{
+	
+	/*for (vector<string>::iterator it = m_itemList.begin(); it != m_itemList.end(); ++it)
+	{
+		(*it);
+	}*/
+
+	for (int i = 0; i < m_itemList.size(); i++)
+	{
+		string str = m_itemList[i];
+		vector<string> v = split(str, ':');
+		
+		for (auto u : v)
+		{
+			int itQ = stoi(u);
+			for (int quant = 0; quant < itQ; quant++)
+			{
+				vector<string> j = split(u, '.');
+				for (auto l : j)
+				{
+					int itR = stoi(l);
+					int itT = stoi(l);
+					CreateNewItem(itT,itR);
+				}
+
+			}
+		}
+	
+	}
+	system("pause");
+}
+
+int Player::SaveInventory()
+{
+	if (m_inventory.size() != 0)
+	{
+		for (vector<vector<Item*>>::iterator it = m_inventory.begin(); it != m_inventory.end(); ++it)
+		{
+			string iName = (*it)[0]->GetFullName();
+			string iCount = to_string(it->size());
+			string itemNameList = iCount + ":" + iName;
+			m_itemList.push_back(itemNameList);
+		}
+		int varItems = m_inventory.size();
+		m_itemList.clear();
+		return varItems;
+	}
+	return 0;
 }
 
 void Player::OpenMenu()
@@ -153,10 +235,14 @@ void Player::OpenMenu()
 		char input = _getch();
 
 		//Exit game selection
-		if (input == 27) 
+		if (input == 27)
 		{
 			if (m_input.BinaryChoice("REALLY QUIT?"))
-			{ exited = true; menuIsOpen = false; }
+			{
+				SaveManager::GetInstance()->WriteToSaveFile();
+				exited = true;
+				menuIsOpen = false;
+			}
 		}
 
 		//Menu inputs, will be expanded upon
@@ -189,71 +275,71 @@ bool Player::HandleMovement()
 	//{
 
 		//Restoring correct symbol on space after player moves from it
-		static WorldActor* ingressActor;
-		ingressActor = Level::GetInstance()->GetActorAtPos(newPlayerX, newPlayerY);
-		if (ingressActor != nullptr) { ingressActor->Draw(); }
-		else { m_visuals.DrawAtSpace(newPlayerX, newPlayerY, ' '); }
+	static WorldActor* ingressActor;
+	ingressActor = Level::GetInstance()->GetActorAtPos(newPlayerX, newPlayerY);
+	if (ingressActor != nullptr) { ingressActor->Draw(); }
+	else { m_visuals.DrawAtSpace(newPlayerX, newPlayerY, ' '); }
 
 
-		//Movement inputs
-		switch (input)
-		{
-		case '\t':
-			OpenMenu();
-			Level::GetInstance()->SetDrawnState(false);
-			break;
-		case 'w': newPlayerY--;
-		case 'W':
-		{ SetFacingDirection(Direction::Up); break; }
-		case 's': newPlayerY++;
-		case 'S':
-		{ SetFacingDirection(Direction::Down); break; }
-		case 'a': newPlayerX--;
-		case 'A':
-		{ SetFacingDirection(Direction::Left); break; }
-		case 'd': newPlayerX++;
-		case 'D':
-		{ SetFacingDirection(Direction::Right); break; }
-		default: break;
-		}
+	//Movement inputs
+	switch (input)
+	{
+	case '\t':
+		OpenMenu();
+		Level::GetInstance()->SetDrawnState(false);
+		break;
+	case 'w': newPlayerY--;
+	case 'W':
+	{ SetFacingDirection(Direction::Up); break; }
+	case 's': newPlayerY++;
+	case 'S':
+	{ SetFacingDirection(Direction::Down); break; }
+	case 'a': newPlayerX--;
+	case 'A':
+	{ SetFacingDirection(Direction::Left); break; }
+	case 'd': newPlayerX++;
+	case 'D':
+	{ SetFacingDirection(Direction::Right); break; }
+	default: break;
+	}
 
-		//Move player and check for unique space
-		bool pathableSpace = false;
-		ingressActor = Level::GetInstance()->GetActorAtPos(newPlayerX, newPlayerY);
+	//Move player and check for unique space
+	bool pathableSpace = false;
+	ingressActor = Level::GetInstance()->GetActorAtPos(newPlayerX, newPlayerY);
 
-		if (Level::GetInstance()->IsSpace(newPlayerX, newPlayerY))
-		{
-			if (ingressActor != nullptr) {
-				bool isImpassable = ingressActor->GetSolidity();
-				if (isImpassable == true)
-				{
-					pathableSpace = false;
-				}
-				else { pathableSpace = true; }
+	if (Level::GetInstance()->IsSpace(newPlayerX, newPlayerY))
+	{
+		if (ingressActor != nullptr) {
+			bool isImpassable = ingressActor->GetSolidity();
+			if (isImpassable == true)
+			{
+				pathableSpace = false;
 			}
 			else { pathableSpace = true; }
 		}
-		else { pathableSpace = false; }
+		else { pathableSpace = true; }
+	}
+	else { pathableSpace = false; }
 
-		if (pathableSpace)
-		{
-			//Confine player to level edges
-			if (newPlayerX < 0)
-				newPlayerX = 0;
-			else if (newPlayerX == Level::GetInstance()->m_width)
-				newPlayerX = Level::GetInstance()->m_width - 1;
-			if (newPlayerY < 0)
-				newPlayerY = 0;
-			else if (newPlayerY == Level::GetInstance()->m_height)
-				newPlayerY = Level::GetInstance()->m_height - 1;
-			m_WorldActor.SetPosition(newPlayerX, newPlayerY);
-		}
-		else if (Level::GetInstance()->IsGoal(newPlayerX, newPlayerY))
-		{
-			Level::GetInstance()->ClearLevel();
-			return true;
-		}
-		else {}
+	if (pathableSpace)
+	{
+		//Confine player to level edges
+		if (newPlayerX < 0)
+			newPlayerX = 0;
+		else if (newPlayerX == Level::GetInstance()->m_width)
+			newPlayerX = Level::GetInstance()->m_width - 1;
+		if (newPlayerY < 0)
+			newPlayerY = 0;
+		else if (newPlayerY == Level::GetInstance()->m_height)
+			newPlayerY = Level::GetInstance()->m_height - 1;
+		m_WorldActor.SetPosition(newPlayerX, newPlayerY);
+	}
+	else if (Level::GetInstance()->IsGoal(newPlayerX, newPlayerY))
+	{
+		Level::GetInstance()->ClearLevel();
+		return true;
+	}
+	else {}
 	//}
 	//m_player->Draw();
 	//m_visuals.DrawAtSpace(m_player->GetXPosition(), m_player->GetYPosition(), m_player->GoodDraw());

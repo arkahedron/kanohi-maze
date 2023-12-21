@@ -9,6 +9,7 @@
 #include <random>
 
 #include "Game.h"
+#include "SaveManager.h"
 #include "Level.h"
 #include "Player.h"
 #include "Input.h"
@@ -76,6 +77,7 @@ int main()
 	//Destroy singletons to free up their used memory
 	Player::GetInstance()->DestroyPlayer();
 	Level::GetInstance()->DestroyLevel();
+	SaveManager::GetInstance()->DestroySaveManger();
 
 }
 

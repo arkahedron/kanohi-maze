@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+
 #include "WorldActor.h"
 #include "Point.h"
 #include "Visuals.h"
@@ -20,6 +21,7 @@ class Level;
 class WorldActor;
 class Item;
 class Key;
+class SaveManager;
 
 class Player
 {
@@ -46,16 +48,20 @@ public:
 
 	void SetFacingDirection(Direction pFacing);
 
-	Item* CreatePickedItem();
+	void CreateNewItem(int itemType, int rarity);
 	void PickupItem(Item* pItem);
 
 	bool FindKey(bool spendKey = false);
 
 	void ListInventory();
+
+	vector<string> split(const string& s, char delim);
+	void LoadInventory();
+	int SaveInventory();
+
 	void OpenMenu();
 
 	bool HandleMovement();
 	void Interact();
-
 };
 

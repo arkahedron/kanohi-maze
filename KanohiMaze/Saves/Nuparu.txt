@@ -1,0 +1,5 @@
+Nuparu
+1:Great.Ore
+3:Decent.Ore
+2:Scrap.Ore
+1:Key

@@ -55,7 +55,9 @@ public:
 
 	void ListLootData();
 
+	void SetRarity(int rarity) { m_rarity = static_cast<Rarity>(rarity); }
 	Rarity GetRarity() { return m_rarity; };
+	void SetElement(int element) { m_element = static_cast<Element>(element); }
 	Element GetElement() { return m_element; };
 	std::string GetName() { return m_name; };
 	std::string GetFullName() { return m_FullName; };
