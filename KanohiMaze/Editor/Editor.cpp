@@ -3,6 +3,8 @@
 #include <windows.h>
 #include <fstream>
 
+/*OLD UTILITY PROGRAM FOR MAP MAKING*/
+
 using namespace std;
 
 constexpr char kCursor = 197;

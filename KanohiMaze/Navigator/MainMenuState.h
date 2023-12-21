@@ -20,6 +20,10 @@ public:
 	virtual bool Update(bool processInput = true) override;
 	virtual void Draw() override;
 
-	int Selector();
+	int MenuSelector();
+
+	std::string CreateSaveFile();
+	std::string FindSaveFiles();
+	bool LoadSaveFile(std::string saveToLoad);
 };
 
