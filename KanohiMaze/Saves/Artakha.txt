@@ -1,0 +1,4 @@
+Artakha
+9:Epic:Ore:None
+15:Ancient:Ore:None
+99:None:Key:None

@@ -153,41 +153,29 @@ void Player::ListInventory()
 
 void Player::LoadInventory()
 {
-
-	/*for (vector<string>::iterator it = m_itemList.begin(); it != m_itemList.end(); ++it)
-	{
-		(*it);
-	}*/
-
 	for (int i = 0; i < m_itemList.size(); i++)
 	{
-		//vector<string> v = split(s, ':');
-
-		string s, str;
-		s = m_itemList[i];
-		stringstream ss(s);
-
 		int iCount = 0;
 		string iRarity;
 		string iType;
 		string iElement;
+
+		string s, str;
+		s = m_itemList[i];
+		stringstream ss(s);
 
 		int sIndex = 0;
 		while (getline(ss, str, ':'))
 		{
 			switch (sIndex)
 			{
-			case 0: /*count*/
-				iCount = stoi(str);
+			case 0: iCount = stoi(str);
 				break;
-			case 1: /*rarity*/
-				iRarity = str;
+			case 1: iRarity = str;
 				break;
-			case 2: /*type*/
-				iType = str;
+			case 2: iType = str;
 				break;
-			case 3: /*element*/
-				iElement = str;
+			case 3: iElement = str;
 				break;
 			default:
 				break;
@@ -199,30 +187,8 @@ void Player::LoadInventory()
 		{
 			Item* testingItem = nullptr;
 			testingItem = CreateNewItem(iType, iRarity);
-			cout << endl;
-			if(testingItem)
-				testingItem->Print();
 		}
-
-
-	/*	for (auto u : v)
-		{
-			int itQ = stoi(u);
-			for (int quant = 0; quant < itQ; quant++)
-			{
-				vector<string> j = split(u, '.');
-				for (auto l : j)
-				{
-					int itR = stoi(l);
-					int itT = stoi(l);
-					CreateNewItem(itT,itR);
-				}
-
-			}
-		}*/
-	
 	}
-	system("pause");
 }
 
 int Player::SaveInventory()

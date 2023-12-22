@@ -37,26 +37,20 @@ SaveManager* SaveManager::GetInstance()
 string SaveManager::CreateSaveFile()
 {
 	string saveName;
-
 	cout << "\n\r Name your character: ";
 	cin >> saveName;
-	string characterName = saveName;
+	
 	saveName.append(".txt");
-	saveName.insert(0, "../Saves/");
+	string tempFileName = saveName;
+	tempFileName.insert(0, "../Saves/");
 
 	ofstream saveFile;
-	saveFile.open(saveName);
+	saveFile.open(tempFileName);
 	if (!saveFile)
-	{
-		cout << "\r Opening file failed!" << endl;
-	}
+	{ cout << "\r Opening file failed!" << endl; }
 	else
 	{
-		saveFile << characterName << endl;
-
-		/*Write player save data into here, following is placeholder data*/
-
-
+		saveFile << saveName << endl;
 		if (!saveFile) { cout << "Write failed!" << endl; }
 		saveFile.close();
 	}
@@ -65,8 +59,6 @@ string SaveManager::CreateSaveFile()
 
 string SaveManager::FindSaveFiles()
 {
-	//system("cls");
-
 	LPCWSTR lpath = L"../Saves/*.txt";
 	vector<wstring> sfListArray;
 	wstring saveSelect;
@@ -160,10 +152,10 @@ string SaveManager::FindSaveFiles()
 	else { return " "; }
 }
 
-bool SaveManager::LoadSaveFile(string saveName)
+bool SaveManager::LoadSaveFile(string saveToLoad)
 {
-	activeSaveFile = saveName;
-	//Get defined text file as level and try to open it
+	activeSaveFile = saveToLoad;
+	string saveName = saveToLoad;
 	saveName.insert(0, "../Saves/");
 	fstream saveFile;
 	saveFile.open(saveName);
@@ -181,9 +173,7 @@ bool SaveManager::LoadSaveFile(string saveName)
 		{
 			index++;
 			if (itemData != "")
-			{
-				m_player->m_itemList.push_back(itemData);
-			}
+			{ m_player->m_itemList.push_back(itemData); }
 		}
 
 		m_player->LoadInventory();
@@ -191,54 +181,35 @@ bool SaveManager::LoadSaveFile(string saveName)
 		saveFile.close();
 		return true;
 	}
-	else {
-		//cout << " Invalid save file, please try again!" << endl;
-		return false;
-	}
+	else { return false; }
 }
 
 void SaveManager::WriteToSaveFile()
 {
 	string saveName = activeSaveFile;
-	string characterName = saveName;
-	//saveName.append(".txt");
+	string characterName = saveName; 
+	characterName.erase(characterName.find_last_of("."), string::npos);
 	saveName.insert(0, "../Saves/");
-
-	fstream getSaveFile;
-	getSaveFile.open(saveName);
-	if (getSaveFile)
-	{
-		getSaveFile >> characterName;
-	}
-	getSaveFile.close();
 
 	ofstream saveFile;
 	saveFile.open(saveName);
 	if (!saveFile)
-	{
-		cout << "\r Opening file failed!" << endl;
-	}
+	{ cout << "\r Opening file failed!" << endl; }
 	else
 	{
-		//characterName.erase(characterName.find_last_of("."), string::npos);
-		saveFile << characterName << endl; /*Skip over character name at first line*/
-		
+		/*Rewrite character name into first line*/
+		saveFile << characterName << endl;
+
+		/*Grab all held items and put into transfer array, clear both once filed*/
 		m_player->SaveInventory();
-		//saveFile << variedItems << endl;
 		for (int i = 0; i< m_player->m_itemList.size(); i++)
 		{
 			string saveItem = m_player->m_itemList[i];
 			saveFile << saveItem << endl;
 		}
 		m_player->m_itemList.clear();
-		//saveFile << "Kanoka Disc of Fire" << endl;
-		/*Write player save data into here, following is placeholder data*/
-
 
 		if (!saveFile) { cout << "Write failed!" << endl; }
 		saveFile.close();
 	}
-
-
-	//saveFile.write("<player name>", 100);
 }
