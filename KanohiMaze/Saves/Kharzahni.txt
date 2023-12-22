@@ -1,2 +1,3 @@
 Kharzahni
 5:Scrap:Ore:None
+1:Great:Ore:None

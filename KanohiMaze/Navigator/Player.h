@@ -45,7 +45,7 @@ public:
 	bool exited;
 
 	Direction playerFacing;
-
+	COORD oldPlayerCoord;
 	void SetFacingDirection(Direction pFacing);
 
 	Item* CreateNewItem(string itemType, string rarity = "");
@@ -56,7 +56,8 @@ public:
 	void ListInventory();
 
 	void LoadInventory();
-	int SaveInventory();
+	void SaveInventory();
+	void ClearInventory();
 
 	void OpenMenu();
 

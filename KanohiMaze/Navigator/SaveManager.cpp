@@ -207,7 +207,7 @@ void SaveManager::WriteToSaveFile()
 			string saveItem = m_player->m_itemList[i];
 			saveFile << saveItem << endl;
 		}
-		m_player->m_itemList.clear();
+		m_player->ClearInventory();
 
 		if (!saveFile) { cout << "Write failed!" << endl; }
 		saveFile.close();

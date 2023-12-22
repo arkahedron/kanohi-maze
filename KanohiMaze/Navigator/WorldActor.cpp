@@ -13,8 +13,11 @@ WorldActor::WorldActor(int x, int y, AColor color, ASymbol symbol)
 	, m_IsActive(true)
 	, m_color(color)
 	, m_symbol(symbol)
+	, m_drawPos()
+	, m_drawMod()
 {
-
+	m_drawMod.X = 0;
+	m_drawMod.Y = 0;
 }
 WorldActor::~WorldActor()
 {
@@ -67,18 +70,39 @@ bool WorldActor::Interact()
 	return false;
 }
 
+bool WorldActor::PlayerOverlap()
+{
+	if (!m_IsSolid)
+	{
+		return true;
+	}
+	return false;
+}
+void WorldActor::ModDrawPos(COORD posOffset)
+{
+	//m_drawPos.X = m_pPosition->x + m_drawMod.X;
+	//m_drawPos.Y = m_pPosition->y + m_drawMod.Y;
+	//m_visuals.DrawAtSpace(m_drawPos.X, m_drawPos.Y, ' ');
+	m_drawMod.X = posOffset.X; 
+	m_drawMod.Y = posOffset.Y;
+}
 void WorldActor::Draw()
 {
+
+	m_drawPos.X = m_pPosition->x + m_drawMod.X;
+	m_drawPos.Y = m_pPosition->y + m_drawMod.Y;
 	if (m_IsActive)
 	{
 		m_visuals.ColorText(m_color);
-		m_visuals.DrawAtSpace(m_pPosition->x, m_pPosition->y, (char)m_symbol);
+		m_visuals.DrawAtSpace(m_drawPos.X, m_drawPos.Y, (char)m_symbol);
 		m_visuals.ResetTextColor();
 	}
 	else 
 	{
-		m_visuals.DrawAtSpace(m_pPosition->x, m_pPosition->y, ' ');
+		m_visuals.DrawAtSpace(m_drawPos.X, m_drawPos.Y, ' ');
 	}
+	m_drawMod.X = 0;
+	m_drawMod.Y = 0;
 }
 
 void WorldActor::Update()

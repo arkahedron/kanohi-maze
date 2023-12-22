@@ -48,6 +48,9 @@ public:
 	WorldActor* UpdateActors(int x, int y);
 	WorldActor* GetActorAtPos(int x, int y);
 
+	COORD edgeShiftBuffer;
+	COORD minCorner;
+	COORD maxCorner;
 private:
 	static Level* instance;
 	bool m_levelDrawn;

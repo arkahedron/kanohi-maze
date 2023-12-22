@@ -20,12 +20,14 @@ Player::Player()
 	: playerFacing(Direction::Down)
 	, exited(false)
 	, menuIsOpen(false)
+	, oldPlayerCoord()
 	, m_WorldActor(WorldActor(0, 0, AColor::Teal, ASymbol::pDown))
 {
-	
+	oldPlayerCoord = { (0),(0) };
 }
 Player::~Player()
 {
+	ClearInventory();
 	/*while (!m_pItems.empty())
 	{
 		delete m_pItems.back();
@@ -190,8 +192,7 @@ void Player::LoadInventory()
 		}
 	}
 }
-
-int Player::SaveInventory()
+void Player::SaveInventory()
 {
 	if (m_inventory.size() != 0)
 	{
@@ -201,7 +202,15 @@ int Player::SaveInventory()
 			string iCount = to_string(it->size());
 			string compressedItem = iCount + ":" + iName;
 			m_itemList.push_back(compressedItem);
-
+		}
+	}
+}
+void Player::ClearInventory()
+{
+	if (m_inventory.size() != 0)
+	{
+		for (vector<vector<Item*>>::iterator it = m_inventory.begin(); it != m_inventory.end(); ++it)
+		{
 			while (!it->empty())
 			{
 				delete it->back();
@@ -210,10 +219,12 @@ int Player::SaveInventory()
 			}
 		}
 		m_inventory.clear();
-		int uniqueItemCount = m_itemList.size();
-		return uniqueItemCount;
 	}
-	return 0;
+	if (m_itemList.size() != 0)
+	{
+		m_itemList.clear();
+	}
+
 }
 
 void Player::OpenMenu()
@@ -292,6 +303,8 @@ bool Player::HandleMovement()
 	if (ingressActor != nullptr) { ingressActor->Draw(); }
 	else { m_visuals.DrawAtSpace(newPlayerX, newPlayerY, ' '); }
 
+	oldPlayerCoord.X = newPlayerX;
+	oldPlayerCoord.Y = newPlayerY;
 
 	//Movement inputs
 	switch (input)
@@ -345,16 +358,18 @@ bool Player::HandleMovement()
 		else if (newPlayerY == Level::GetInstance()->m_height)
 			newPlayerY = Level::GetInstance()->m_height - 1;
 		m_WorldActor.SetPosition(newPlayerX, newPlayerY);
+
+
+		WorldActor* playerOverlapActor = ingressActor;
+		if (playerOverlapActor != nullptr)
+		{
+			if (playerOverlapActor->GetType() == ActorType::Goal)
+			{
+				Level::GetInstance()->ClearLevel();
+				return true;
+			}
+		}
 	}
-	else if (Level::GetInstance()->IsGoal(newPlayerX, newPlayerY))
-	{
-		Level::GetInstance()->ClearLevel();
-		return true;
-	}
-	else {}
-	//}
-	//m_player->Draw();
-	//m_visuals.DrawAtSpace(m_player->GetXPosition(), m_player->GetYPosition(), m_player->GoodDraw());
 	m_visuals.ResetTextColor();
 
 	if (newPlayerX == m_WorldActor.GetXPosition() && newPlayerY == m_WorldActor.GetYPosition())

@@ -54,22 +54,28 @@ public:
 	void SetLevelRef(Level* lvlRef) { levelRef = lvlRef; };
 
 	COORD FindCursorPos();
-	void ResetCursor(COORD cPos = {0,0});
+	void ResetCursor(COORD cPos = { (0),(0) }, bool toIdle = false);
 	void WipeLastLines(int x);
 
-	void DrawAtSpace(int x, int y, char thing);
+	void DrawAtSpace(int x, int y, char thing, COORD bufferSpace = {(0),(0)});
 
 	void ColorText(AColor color = AColor::Regular);
 	void ResetTextColor();
 
 	void PrintOutActor(char actor, AColor color = AColor::Regular);
 
-	void DrawMazeControls();
 
 	void DrawTop();
 	void DrawBottom();
 	void DrawLeft(int y);
 	void DrawRight(int y);
+
+	int edgeWidth;
+	int edgeHeight;
+	void DrawFrame();
+
+	void DrawMazeControls();
 private:
 	Level* levelRef;
+
 };
