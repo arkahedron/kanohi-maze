@@ -1,0 +1,6 @@
+Onewa
+6:Decent:Ore:None
+3:Great:Ore:None
+1:Ancient:Ore:None
+3:Scrap:Ore:None
+1:None:Key:None

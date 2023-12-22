@@ -1,0 +1,7 @@
+Matoro
+6:Decent:Ore:None
+2:Great:Ore:None
+5:Scrap:Ore:None
+5:None:Key:None
+2:Epic:Ore:None
+1:Ancient:Ore:None

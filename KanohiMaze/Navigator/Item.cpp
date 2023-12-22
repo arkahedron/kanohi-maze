@@ -11,7 +11,7 @@ Item::Item(string name, ItemType type, Rarity rarity, Element element)
 	, m_rarity(rarity)
 	, m_element(element)
 	, m_name(name)
-	, m_FullName(name = "nothing")
+	, m_FullName(name = "Nothing")
 {
 	/*either implement trait rolling into constructor or reroll after creation*/
 }
@@ -56,24 +56,16 @@ void Item::RollRarity(int range)
 
 string Item::UpdateFullName()
 {
-
 	string tName = m_name;
 
-	string tRarity = "";
-	if(m_rarity != Rarity::NONE)
-	{ 
-		tRarity = RarityToStr(m_rarity); 
-		tRarity = tRarity + ".";
-	}
+	string tRarity = ":"; 
+	tRarity = RarityToStr(m_rarity) + tRarity;
 
-	string tElement = "";
-	if(m_element != Element::NONE)
-	{ 
-		tElement = ElementToStr(m_element); 
-		tElement = "," + tElement;
-	}
-	
-	m_FullName = tRarity + tElement + tName;
+	string tElement = ":";
+	tElement = tElement + ElementToStr(m_element);
+
+	/*eg should make= Great:Ore:Fire*/
+	m_FullName = tRarity  + tName + tElement;
 
 	return m_FullName;
 }

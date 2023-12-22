@@ -1,0 +1,6 @@
+Pohatu
+24:Decent:Ore:None
+3:None:Key:None
+3:Epic:Ore:None
+13:Great:Ore:None
+13:Scrap:Ore:None

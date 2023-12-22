@@ -48,34 +48,45 @@ void Player::SetFacingDirection(Direction pFacing)
 	m_WorldActor.SetSymbol(kPlayerSymbol);
 }
 
-void Player::CreateNewItem(int itemType, int rarity)
+Item* Player::CreateNewItem(string itemType, string rarity)
 {
-	int type = itemType;
-	switch (type)
-	{
-	case 0:
-	{
-		Item* nKey = new Key();
-		PickupItem(nKey);
-	} break;
-	case 1:
-	{
-		Item* nOre = new Ore();
-		nOre->SetRarity(rarity);
-		PickupItem(nOre);
-	} break;
-	default:
-		break;
-	}
+	Item* nItem = nullptr;
 
-	//return &nItem;
+	Rarity iRarity;
+	if (rarity == "Scrap")
+		iRarity = Rarity::SCRAP;
+	else if (rarity == "Decent")
+		iRarity = Rarity::DECENT;
+	else if (rarity == "Great")
+		iRarity = Rarity::GREAT;
+	else if (rarity == "Epic")
+		iRarity = Rarity::EPIC;
+	else if (rarity == "Ancient")
+		iRarity = Rarity::ANCIENT;
+	else if (rarity == "None")
+		iRarity = Rarity::NONE;
+	else { iRarity = Rarity::NONE; }
+
+	if (itemType == "Key")
+	{
+		nItem = new Key();
+		PickupItem(nItem);
+	}
+	else if (itemType == "Ore")
+	{
+		nItem = new Ore();
+		nItem->SetRarity(iRarity);
+		PickupItem(nItem);
+	}
+	else {}
+
+	return nItem;
 }
 
 void Player::PickupItem(Item* pItem)
 {
 	bool exists = false;
 
-	pItem->UpdateFullName();
 	string refItemName = pItem->GetFullName();
 	if (m_inventory.size() != 0)
 	{
@@ -106,7 +117,7 @@ bool Player::FindKey(bool spendKey)
 	{
 		for (vector<vector<Item*>>::iterator it = m_inventory.begin(); it != m_inventory.end(); ++it)
 		{
-			string compItemName = (*it)[0]->GetFullName();
+			string compItemName = (*it)[0]->GetName();
 			if (compItemName == "Key")
 			{
 				if (it->size() > 0)
@@ -140,23 +151,9 @@ void Player::ListInventory()
 	}
 }
 
-
-vector<string> Player::split(const string& s, char delim)
-{
-	vector<string> result;
-	stringstream ss(s);
-	string item;
-
-	while (getline(ss, item, delim))
-	{
-		result.push_back(item);
-	}
-	return result;
-}
-
 void Player::LoadInventory()
 {
-	
+
 	/*for (vector<string>::iterator it = m_itemList.begin(); it != m_itemList.end(); ++it)
 	{
 		(*it);
@@ -164,10 +161,51 @@ void Player::LoadInventory()
 
 	for (int i = 0; i < m_itemList.size(); i++)
 	{
-		string str = m_itemList[i];
-		vector<string> v = split(str, ':');
-		
-		for (auto u : v)
+		//vector<string> v = split(s, ':');
+
+		string s, str;
+		s = m_itemList[i];
+		stringstream ss(s);
+
+		int iCount = 0;
+		string iRarity;
+		string iType;
+		string iElement;
+
+		int sIndex = 0;
+		while (getline(ss, str, ':'))
+		{
+			switch (sIndex)
+			{
+			case 0: /*count*/
+				iCount = stoi(str);
+				break;
+			case 1: /*rarity*/
+				iRarity = str;
+				break;
+			case 2: /*type*/
+				iType = str;
+				break;
+			case 3: /*element*/
+				iElement = str;
+				break;
+			default:
+				break;
+			}
+			sIndex++;
+		}
+
+		for (int c = 0; c < iCount; c++)
+		{
+			Item* testingItem = nullptr;
+			testingItem = CreateNewItem(iType, iRarity);
+			cout << endl;
+			if(testingItem)
+				testingItem->Print();
+		}
+
+
+	/*	for (auto u : v)
 		{
 			int itQ = stoi(u);
 			for (int quant = 0; quant < itQ; quant++)
@@ -181,7 +219,7 @@ void Player::LoadInventory()
 				}
 
 			}
-		}
+		}*/
 	
 	}
 	system("pause");
@@ -195,12 +233,19 @@ int Player::SaveInventory()
 		{
 			string iName = (*it)[0]->GetFullName();
 			string iCount = to_string(it->size());
-			string itemNameList = iCount + ":" + iName;
-			m_itemList.push_back(itemNameList);
+			string compressedItem = iCount + ":" + iName;
+			m_itemList.push_back(compressedItem);
+
+			while (!it->empty())
+			{
+				delete it->back();
+				it->pop_back();
+
+			}
 		}
-		int varItems = m_inventory.size();
-		m_itemList.clear();
-		return varItems;
+		m_inventory.clear();
+		int uniqueItemCount = m_itemList.size();
+		return uniqueItemCount;
 	}
 	return 0;
 }
@@ -240,6 +285,7 @@ void Player::OpenMenu()
 			if (m_input.BinaryChoice("REALLY QUIT?"))
 			{
 				SaveManager::GetInstance()->WriteToSaveFile();
+				SaveManager::GetInstance()->activeSaveFile = " ";
 				exited = true;
 				menuIsOpen = false;
 			}

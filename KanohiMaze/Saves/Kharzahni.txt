@@ -1,0 +1,4 @@
+Kharzahni
+4:Scrap:Ore:None
+1:None:Key:None
+2:Decent:Ore:None

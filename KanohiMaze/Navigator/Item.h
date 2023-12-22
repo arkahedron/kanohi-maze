@@ -11,7 +11,7 @@ constexpr const char* RarityToStr(Rarity e) noexcept
 {
 	switch (e)
 	{
-	case Rarity::NONE: return "";
+	case Rarity::NONE: return "None";
 	case Rarity::SCRAP: return "Scrap";
 	case Rarity::DECENT: return "Decent";
 	case Rarity::GREAT: return "Great";
@@ -26,7 +26,7 @@ constexpr const char* ElementToStr(Element e) noexcept
 {
 	switch (e)
 	{
-	case Element::NONE: return "";
+	case Element::NONE: return "None";
 	case Element::ICE: return "Ice";
 	case Element::WATER: return "Water";
 	case Element::AIR: return "Air";
@@ -50,17 +50,20 @@ public:
 	void RollElement();
 	void RollRarity(int range = 2); /*Rarity ranges are 1-3*/
 
-	std::string UpdateFullName();
+
 	void Print();
 
 	void ListLootData();
 
-	void SetRarity(int rarity) { m_rarity = static_cast<Rarity>(rarity); }
+	void SetRarity(Rarity rarity) { m_rarity = rarity; }
 	Rarity GetRarity() { return m_rarity; };
-	void SetElement(int element) { m_element = static_cast<Element>(element); }
+
+	void SetElement(Element element) { m_element = element; }
 	Element GetElement() { return m_element; };
 	std::string GetName() { return m_name; };
-	std::string GetFullName() { return m_FullName; };
+
+	std::string UpdateFullName();
+	std::string GetFullName() { UpdateFullName(); return m_FullName; };
 
 protected:	
 

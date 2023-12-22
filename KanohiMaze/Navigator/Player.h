@@ -48,14 +48,13 @@ public:
 
 	void SetFacingDirection(Direction pFacing);
 
-	void CreateNewItem(int itemType, int rarity);
+	Item* CreateNewItem(string itemType, string rarity = "");
 	void PickupItem(Item* pItem);
 
 	bool FindKey(bool spendKey = false);
 
 	void ListInventory();
 
-	vector<string> split(const string& s, char delim);
 	void LoadInventory();
 	int SaveInventory();
 

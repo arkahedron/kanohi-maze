@@ -186,8 +186,9 @@ bool SaveManager::LoadSaveFile(string saveName)
 			}
 		}
 
-		m_player->m_itemList.clear();
 		m_player->LoadInventory();
+		m_player->m_itemList.clear();
+		saveFile.close();
 		return true;
 	}
 	else {
@@ -203,6 +204,14 @@ void SaveManager::WriteToSaveFile()
 	//saveName.append(".txt");
 	saveName.insert(0, "../Saves/");
 
+	fstream getSaveFile;
+	getSaveFile.open(saveName);
+	if (getSaveFile)
+	{
+		getSaveFile >> characterName;
+	}
+	getSaveFile.close();
+
 	ofstream saveFile;
 	saveFile.open(saveName);
 	if (!saveFile)
@@ -211,17 +220,17 @@ void SaveManager::WriteToSaveFile()
 	}
 	else
 	{
-		characterName.erase(characterName.find_last_of("."), string::npos);
-		saveFile << characterName << endl;
-
-		int variedItems = m_player->SaveInventory();
+		//characterName.erase(characterName.find_last_of("."), string::npos);
+		saveFile << characterName << endl; /*Skip over character name at first line*/
+		
+		m_player->SaveInventory();
 		//saveFile << variedItems << endl;
 		for (int i = 0; i< m_player->m_itemList.size(); i++)
 		{
 			string saveItem = m_player->m_itemList[i];
 			saveFile << saveItem << endl;
 		}
-		
+		m_player->m_itemList.clear();
 		//saveFile << "Kanoka Disc of Fire" << endl;
 		/*Write player save data into here, following is placeholder data*/
 
