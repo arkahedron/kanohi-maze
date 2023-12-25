@@ -15,15 +15,15 @@ using namespace std;
 
 char kPlayerSymbol = 48;
 constexpr int kStartingLives = 3;
+constexpr unsigned char WAL = (char)219;
 
 Player::Player()
 	: playerFacing(Direction::Down)
 	, exited(false)
 	, menuIsOpen(false)
-	, oldPlayerCoord()
 	, m_WorldActor(WorldActor(0, 0, AColor::Teal, ASymbol::pDown))
 {
-	oldPlayerCoord = { (0),(0) };
+
 }
 Player::~Player()
 {
@@ -140,17 +140,48 @@ bool Player::FindKey(bool spendKey)
 
 void Player::ListInventory()
 {
+	int invSize = 0;
 	if (m_inventory.size() != 0)
 	{
+		cout << endl << endl << "    +---{Inventory}---+";
 		for (vector<vector<Item*>>::iterator it = m_inventory.begin(); it != m_inventory.end(); ++it)
 		{
-
-			cout << endl << "   - ";
+			invSize++;
+			cout << endl << "    - ";
 			cout << "x" << it->size() << " ";
 			(*it)[0]->Print();
 
 		}
+		cout << endl << "    +-----------------+";
+		if (true) {
+			m_visuals.ColorText(AColor::White);
+			invSize += 1;
+			int width;
+			width = 21;
+			int height;
+			height = invSize;
+			COORD frameAlign = { (-2),(0) };
+			//cout << WAL;
+			for (int t = 0; t < width + 2; t++) { m_visuals.DrawAtSpace(t, -1, WAL, frameAlign); }
+			//cout << WAL;
+
+			for (int y = 0; y < height + 2; ++y)
+			{
+				m_visuals.DrawAtSpace(0, y, WAL, frameAlign);
+				m_visuals.DrawAtSpace(1, y, WAL, frameAlign);
+
+				m_visuals.DrawAtSpace(width, y, WAL, frameAlign);
+				m_visuals.DrawAtSpace(width + 1, y, WAL, frameAlign);
+			}
+
+			//cout << WAL;
+			for (int b = 0; b < width + 2; b++) { m_visuals.DrawAtSpace(b, height + 1, WAL, frameAlign); }
+			//cout << WAL;
+		}
+		COORD postInv = { (0),(invSize + 4) };
+		m_visuals.ResetCursor(postInv);
 	}
+	else { cout << endl; }
 }
 
 void Player::LoadInventory()
@@ -232,19 +263,11 @@ void Player::OpenMenu()
 	menuIsOpen = true;
 	do {
 		system("cls");
-		//cout << endl << "  ------{MENU}------" << endl;
-		//COORD invBuffer = { (2),(3) };
-		//m_input.VerticalMenu(m_itemList, invBuffer);
 
-
-		cout << endl << "  +---{Inventory}---+";
 		ListInventory();
 
-		cout << endl << "  +-----------------+" << endl;
-		cout.flush();
-
 		//Menu control prints
-		cout << endl << "  ";
+		cout << "  ";
 		m_visuals.ColorText(AColor::Inverted);
 		cout << " >Map: TAB     ";
 		m_visuals.ResetTextColor();
@@ -290,23 +313,17 @@ bool Player::HandleMovement()
 	int newPlayerX = m_WorldActor.GetXPosition();
 	int newPlayerY = m_WorldActor.GetYPosition();
 
-	if (input == 'e' || input == 'E')
-	{
-		Interact();
-	}
-	//else
-	//{
+	if (input == 'e' || input == 'E') { Interact(); }
 
-		//Restoring correct symbol on space after player moves from it
+	//Restoring correct symbol on space after player moves from it
 	static WorldActor* ingressActor;
 	ingressActor = Level::GetInstance()->GetActorAtPos(newPlayerX, newPlayerY);
+	int xClean = this->m_WorldActor.m_drawPos.X;
+	int yClean = this->m_WorldActor.m_drawPos.Y;
 	if (ingressActor != nullptr) { ingressActor->Draw(); }
-	else { m_visuals.DrawAtSpace(newPlayerX, newPlayerY, ' '); }
+	else { m_visuals.DrawAtSpace(xClean, yClean, ' '); }
 
-	oldPlayerCoord.X = newPlayerX;
-	oldPlayerCoord.Y = newPlayerY;
-
-	//Movement inputs
+	//Movement key inputs
 	switch (input)
 	{
 	case '\t':
@@ -332,19 +349,12 @@ bool Player::HandleMovement()
 	bool pathableSpace = false;
 	ingressActor = Level::GetInstance()->GetActorAtPos(newPlayerX, newPlayerY);
 
-	if (Level::GetInstance()->IsSpace(newPlayerX, newPlayerY))
-	{
-		if (ingressActor != nullptr) {
-			bool isImpassable = ingressActor->GetSolidity();
-			if (isImpassable == true)
-			{
-				pathableSpace = false;
-			}
-			else { pathableSpace = true; }
-		}
+	if (ingressActor != nullptr) {
+		bool isActorSolid = ingressActor->GetSolidity();
+		if (isActorSolid == true)
+		{ pathableSpace = false; }
 		else { pathableSpace = true; }
-	}
-	else { pathableSpace = false; }
+	} else { pathableSpace = true; }
 
 	if (pathableSpace)
 	{
@@ -359,7 +369,7 @@ bool Player::HandleMovement()
 			newPlayerY = Level::GetInstance()->m_height - 1;
 		m_WorldActor.SetPosition(newPlayerX, newPlayerY);
 
-
+		//Check for overlapping actor in new space and perform relevant action
 		WorldActor* playerOverlapActor = ingressActor;
 		if (playerOverlapActor != nullptr)
 		{
@@ -370,17 +380,6 @@ bool Player::HandleMovement()
 			}
 		}
 	}
-	m_visuals.ResetTextColor();
-
-	if (newPlayerX == m_WorldActor.GetXPosition() && newPlayerY == m_WorldActor.GetYPosition())
-	{
-		return false;
-	}
-	//else
-	//{
-	//	return HandleCollision(newPlayerX, newPlayerY);
-	//}
-
 	return false;
 }
 

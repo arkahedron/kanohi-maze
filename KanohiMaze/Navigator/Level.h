@@ -4,17 +4,19 @@
 #include <string>
 #include <vector>
 
+using namespace std;
+
 class WorldActor;
 
 class Level
 {
 	Visuals m_visuals;
 	Randomizer m_randomizer;
-	std::string m_levelToLoad;
-	std::string m_defaultLevel;
+	string m_levelToLoad;
+	string m_defaultLevel;
 	char* m_pLevelData;
 
-	std::vector<WorldActor*> m_pActors;
+	vector<WorldActor*> m_pActors;
 
 protected:
 	Level();
@@ -30,24 +32,22 @@ public:
 	int m_holeY;
 	int m_levelsCleared;
 
-	std::string SelectNewLevel();
+	string SelectNewLevel();
 
-	bool Load(std::string levelName, int* playerX, int* playerY);
+	bool Load(string levelName, int* playerX, int* playerY);
 
 	void SetDrawnState(bool isDrawn);
 
 	char GetSpaceAtPosition(int x, int y);
-	bool IsSpace(int x, int y);
-	bool IsGoal(int x, int y);
 
-	void ClearSpace(int x, int y, WorldActor* actorToDelete = nullptr);
+	void ClearSpace(int x, int y, WorldActor* delActor = nullptr);
 	void ClearLevel();
 
 	void Draw();
 
-	WorldActor* UpdateActors(int x, int y);
 	WorldActor* GetActorAtPos(int x, int y);
 
+	bool edgeHit;
 	COORD edgeShiftBuffer;
 	COORD minCorner;
 	COORD maxCorner;
@@ -56,7 +56,10 @@ private:
 	bool m_levelDrawn;
 
 	bool Convert(int* playerX, int* playerY);
-	int GetIndexFromCoordinates(int x, int y);
 
+	void AlignScreenToPlayer(int* playerX, int* playerY);
+	int GetIndexFromCoordinates(int x, int y);
+	void CleanUpScreen();
+	bool HandlePlayerEdgeHit();
 };
 

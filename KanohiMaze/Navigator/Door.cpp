@@ -21,7 +21,7 @@ void Door::Update()
 		m_color = AColor::Green;
 	}
 	else { m_color = AColor::Red; }
-	Draw();
+	//Draw();
 }
 
 bool Door::Interact()

@@ -80,15 +80,11 @@ bool WorldActor::PlayerOverlap()
 }
 void WorldActor::ModDrawPos(COORD posOffset)
 {
-	//m_drawPos.X = m_pPosition->x + m_drawMod.X;
-	//m_drawPos.Y = m_pPosition->y + m_drawMod.Y;
-	//m_visuals.DrawAtSpace(m_drawPos.X, m_drawPos.Y, ' ');
 	m_drawMod.X = posOffset.X; 
 	m_drawMod.Y = posOffset.Y;
 }
 void WorldActor::Draw()
 {
-
 	m_drawPos.X = m_pPosition->x + m_drawMod.X;
 	m_drawPos.Y = m_pPosition->y + m_drawMod.Y;
 	if (m_IsActive)
@@ -101,11 +97,9 @@ void WorldActor::Draw()
 	{
 		m_visuals.DrawAtSpace(m_drawPos.X, m_drawPos.Y, ' ');
 	}
-	m_drawMod.X = 0;
-	m_drawMod.Y = 0;
 }
 
 void WorldActor::Update()
 {
-	Draw();
+	//Draw();
 }

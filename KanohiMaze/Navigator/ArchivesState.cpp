@@ -71,8 +71,4 @@ bool ArchivesState::Update(bool processInput)
 void ArchivesState::Draw() 
 {
 	m_level->Draw();
-	
-
-	//short int heightBuffer = (int)m_level->m_height + 5;
-	//m_visuals.ResetCursor({ (0),(heightBuffer) });
 }

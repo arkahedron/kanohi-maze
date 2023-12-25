@@ -15,8 +15,6 @@
 #include "Chest.h"
 #include "Ore.h"
 
-#include <assert.h>
-
 using namespace std;
 
 constexpr char WAL = (char)219;
@@ -34,6 +32,7 @@ Level::Level()
 	, m_levelToLoad(" ")
 	, m_defaultLevel("Entry.txt")
 	, m_levelDrawn(false)
+	, edgeHit(false)
 	, edgeShiftBuffer()
 	, minCorner()
 	, maxCorner()
@@ -156,12 +155,16 @@ bool Level::Load(string levelName, int* playerX, int* playerY)
 bool Level::Convert(int* playerX, int* playerY)
 {
 	bool anyWarnings = false;
+
+	//Top Edge Walls
 	for (int t = -1; t < m_width+1; t++)
 	{ m_pActors.push_back(new Wall(t, -1)); }
 
 	for (int y = 0; y < m_height; y++)
 	{
+		//Left Edge Walls
 		m_pActors.push_back(new Wall(-1, y));
+
 		for (int x = 0; x < m_width; x++)
 		{
 
@@ -224,53 +227,47 @@ bool Level::Convert(int* playerX, int* playerY)
 				break;
 			}
 		}
+		//Right Edge Walls
 		m_pActors.push_back(new Wall(m_width, y));
 	}
+	//Bottom Edge Walls
 	for (int t = -1; t < m_width+1; t++)
 	{ m_pActors.push_back(new Wall(t, m_height)); }
 	
+	AlignScreenToPlayer(playerX, playerY);
+	
+	edgesDrawn = false;
+	return anyWarnings;
+}
 
+void Level::AlignScreenToPlayer(int* playerX, int* playerY)
+{
 	COORD screenCenter = {};
-	screenCenter.X = round(m_visuals.edgeWidth/2);
-	screenCenter.Y = round(m_visuals.edgeHeight/2);
-	
-
-	
+	screenCenter.X = round(m_visuals.edgeWidth / 2);
+	screenCenter.Y = round(m_visuals.edgeHeight / 2);
 
 	//edgeShiftBuffer = { (0),(0) };
-	edgeShiftBuffer.X = (screenCenter.X - *playerX) / 2; 
+	edgeShiftBuffer.X = (screenCenter.X - *playerX) / 2;
 	edgeShiftBuffer.Y = (screenCenter.Y - *playerY) / 2;
-	
+
 	minCorner = { (0),(0) };
 	maxCorner.X = m_visuals.edgeWidth;
 	maxCorner.Y = m_visuals.edgeHeight;
-	edgesDrawn = false;
-	return anyWarnings;
 }
 
 char Level::GetSpaceAtPosition(int x, int y)
 {
 	return m_pLevelData[GetIndexFromCoordinates(x, y)];
 }
-bool Level::IsSpace(int x, int y)
-{
-	return m_pLevelData[GetIndexFromCoordinates(x, y)] == ' ';
-}
-bool Level::IsGoal(int x, int y)
-{
-	return m_pLevelData[GetIndexFromCoordinates(x, y)] == GOL;
-}
 
-void Level::ClearSpace(int x, int y, WorldActor* actorToDelete)
+void Level::ClearSpace(int x, int y, WorldActor* delActor)
 {
-	m_pLevelData[GetIndexFromCoordinates(x, y)] = ' ';
-	
-	if (actorToDelete != nullptr)
+	if (delActor != nullptr)
 	{
 		for (auto actor = m_pActors.begin(); actor != m_pActors.end(); ++actor)
 		{
 			WorldActor* refActor = (*actor);
-			if (refActor == actorToDelete)
+			if (refActor == delActor)
 			{
 				m_pActors.erase(actor);
 				break;
@@ -298,150 +295,48 @@ void Level::ClearLevel()
 
 void Level::Draw()
 {
-	//system("cls");
-	////////////START OF ENCAP EXPERIMENT
 	HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
-	COORD finalScreenPos = {};
 
-	int playX = Player::GetInstance()->m_WorldActor.m_drawPos.X;
-	int playY = Player::GetInstance()->m_WorldActor.m_drawPos.Y;
+	edgeHit = HandlePlayerEdgeHit();
 
-	COORD oldPlayPos = Player::GetInstance()->oldPlayerCoord;
+	if (edgeHit) { CleanUpScreen(); }
 
-	bool edgeHit;
-
-	if (playX <= 0)
-	{
-		//maxCorner.X += 1; 
-		//minCorner.X += 1; 
-		edgeShiftBuffer.X++;
-		edgeHit = true;
-	}
-	if (playY <= 0)
-	{
-		edgeShiftBuffer.Y++;
-		edgeHit = true;
-	}
-	if (playX >= m_visuals.edgeWidth-4)
-	{
-		edgeShiftBuffer.X--;
-		edgeHit = true;
-	}
-	if (playY >= m_visuals.edgeHeight)
-	{
-		edgeShiftBuffer.Y--;
-		edgeHit = true;
-	}
-
-
-
-	COORD oldActorPos = { (0),(0) };
+	//Updating actors in level and drawing those within screen bounds
 	for (auto actor = m_pActors.begin(); actor != m_pActors.end(); ++actor)
 	{
 		if ((*actor)->IsActive())
 		{
-			oldActorPos.X = (*actor)->GetXPosition();
-			oldActorPos.Y = (*actor)->GetYPosition();
-	
-			oldActorPos.X += edgeShiftBuffer.X;
-			oldActorPos.Y += edgeShiftBuffer.Y;
-	
+			if ((*actor)->GetType() == ActorType::Door) { (*actor)->Update(); }
+
+			COORD actorRelativeDrawPos = {};
+			actorRelativeDrawPos.X = (*actor)->GetXPosition() + edgeShiftBuffer.X;
+			actorRelativeDrawPos.Y = (*actor)->GetYPosition() + edgeShiftBuffer.Y;
 			(*actor)->ModDrawPos(edgeShiftBuffer);
+
 			bool isWithinScreenBounds = false;
-			if(oldActorPos.X > minCorner.X-1 && oldActorPos.Y > minCorner.Y-1)
+			if(actorRelativeDrawPos.X > minCorner.X-1 && actorRelativeDrawPos.Y > minCorner.Y-1)
 			{ 
-				if (oldActorPos.X < maxCorner.X-2 && oldActorPos.Y < maxCorner.Y+1)
+				if (actorRelativeDrawPos.X < maxCorner.X-2 && actorRelativeDrawPos.Y < maxCorner.Y+1)
 				{ isWithinScreenBounds = true; }
 			}
 
-			if (isWithinScreenBounds)
-			{
-				(*actor)->Draw();
-				//if ((*actor)->GetType() == ActorType::Door) { (*actor)->Update(); }
-			}
-	
+			if (isWithinScreenBounds) { (*actor)->Draw(); }
+
 		}
 	}
+
+	//Correct and draw player on screen
 	Player::GetInstance()->m_WorldActor.ModDrawPos(edgeShiftBuffer);
 	Player::GetInstance()->m_WorldActor.Draw();
 
-	do {
+	//Draw frame and HUD
+	if(!edgesDrawn){
 		m_visuals.DrawFrame();
 		m_visuals.DrawMazeControls();
 		m_visuals.ResetCursor({ (0),(0) }, true);
-		edgeHit = false;
-	} while (edgeHit == true);
-
-	////////////END OF ENCAP EXPERIMENT
-
-
-	//if (m_pLevelData)
-	//{
-	//	HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
-	//	m_visuals.ResetTextColor();
-	//	m_visuals.ResetCursor(); /*required for correct map placement*/
-	//	if (!m_levelDrawn)
-	//	{
-	//		m_visuals.DrawTop();
-	//		for (int y = 0; y < m_height; ++y)
-	//		{
-	//			m_visuals.DrawLeft(y);
-	//			for (int x = 0; x < m_width; ++x)
-	//			{
-	//				int indexToPrint = GetIndexFromCoordinates(x, y);
-	//				cout << m_pLevelData[indexToPrint];
-	//			}
-	//			m_visuals.DrawRight(y);
-	//		}
-	//		m_visuals.DrawBottom();
-	//		m_visuals.DrawMazeControls();
-
-
-	//		COORD actorCursorPosition = {(0),(0)};
-	//	for (auto actor = m_pActors.begin(); actor != m_pActors.end(); ++actor)
-	//	{
-	//		if ((*actor)->IsActive())
-	//		{
-	//			actorCursorPosition.X = (*actor)->GetXPosition();
-	//			actorCursorPosition.Y = (*actor)->GetYPosition();
-	//			SetConsoleCursorPosition(console, actorCursorPosition);
-	//			(*actor)->Draw();
-	//			if ((*actor)->GetType() == ActorType::Door)
-	//			{
-	//				(*actor)->Update();
-	//			}
-	//		
-	//		}
-	//	}
-	//	m_levelDrawn = true;
-	//	}
-	//	Player::GetInstance()->m_WorldActor.Draw();
-	//}
-}
-
-WorldActor* Level::UpdateActors(int x, int y)
-{
-	WorldActor* collidedActor = nullptr;
-
-	for (auto actor = m_pActors.begin(); actor != m_pActors.end(); ++actor)
-	{
-		if ((*actor)->IsActive())
-		{
-			//updates all actors
-			(*actor)->Update(); 
-			if ((*actor)->GetXPositionPointer() != nullptr && (*actor)->GetYPositionPointer() != nullptr)
-			{
-				if (x == (*actor)->GetXPosition() && y == (*actor)->GetYPosition())
-				{
-					//only collide with one actor
-					assert(collidedActor == nullptr);
-					collidedActor = (*actor);
-				}
-			}
-		}
-		else { delete (*actor); }
+		edgesDrawn = true;
 	}
-	return collidedActor;
+	
 }
 
 WorldActor* Level::GetActorAtPos(int x, int y)
@@ -467,6 +362,57 @@ int Level::GetIndexFromCoordinates(int x, int y)
 
 void Level::SetDrawnState(bool isDrawn) 
 {
+	if(!isDrawn)
+	for (int y = minCorner.Y; y < maxCorner.Y + 1; ++y)
+	{
+		for (int x = minCorner.X; x < maxCorner.X - 2; ++x)
+		{
+			m_visuals.DrawAtSpace(x, y, ' ');
+		}
+	}
 	m_levelDrawn = isDrawn; 
 	edgesDrawn = isDrawn;
 };
+
+void Level::CleanUpScreen()
+{
+	for (int y = minCorner.Y; y < maxCorner.Y + 1; ++y)
+	{
+		for (int x = minCorner.X; x < maxCorner.X - 2; ++x)
+		{
+			m_visuals.DrawAtSpace(x, y, ' ');
+		}
+	}
+}
+
+bool Level::HandlePlayerEdgeHit()
+{
+	int playX = Player::GetInstance()->m_WorldActor.m_drawPos.X;
+	int playY = Player::GetInstance()->m_WorldActor.m_drawPos.Y;
+
+	if (playX <= 0)
+	{
+		edgeShiftBuffer.X++;
+		return true;
+	}
+	else if (playY <= 0)
+	{
+		edgeShiftBuffer.Y++;
+		return true;
+	}
+	else if (playX >= m_visuals.edgeWidth - 4)
+	{
+		edgeShiftBuffer.X--;
+		return true;
+	}
+	else if (playY >= m_visuals.edgeHeight)
+	{
+		edgeShiftBuffer.Y--;
+		return true;
+	}
+	else 
+	{ 
+		return false; 
+	}
+
+}

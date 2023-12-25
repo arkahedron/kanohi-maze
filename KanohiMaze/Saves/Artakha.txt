@@ -1,7 +1,7 @@
 Artakha
-9:Epic:Ore:None
-16:Ancient:Ore:None
-90:None:Key:None
-20:Decent:Ore:None
-4:Great:Ore:None
-5:Scrap:Ore:None
+11:Epic:Ore:None
+17:Ancient:Ore:None
+99:None:Key:None
+44:Decent:Ore:None
+20:Great:Ore:None
+22:Scrap:Ore:None
